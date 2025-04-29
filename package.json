@@ -1,0 +1,17 @@
+{
+  "name": "@iizuka/codablecashlib",
+  "version": "0.0.1",
+  "description": "Codablecash Javascript Library.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "prepare": "npm run build",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Tomohiro Iizuka",
+  "license": "MIT",
+  "dependencies": {
+    "typescript": "^5.8.3"
+  }
+}
