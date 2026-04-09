@@ -8,6 +8,10 @@ export class BigInteger {
 
     }
 
+    public getValue() : bigint {
+        return this.value;
+    }
+
     public add(val : BigInteger) : BigInteger {
         let ans : bigint = this.value + val.value;
         return new BigInteger(ans);
