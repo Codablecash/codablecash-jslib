@@ -1,3 +1,4 @@
+import { ByteBuffer } from "../base_io/ByteBuffer";
 
 
 export class BigInteger {
@@ -5,6 +6,10 @@ export class BigInteger {
 
     constructor(val : bigint){
         this.value = BigInt(val);
+    }
+
+    public copy(){
+        return new BigInteger(this.value);
     }
 
     public getValue() : bigint {
@@ -87,4 +92,36 @@ export class BigInteger {
     public equals(x : BigInteger) : boolean {
         return this.compareTo(x) === 0;
     }
+
+    public static ramdom() : BigInteger {
+        const max = 10000000000000000n;
+        const randomBigInt = BigInt(Math.floor(Math.random() * Number(max)));
+        return new BigInteger(randomBigInt);
+    }
+
+    public binarySize() : number {
+        const hexString = this.value.toString(16);
+        const buffer = Buffer.from(hexString.padStart(hexString.length + (hexString.length % 2), '0'), 'hex');
+
+        let length : number = buffer.byteLength;
+
+        return length;
+    }
+
+    public toBinary() : ByteBuffer {
+        const hexString = this.value.toString(16);
+        const buffer = Buffer.from(hexString.padStart(hexString.length + (hexString.length % 2), '0'), 'hex');
+
+        let length : number = buffer.byteLength;
+
+        let bytes = new ByteBuffer(length);
+        bytes.putBuffer(buffer);
+
+        return bytes;
+    }
+
+    public static fromBinary(indata : ByteBuffer) {
+        return indata.toBigInteger();
+    }
+
 }

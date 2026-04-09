@@ -12,6 +12,7 @@
   "author": "Tomohiro Iizuka",
   "license": "MIT",
   "dependencies": {
+    "bigint-buffer": "^1.1.5",
     "typescript": "^5.9.3"
   },
   "devDependencies": {

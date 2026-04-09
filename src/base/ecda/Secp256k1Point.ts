@@ -1,3 +1,4 @@
+import { ByteBuffer } from "../../db/base_io/ByteBuffer";
 import { BigInteger } from "../../db/numeric/BigInteger";
 
 
@@ -102,5 +103,9 @@ export class Secp256k1Point {
 
     public isO() : boolean {
         return this.x.equals(Secp256k1Point.Zero) && this.y.equals(Secp256k1Point.Zero);
+    }
+
+    public to65Bytes() : ByteBuffer {
+        let buffx = this.x.toBinary();
     }
 }
