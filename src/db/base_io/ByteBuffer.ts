@@ -1,3 +1,4 @@
+import { BufferOverflowException } from "./BufferOverflowException";
 
 const { Buffer } = require('node:buffer');
 
@@ -19,7 +20,7 @@ export class ByteBuffer {
 
     public put(data : number) : ByteBuffer {
         if(this.remaining() < 1){
-            
+            throw new BufferOverflowException("put(data : number)");
         }
 
         this.data.writeInt8(data, this.pos);
