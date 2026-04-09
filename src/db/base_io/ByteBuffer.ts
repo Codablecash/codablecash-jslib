@@ -28,6 +28,20 @@ export class ByteBuffer {
         return this;
     }
 
+    public get() : number {
+        if(this.remaining() < 1){
+            throw new BufferOverflowException("put(data : number)");
+        }
+
+        return this.data.readInt8(this.pos++);
+    }
+    public geti(index : number) : number {
+        if(index + 1 > this.lim){
+            throw new BufferOverflowException("get()");
+        }
+
+        return this.data.readInt8(index);
+    }
     public remaining() : number {
         return this.lim - this.pos;
     }
