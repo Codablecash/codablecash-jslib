@@ -5,7 +5,6 @@ export class BigInteger {
 
     constructor(val : bigint){
         this.value = BigInt(val);
-
     }
 
     public getValue() : bigint {
