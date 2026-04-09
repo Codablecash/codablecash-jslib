@@ -1,4 +1,5 @@
+import { Exception } from "../base/Exception";
 
-class BufferOverflowException {
+class BufferOverflowException extends Exception {
     
 }
