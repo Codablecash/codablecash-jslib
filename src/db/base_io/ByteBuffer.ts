@@ -18,19 +18,9 @@ export class ByteBuffer {
         this.pos = 0;
     }
 
-    public put(data : number) : ByteBuffer {
-        if(this.remaining() < 1){
-            throw new BufferOverflowException("put(data : number)");
-        }
-
-        this.data.writeInt8(data, this.pos);
-        this.pos++;
-        return this;
-    }
-
     public get() : number {
         if(this.remaining() < 1){
-            throw new BufferOverflowException("put(data : number)");
+            throw new BufferOverflowException("get()");
         }
 
         return this.data.readInt8(this.pos++);
@@ -41,6 +31,61 @@ export class ByteBuffer {
         }
 
         return this.data.readInt8(index);
+    }
+    public getShort() : number {
+       if(this.remaining() < 2){
+            throw new BufferOverflowException("getShort()");
+        }
+
+        return this.data.readInt16BE(this.pos++);
+    }
+    public getInt() : number {
+       if(this.remaining() < 4){
+            throw new BufferOverflowException("getInt()");
+        }
+
+        return this.data.readInt32BE(this.pos++);
+    }
+    public getLong() : bigint {
+       if(this.remaining() < 4){
+            throw new BufferOverflowException("getInt()");
+        }
+
+        return this.data.readBigInt64BE(this.pos++);
+    }
+
+    public put(data : number) : ByteBuffer {
+        if(this.remaining() < 1){
+            throw new BufferOverflowException("put(data : number)");
+        }
+
+        this.data.writeInt8(data, this.pos);
+        this.pos++;
+        return this;
+    }
+    public putShort(data : number) : ByteBuffer {
+        if(this.remaining() < 1){
+            throw new BufferOverflowException("put(data : number)");
+        }
+
+        this.data.writeInt16BE(data, this.pos);
+        this.pos++;
+        return this;
+    }
+    public putInt(data : number) : ByteBuffer {
+        if(this.remaining() < 4){
+            throw new BufferOverflowException("put(data : number)");
+        }
+
+        this.data.writeInt32BE(data, this.pos++);
+        return this;
+    }
+    public putLong(data : bigint) : bigiByteBuffernt {
+        if(this.remaining() < 8){
+            throw new BufferOverflowException("putLong(data : number)");
+        }
+
+        this.data.writeBigInt64BE(data, this.pos++);
     }
     public remaining() : number {
         return this.lim - this.pos;
