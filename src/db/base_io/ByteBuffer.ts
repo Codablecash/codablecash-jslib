@@ -80,12 +80,13 @@ export class ByteBuffer {
         this.data.writeInt32BE(data, this.pos++);
         return this;
     }
-    public putLong(data : bigint) : bigiByteBuffernt {
+    public putLong(data : bigint) : ByteBuffer {
         if(this.remaining() < 8){
             throw new BufferOverflowException("putLong(data : number)");
         }
 
         this.data.writeBigInt64BE(data, this.pos++);
+        return this;
     }
     public remaining() : number {
         return this.lim - this.pos;
