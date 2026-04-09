@@ -15,6 +15,14 @@ export class BigInteger {
         let ans : bigint = this.value + val.value;
         return new BigInteger(ans);
     }
+    public subtract(val : BigInteger) : BigInteger {
+        let ans : bigint = this.value - val.value;
+        return new BigInteger(ans);
+    }
+    public multiply(val : BigInteger) {
+       let ans : bigint = this.value * val.value;
+        return new BigInteger(ans);
+    }
     public divide(val : BigInteger) : BigInteger {
         let ans : bigint = this.value / val.value;
         return new BigInteger(ans);
@@ -70,5 +78,13 @@ export class BigInteger {
         if (a !== 1n) throw new Error("Modular inverse does not exist");
 
         return new BigInteger(x);
+    }
+
+    public compareTo(x : BigInteger) : number {
+        return this.value === x.value ? 0 : (this.value > x.value ? 1 : -1);
+    }
+
+    public equals(x : BigInteger) : boolean {
+        return this.compareTo(x) === 0;
     }
 }
