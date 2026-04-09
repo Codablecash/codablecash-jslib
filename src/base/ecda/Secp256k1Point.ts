@@ -19,9 +19,20 @@ export class Secp256k1Point {
     protected x : BigInteger;
     protected y : BigInteger;
 
+    public getX() : BigInteger {
+        return this.x;
+    }
+    public getY() : BigInteger {
+        return this.y;
+    }
+
     constructor(x : BigInteger, y : BigInteger){
         this.x = new BigInteger(x.getValue());
         this.y = new BigInteger(y.getValue());
+    }
+
+    static getBasePoint() : Secp256k1Point {
+        return new Secp256k1Point(Secp256k1Point.gX, Secp256k1Point.gY);
     }
 
     public multiple(value : BigInteger) : Secp256k1Point {
