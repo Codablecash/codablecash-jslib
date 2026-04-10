@@ -7,11 +7,21 @@
   "scripts": {
     "build": "tsc",
     "prepare": "npm run build",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "author": "Tomohiro Iizuka",
   "license": "MIT",
   "dependencies": {
-    "typescript": "^5.8.3"
+    "big-integer": "^1.6.52",
+    "bigint-buffer": "^1.1.5",
+    "typescript": "^5.9.3"
+  },
+  "devDependencies": {
+    "@types/big-integer": "^0.0.30",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^25.5.2",
+    "eslint-plugin-jest": "^29.15.1",
+    "jest": "^30.3.0",
+    "ts-jest": "^29.4.9"
   }
 }
