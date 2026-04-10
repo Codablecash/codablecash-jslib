@@ -124,4 +124,16 @@ export class Secp256k1Point {
 
         return ret;
     }
+
+    public static from65Bytes(buff : ByteBuffer) : Secp256k1Point {
+        buff.get(); // skip 0x04
+
+        let datax = buff.getByteBuffer(32);
+        let datay = buff.getByteBuffer(32);
+
+        let xptr = datax.toBigInteger();
+        let yptr = datay.toBigInteger();
+
+        return new Secp256k1Point(xptr, yptr);
+    }
 }

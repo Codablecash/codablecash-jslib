@@ -35,6 +35,22 @@ export class ByteBuffer {
 
         return this.data.readInt8(this.pos++);
     }
+    public getByteBuffer(length : number) {
+        if(this.remaining() < length){
+            throw new BufferOverflowException("getByteBuffer()");
+        }
+
+        let buff = Buffer.allocate(length);
+
+        this.data.copy(buff, 0, this.pos, this.pos + length);
+        this.pos += 8;
+
+        let ret = new ByteBuffer(8);
+        ret.putBuffer(buff);
+        ret.position(0);
+
+        return ret;
+    }
     public geti(index : number) : number {
         if(index + 1 > this.lim){
             throw new BufferOverflowException("get()");
@@ -68,6 +84,7 @@ export class ByteBuffer {
         let ret = new BigInteger(val);
         return ret;
     }
+
 
     public put(data : number) : ByteBuffer {
         if(this.remaining() < 1){
