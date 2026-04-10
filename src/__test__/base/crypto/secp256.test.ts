@@ -61,7 +61,15 @@ describe('Secp256k1Point test', () => {
   })
 
   it('zero', () => {
+    let pt = new Secp256k1Point();
 
+    var add0 = pt.add(pt.multiple(new BigInteger(0n)));
+    let bl = add0.equals(pt);
+    expect(bl).toBe(true);
+
+    let add02 = pt.add(pt.multiple(new BigInteger((0n))));
+    bl = add02.equals(pt);
+    expect(bl).toBe(true);
   })
 
 
