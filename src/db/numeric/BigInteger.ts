@@ -4,73 +4,86 @@ import bigInt from "big-integer";
 
 
 export class BigInteger {
-    private value : bigint;
+    private value : bigInt.BigInteger;
 
-    constructor(val : bigint){
-        this.value = BigInt(val);
-         const hexString = this.value.toString(16);
+    constructor(val : string);
+    constructor(val : bigint);
+    constructor(val : bigInt.BigInteger);
+    constructor(val : any){
+         this.value = bigInt(val);
     }
 
     public copy(){
-        return new BigInteger(this.value);
+        const hexString = this.value.toString(10);
+
+        return new BigInteger(hexString);
     }
 
     public getValue() : bigint {
-        return this.value;
+        const hexString = this.value.toString(10);
+
+        return BigInt(hexString);
     }
 
     public add(val : BigInteger) : BigInteger {
-        let ans : bigint = this.value + val.value;
+        let ans = this.value.add(val.value);
         return new BigInteger(ans);
     }
     public subtract(val : BigInteger) : BigInteger {
-        let ans : bigint = this.value - val.value;
+        let ans = this.value.subtract(val.value);
         return new BigInteger(ans);
     }
     public multiply(val : BigInteger) {
-       let ans : bigint = this.value * val.value;
+        let ans = this.value.multiply(val.value);
         return new BigInteger(ans);
     }
     public divide(val : BigInteger) : BigInteger {
-        let ans : bigint = this.value / val.value;
+        let ans = this.value.divide(val.value);
         return new BigInteger(ans);
     }
     public pow(exp : bigint) : BigInteger {
-        let ans = this.value ** exp;
+        let bexp = bigInt(exp);
+        let ans = this.value.pow(bexp);
         return new BigInteger(ans);
     }
     public modPow(exponent : BigInteger, mod : BigInteger) : BigInteger {
-        if (mod.value === 1n){
-            return new BigInteger(0n);
-        }
-        let res = 1n;
-        let base = this.value % mod.value;
-        let exp = exponent.value;
-
-        while (exp > 0n) {
-            if (exp % 2n === 1n){
-                res = (res * base) % mod.value;
-            }
-            base = (base * base) % mod.value;
-            exp = exp / 2n;
-        }
-        return new BigInteger(res);
+        let ans = this.value.modPow(exponent.value, mod.value);
+        return new BigInteger(ans);
     }
     public mod(mod : BigInteger) : BigInteger {
-         let res = this.value % mod.value;
-         return new BigInteger(res);
+        let res = this.value.mod(mod.value);
+        if(res.isNegative()){
+            res = res.add(mod.value);
+        }
+
+        return new BigInteger(res);
     }
     public modInverse(val : BigInteger) : BigInteger {
-        let ans = bigInt(this.value).modInv(val.getValue());
-
-        let str = ans.toString(10);
-        const bigIntAgain: bigint = BigInt(str);
-
-        return new BigInteger(bigIntAgain);
+        let ans = this.value.modInv(val.value);
+        return new BigInteger(ans);
     }
 
+    private doModInverse(a: bigint, m: bigint): bigint {
+        let [old_r, r] = [a, m];
+        let [old_s, s] = [1n, 0n];
+
+    while (r !== 0n) {
+        const quotient = old_r / r;
+        [old_r, r] = [r, old_r - quotient * r];
+        [old_s, s] = [s, old_s - quotient * s];
+    }
+
+    if (old_r !== 1n) {
+        throw new Error("Modular inverse does not exist (numbers are not coprime)");
+    }
+
+    // Ensure result is positive
+    return ((old_s % m) + m) % m;
+}
+
+
     public compareTo(x : BigInteger) : number {
-        return this.value === x.value ? 0 : (this.value > x.value ? 1 : -1);
+        return this.value.compareTo(x.value);
     }
 
     public equals(x : BigInteger) : boolean {

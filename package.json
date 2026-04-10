@@ -12,10 +12,12 @@
   "author": "Tomohiro Iizuka",
   "license": "MIT",
   "dependencies": {
+    "big-integer": "^1.6.52",
     "bigint-buffer": "^1.1.5",
     "typescript": "^5.9.3"
   },
   "devDependencies": {
+    "@types/big-integer": "^0.0.30",
     "@types/jest": "^30.0.0",
     "@types/node": "^25.5.2",
     "eslint-plugin-jest": "^29.15.1",

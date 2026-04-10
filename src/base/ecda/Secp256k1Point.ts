@@ -3,19 +3,19 @@ import { BigInteger } from "../../db/numeric/BigInteger";
 
 
 export class Secp256k1Point {
-    public static p = new BigInteger(0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2Fn);
-    public static a = new BigInteger(0x0n);
-    public static b = new BigInteger(0x7n);
+    public static readonly p = new BigInteger(0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2Fn);
+    public static readonly a = new BigInteger(0n);
+    public static readonly b = new BigInteger(7n);
 
-    public static gX = new BigInteger(0x79BE667EF9DCBBAC55A06295CE870B07029BFCDB2DCE28D959F2815B16F81798n);
-    public static gY = new BigInteger(0x483ADA7726A3C4655DA4FBFC0E1108A8FD17B448A68554199C47D08FFB10D4B8n);
+    public static readonly gX = new BigInteger(0x79BE667EF9DCBBAC55A06295CE870B07029BFCDB2DCE28D959F2815B16F81798n);
+    public static readonly gY = new BigInteger(0x483ADA7726A3C4655DA4FBFC0E1108A8FD17B448A68554199C47D08FFB10D4B8n);
 
-    public static n = new BigInteger(0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141n); 
+    public static readonly n = new BigInteger(0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141n); 
 
-    public static Zero = new BigInteger(0x0n);
-    public static One = new BigInteger(0x1n);
-    public static Two = new BigInteger(0x2n);
-    public static Three = new BigInteger(0x3n);
+    public static readonly Zero = new BigInteger(0n);
+    public static readonly One = new BigInteger(1n);
+    public static readonly Two = new BigInteger(2n);
+    public static readonly Three = new BigInteger(3n);
 
     protected x : BigInteger;
     protected y : BigInteger;
