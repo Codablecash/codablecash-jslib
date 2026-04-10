@@ -36,4 +36,33 @@ describe('Secp256k1Point test', () => {
     let bl = pt4.equals(ptadd4);
     expect(bl).toBe(true);
   })
+
+  it('mulMinus', () => {
+    let pt = new Secp256k1Point();
+    let pa = pt.multiple(new BigInteger(-1n))
+    let pb = pt.multiple(new BigInteger(2n));
+
+    let ans = pa.add(pb);
+
+    let pt4 = pt;
+
+    let bl = pt4.equals(ans);
+    expect(bl).toBe(true);
+  })
+
+  it('addInversePoint', () => {
+    let pt = new Secp256k1Point();
+    let pt2 = new Secp256k1Point(Secp256k1Point.gX, Secp256k1Point.gY.negate());
+
+    let ans = pt.add(pt2);
+
+    let bl = ans.isO();
+    expect(bl).toBe(true);
+  })
+
+  it('zero', () => {
+
+  })
+
+
 })

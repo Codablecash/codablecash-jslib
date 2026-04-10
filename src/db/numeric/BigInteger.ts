@@ -63,24 +63,10 @@ export class BigInteger {
         return new BigInteger(ans);
     }
 
-    private doModInverse(a: bigint, m: bigint): bigint {
-        let [old_r, r] = [a, m];
-        let [old_s, s] = [1n, 0n];
-
-    while (r !== 0n) {
-        const quotient = old_r / r;
-        [old_r, r] = [r, old_r - quotient * r];
-        [old_s, s] = [s, old_s - quotient * s];
+    public negate() : BigInteger {
+        let neg : bigInt.BigInteger = this.value.negate();
+        return new BigInteger(neg);
     }
-
-    if (old_r !== 1n) {
-        throw new Error("Modular inverse does not exist (numbers are not coprime)");
-    }
-
-    // Ensure result is positive
-    return ((old_s % m) + m) % m;
-}
-
 
     public compareTo(x : BigInteger) : number {
         return this.value.compareTo(x.value);
