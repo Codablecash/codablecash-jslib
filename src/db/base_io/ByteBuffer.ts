@@ -14,7 +14,7 @@ export class ByteBuffer {
     protected data : Buffer;
     
     constructor(length : number){
-        this.data =  Buffer.allocate(length);
+        this.data =  Buffer.alloc(length, 0);
         this.cap = length;
         this.lim = length;
         this.pos = 0;
@@ -101,7 +101,7 @@ export class ByteBuffer {
             throw new BufferOverflowException("putBuffer(data : Buffer)");
         }
 
-        this.data.copy(data, this.pos);
+        data.copy(this.data, this.pos, 0 , dataLength);
         this.pos += dataLength;
 
         return this;

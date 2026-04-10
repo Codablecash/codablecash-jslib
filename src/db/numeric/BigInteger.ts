@@ -1,3 +1,4 @@
+import { toBufferBE } from "bigint-buffer";
 import { ByteBuffer } from "../base_io/ByteBuffer";
 
 
@@ -6,6 +7,7 @@ export class BigInteger {
 
     constructor(val : bigint){
         this.value = BigInt(val);
+         const hexString = this.value.toString(16);
     }
 
     public copy(){
@@ -110,6 +112,7 @@ export class BigInteger {
 
     public toBinary() : ByteBuffer {
         const hexString = this.value.toString(16);
+
         const buffer = Buffer.from(hexString.padStart(hexString.length + (hexString.length % 2), '0'), 'hex');
 
         let length : number = buffer.byteLength;
