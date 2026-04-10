@@ -13,5 +13,16 @@ describe('Secp256k1Point test', () => {
     let bl = left.equals(right);
     expect(bl).toBe(true);
   })
+
+  it('checkBasePoint', () => {
+    let pt = new Secp256k1Point();
+    let Opt = new Secp256k1Point(Secp256k1Point.Zero, Secp256k1Point.Zero);
+
+    let L = Secp256k1Point.n;
+    let mul = pt.multiple(L);
+
+    let bl = Opt.equals(mul);
+    expect(bl).toBe(true);
+  })
  
 })

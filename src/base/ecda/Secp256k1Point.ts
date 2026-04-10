@@ -27,7 +27,7 @@ export class Secp256k1Point {
         return this.y;
     }
 
-    constructor(x : BigInteger, y : BigInteger){
+    constructor(x =  Secp256k1Point.gX, y =  Secp256k1Point.gY){
         this.x = new BigInteger(x.getValue());
         this.y = new BigInteger(y.getValue());
     }

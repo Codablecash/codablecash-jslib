@@ -1,5 +1,6 @@
 import { toBufferBE } from "bigint-buffer";
 import { ByteBuffer } from "../base_io/ByteBuffer";
+import bigInt from "big-integer";
 
 
 export class BigInteger {
@@ -60,31 +61,12 @@ export class BigInteger {
          return new BigInteger(res);
     }
     public modInverse(val : BigInteger) : BigInteger {
-        if (val.value === 1n) return new BigInteger(0n);
+        let ans = bigInt(this.value).modInv(val.getValue());
 
-        let m = val.value;
-        let m0 = m;
-        let y = 0n, x = 1n;
-        let a = this.value;
+        let str = ans.toString(10);
+        const bigIntAgain: bigint = BigInt(str);
 
-        while (a > 1n) {
-             if (m === 0n) throw new Error("Division by zero");
-             let q = a / m;
-             let t = m;
-
-             m = a % m;
-             a = t;
-             t = y
-
-             y = x - q * y;
-             x = t;
-        }
-
-        if(x < 0n){x += m0;}
-
-        if (a !== 1n) throw new Error("Modular inverse does not exist");
-
-        return new BigInteger(x);
+        return new BigInteger(bigIntAgain);
     }
 
     public compareTo(x : BigInteger) : number {
