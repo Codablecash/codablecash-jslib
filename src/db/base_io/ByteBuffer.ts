@@ -20,6 +20,14 @@ export class ByteBuffer {
         this.pos = 0;
     }
 
+    public position(i : number) : void {
+        this.pos = i;
+    }
+
+    public limit() : number {
+        return this.lim;
+    }
+
     public get() : number {
         if(this.remaining() < 1){
             throw new BufferOverflowException("get()");
@@ -79,6 +87,10 @@ export class ByteBuffer {
         this.data.copy(data, this.pos);
         this.pos += dataLength;
 
+        return this;
+    }
+    public putByteBuffer(data : ByteBuffer) : ByteBuffer {
+        this.putBuffer(data.data);
         return this;
     }
 

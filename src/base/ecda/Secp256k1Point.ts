@@ -107,5 +107,21 @@ export class Secp256k1Point {
 
     public to65Bytes() : ByteBuffer {
         let buffx = this.x.toBinary();
+        let buffy = this.y.toBinary();
+
+        let buffxp = BigInteger.padBuffer(buffx, 32);
+        let buffyp = BigInteger.padBuffer(buffy, 32);
+
+        buffxp.position(0);
+        buffyp.position(0);
+
+        let size : number = 1 + buffxp.limit() + buffyp.limit();
+
+        let ret = new ByteBuffer(size);
+        ret.put(0x04);
+        ret.putByteBuffer(buffxp);
+        ret.putByteBuffer(buffyp);
+
+        return ret;
     }
 }

@@ -123,5 +123,20 @@ export class BigInteger {
     public static fromBinary(indata : ByteBuffer) {
         return indata.toBigInteger();
     }
+    public static padBuffer(bin : ByteBuffer, size : number) : ByteBuffer {
+        bin.position(0);
+        let len = bin.limit();
+
+        let pad : number = size - len;
+        let buff = new ByteBuffer(size);
+
+        for(let i = 0; i != pad; ++i){
+            buff.put(0);
+        }
+
+        buff.putByteBuffer(bin);
+
+        return buff;
+    }
 
 }
