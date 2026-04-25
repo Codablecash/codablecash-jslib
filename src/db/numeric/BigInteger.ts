@@ -81,10 +81,28 @@ export class BigInteger {
         return this.compareTo(x) === 0;
     }
 
-    public static ramdom() : BigInteger {
-        const max = 10000000000000000n;
-        const randomBigInt = BigInt(Math.floor(Math.random() * Number(max)));
-        return new BigInteger(randomBigInt);
+    public static ramdom(min = new BigInteger(0n), max = new BigInteger(100000000000000000n)) : BigInteger {
+        const range = max.getValue() - min.getValue() + 1n;
+        const bits = range.toString(2).length;
+        let randomValue: bigint;
+
+        do {
+            randomValue = BigInteger.getRandomBigInt(bits);
+        } while (randomValue >= range);
+
+        return new BigInteger(min.getValue() + randomValue);
+    }
+
+    public static getRandomBigInt(bits: number) : bigint {
+        const bytes = Math.ceil(bits / 8);
+        const buffer = new Uint8Array(bytes);
+        crypto.getRandomValues(buffer);
+
+         let result = 0n;
+         for (let i = 0; i < bytes; i++) {
+            result = (result << 8n) | BigInt(buffer[i]);
+         }
+         return result & ((1n << BigInt(bits)) - 1n);
     }
 
     public binarySize() : number {
