@@ -1,6 +1,7 @@
 import { BigInteger } from "../../db/numeric/BigInteger";
 import { Secp256k1Point } from "../ecda/Secp256k1Point";
 import { IMuSigSigner } from "./IMuSigSigner";
+import { MuSigHashBuilder } from "./MuSigHashBuilder";
 
 
 export class SimpleMuSigSigner implements IMuSigSigner {
@@ -30,10 +31,17 @@ export class SimpleMuSigSigner implements IMuSigSigner {
 
         let HLXi : BigInteger;
         {
-            // FIXME
+            let hashBuilder = new MuSigHashBuilder();
+            hashBuilder.addBigInteger(L);
+            hashBuilder.add(Xi);
+            hashBuilder.buildHash();
+            
+            HLXi = hashBuilder.getResultAsBigInteger();
         }
 
+        let v2 = HXRm.multiply(HLXi).multiply(this.x);
+        let ret = this.r.add(v2);
 
-        return new BigInteger(0n); // FIXME
+        return ret;
     }
 }

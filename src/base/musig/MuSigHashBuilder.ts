@@ -28,6 +28,12 @@ export class MuSigHashBuilder {
     }
 
     public buildHash() {
-        
+
+    }
+
+    public getResultAsBigInteger() : BigInteger {
+        // FIXME
+
+        return new BigInteger(0n);
     }
 }
