@@ -25,6 +25,11 @@ export class BigInteger {
         return BigInt(hexString);
     }
 
+    public toString(radix = 10) : string {
+        const val : bigint = this.getValue();
+        return val.toString(radix);
+    }
+
     public add(val : BigInteger) : BigInteger {
         let ans = this.value.add(val.value);
         return new BigInteger(ans);
