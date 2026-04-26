@@ -37,6 +37,17 @@ export class MuSigHashBuilder {
 
     }
 
+    private binarySize() : number {
+        let total = 0;
+
+        const maxLoop = this.list.size();
+        for(let i = 0; i != maxLoop; ++i){
+            let b  = this.list.get(i);
+            total += b.limit();
+        }
+        return total;
+    }
+
     public getResultAsBigInteger() : BigInteger {
         // FIXME
 
