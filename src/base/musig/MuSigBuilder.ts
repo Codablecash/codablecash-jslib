@@ -22,4 +22,10 @@ export class MuSigBuilder {
         this.signers = new ArrayList<IMuSigSigner>();
         this.XiList = new ArrayList<Secp256k1Point>();
     }
+
+    public addSigner(signer : IMuSigSigner) : void {
+        this.signers.addElement(signer);
+    }
+
+    
 }
