@@ -4,6 +4,9 @@ import bigInt from "big-integer";
 
 
 export class BigInteger {
+    public static readonly ZERO : BigInteger = new BigInteger(0n);
+    public static readonly TWO : BigInteger = new BigInteger(2n);
+
     private value : bigInt.BigInteger;
 
     constructor(val : string);
