@@ -3,6 +3,8 @@ import { ByteBuffer } from "../../db/base_io/ByteBuffer";
 import { BigInteger } from "../../db/numeric/BigInteger";
 import { Secp256k1Point } from "../ecda/Secp256k1Point";
 
+import sha256 from "fast-sha256";
+
 export class MuSigHashBuilder {
     private list : ArrayList<ByteBuffer>;
     private sha256 : number[];
@@ -34,7 +36,18 @@ export class MuSigHashBuilder {
     } 
 
     public buildHash() {
+        let binsize = this.binarySize();
+        let buff = ByteBuffer.allocateWithEndian(binsize, true);
 
+        let maxLoop = this.list.size();
+        for(let i = 0; i != maxLoop; ++i){
+            let b  = this.list.get(i);
+            buff.putByteBuffer(b);
+        }
+
+        let data = buff.toUint8Array();
+
+        // sha256(data);
     }
 
     private binarySize() : number {

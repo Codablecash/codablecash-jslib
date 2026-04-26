@@ -30,6 +30,22 @@ export class ByteBuffer {
         return inst;
     }
 
+    public static allocateWithEndian(capacity : number, bigEndian : boolean) : ByteBuffer {
+        let inst = new ByteBuffer(capacity);
+         return inst;
+    }
+
+    public toUint8Array() : Uint8Array {
+        let ar = new Uint8Array(this.cap);
+
+        for(let i = 0; i != this.cap; ++i){
+            let val = this.geti(i);
+            ar[i] = val;
+        }
+        
+        return ar;
+    }
+
     public position(i : number) : void {
         this.pos = i;
     }
@@ -45,6 +61,7 @@ export class ByteBuffer {
 
         return this.data.readInt8(this.pos++);
     }
+
     public getByteBuffer(length : number) {
         if(this.remaining() < length){
             throw new BufferOverflowException("getByteBuffer()");
