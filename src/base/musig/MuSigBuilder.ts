@@ -63,12 +63,28 @@ export class MuSigBuilder {
         this.L = hashBuilder.getResultAsBigInteger();
     }
 
+    // Call X the sum of all H(L,Xi)Xi
     public calcX() : void {
+        let result = new Secp256k1Point(Secp256k1Point.Zero, Secp256k1Point.Zero);
 
+        let maxLoop = this.XiList.size();
+        for(let i = 0; i != maxLoop; ++i){
+            let Xi = this.XiList.get(i);
+
+            const hashBuilder = new MuSigHashBuilder();
+            hashBuilder.addBigInteger(this.L);
+            hashBuilder.add(Xi);
+            hashBuilder.buildHash();
+
+            let hash = hashBuilder.getResultAsBigInteger();
+            let value = Xi.multiple(hash);
+
+            result = result.add(value);
+        }
     }
 
     public calcR() : void {
-
+        
     }
 
     public calcs(data : Uint8Array, length : number) : void {
