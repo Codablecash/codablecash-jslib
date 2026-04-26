@@ -20,7 +20,10 @@ export class MuSigHashBuilder {
     }
 
     public addBigInteger(bi : BigInteger) : void {
+        const buff = bi.toBinary();
+        buff.position(0);
 
+        this.list.addElement(buff);
     }
 
     public addArray(data : number[], length : number) {
