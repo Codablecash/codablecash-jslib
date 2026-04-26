@@ -70,9 +70,9 @@ export class ByteBuffer {
         let buff = Buffer.allocate(length);
 
         this.data.copy(buff, 0, this.pos, this.pos + length);
-        this.pos += 8;
+        this.pos += length;
 
-        let ret = new ByteBuffer(8);
+        let ret = new ByteBuffer(length);
         ret.putBuffer(buff);
         ret.position(0);
 
