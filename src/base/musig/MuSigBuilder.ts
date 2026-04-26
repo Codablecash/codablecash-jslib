@@ -84,7 +84,17 @@ export class MuSigBuilder {
     }
 
     public calcR() : void {
-        
+        let result = new Secp256k1Point(Secp256k1Point.Zero, Secp256k1Point.Zero);
+
+        let maxLoop = this.signers.size();
+        for(let i = 0; i != maxLoop; ++i){
+            let signer = this.signers.get(i);
+
+            let Ri = signer.getrG();
+            result = result.add(Ri);
+        }
+
+        this.R = result;
     }
 
     public calcs(data : Uint8Array, length : number) : void {
