@@ -1,4 +1,5 @@
 import { ScPrivateKey } from "../../../base/ecda/ScPrivateKey"
+import { Secp256k1Point } from "../../../base/ecda/Secp256k1Point";
 import { MuSigBuilder } from "../../../base/musig/MuSigBuilder";
 import { SimpleMuSigSigner } from "../../../base/musig/SimpleMuSigSigner";
 
@@ -16,6 +17,8 @@ describe('Musig test', () => {
 
         let data = new TextEncoder().encode(datastr);
         let length = data.length;
+
+        let modp = Secp256k1Point.n;
 
         // sign
         let sig = builder.sign(data, length);

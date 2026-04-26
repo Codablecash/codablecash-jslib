@@ -29,7 +29,7 @@ export class SimpleMuSigSigner implements IMuSigSigner {
     gets(HXRm : BigInteger, L : BigInteger) : BigInteger {
         let Xi = this.getxG();
 
-        let HLXi : BigInteger;
+        let HLXi = new BigInteger(0n);
         {
             let hashBuilder = new MuSigHashBuilder();
             hashBuilder.addBigInteger(L);

@@ -86,6 +86,8 @@ export class MuSigBuilder {
 
             result = result.add(value);
         }
+
+        this.X = result;
     }
 
     // Each signer chooses a random nonce ri, and shares Ri = riG with the other signers

@@ -58,6 +58,10 @@ export class BigInteger {
     }
     public modPow(exponent : BigInteger, mod : BigInteger) : BigInteger {
         let ans = this.value.modPow(exponent.value, mod.value);
+        if(ans.isNegative()){
+            ans = ans.add(mod.value);
+        }
+
         return new BigInteger(ans);
     }
     public mod(mod : BigInteger) : BigInteger {

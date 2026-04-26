@@ -63,7 +63,7 @@ export class MuSigHashBuilder {
     }
 
     public getResultAsBigInteger() : BigInteger {
-        let buff = ByteBuffer.allocateWithEndian(32, true);
+        let buff = ByteBuffer.allocateWithEndian(this.sha256.length, true);
         buff.putBuffer(this.sha256);
         buff.position(0);
 
