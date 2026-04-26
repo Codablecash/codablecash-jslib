@@ -61,7 +61,7 @@ export class Schnorr {
         return sig;
     }
 
-    public static verify(e : BigInteger, y : BigInteger, p : BigInteger, data : Uint8Array, size : number){
+    public static verify(e : BigInteger, y : BigInteger, p : BigInteger, data : Uint8Array, size : number) : boolean {
         let eP = p.modPow(e, SchnorrConsts.Q);
         let yG = SchnorrConsts.G.modPow(y, SchnorrConsts.Q);
         let powG = eP.multiplySelf(yG).modSelf(SchnorrConsts.Q);

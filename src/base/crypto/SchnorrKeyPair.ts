@@ -5,8 +5,8 @@ import { BigInteger } from "../../db/numeric/BigInteger";
 export class SchnorrKeyPair {
     public static readonly PAIR_SCHNORR : number = 1;
 
-    private secretKey: BigInteger;
-    private publicKey: BigInteger;
+    public secretKey: BigInteger;
+    public publicKey: BigInteger;
 
     constructor(secretKey : BigInteger, publicKey : BigInteger){
         this.secretKey = secretKey.copy();
