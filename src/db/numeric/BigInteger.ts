@@ -52,10 +52,15 @@ export class BigInteger {
         return this;
     }
 
-    public multiply(val : BigInteger) {
+    public multiply(val : BigInteger) : BigInteger {
         let ans = this.value.multiply(val.value);
         return new BigInteger(ans);
     }
+    public multiplySelf(val : BigInteger) {
+        this.value = this.value.multiply(val.value);
+        return this;
+    }
+
     public divide(val : BigInteger) : BigInteger {
         let ans = this.value.divide(val.value);
         return new BigInteger(ans);

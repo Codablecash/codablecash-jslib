@@ -60,5 +60,38 @@ export class Schnorr {
         let sig = new SchnorrSignature(e, y);
         return sig;
     }
+
+    public static verify(e : BigInteger, y : BigInteger, p : BigInteger, data : Uint8Array, size : number){
+        let eP = p.modPow(e, SchnorrConsts.Q);
+        let yG = SchnorrConsts.G.modPow(y, SchnorrConsts.Q);
+        let powG = eP.multiplySelf(yG).modSelf(SchnorrConsts.Q);
+
+        let e2 : BigInteger;
+        {
+            let buff = powG.toBinary();
+
+            let count = buff.capacity();
+            let hashinLen = count + size;
+
+            let hashinbuff = ByteBuffer.allocateWithEndian(hashinLen, true);
+            let datab = Buffer.from(data);
+            hashinbuff.putBuffer(datab);
+
+            hashinbuff.putByteBuffer(buff);
+
+            let hashindata = buff.toUint8Array();
+            let shaData = sha256(hashindata);
+            let shaDataBuff = Buffer.from(shaData);
+
+            let hashByteBuffer = new ByteBuffer(shaData.length);
+            hashByteBuffer.putBuffer(shaDataBuff);
+
+            e2 = hashByteBuffer.toBigInteger();
+            e2.modSelf(SchnorrConsts.Q);
+        }
+
+        let cmp = e.mod(SchnorrConsts.Q).compareTo(e2);
+        return cmp == 0;
+    }
 }
 
