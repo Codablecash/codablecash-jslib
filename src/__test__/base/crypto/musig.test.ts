@@ -1,4 +1,5 @@
 import { ScPrivateKey } from "../../../base/ecda/ScPrivateKey"
+import { Secp256k1CompressedPoint } from "../../../base/ecda/Secp256k1CompressedPoint";
 import { Secp256k1Point } from "../../../base/ecda/Secp256k1Point";
 import { MuSigBuilder } from "../../../base/musig/MuSigBuilder";
 import { SimpleMuSigSigner } from "../../../base/musig/SimpleMuSigSigner";
@@ -30,6 +31,13 @@ describe('Musig test', () => {
             let Xi = signer.getxG();
 
             sig.addXi(Xi);
+
+            // compressed test
+            let point = Secp256k1CompressedPoint.compress(Xi);
+            let Xi2 = point.decompress();
+
+            let bl = Xi.equals(Xi2);
+            expect(bl).toBe(true);
         }
 
         let bl = sig.verify(data, length);

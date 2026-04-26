@@ -5,6 +5,7 @@ import bigInt from "big-integer";
 
 export class BigInteger {
     public static readonly ZERO : BigInteger = new BigInteger(0n);
+     public static readonly ONE : BigInteger = new BigInteger(1n);
     public static readonly TWO : BigInteger = new BigInteger(2n);
 
     private value : bigInt.BigInteger;
@@ -97,6 +98,15 @@ export class BigInteger {
 
     public compareTo(x : BigInteger) : number {
         return this.value.compareTo(x.value);
+    }
+
+    public shiftRight(n : number) : BigInteger {
+        let ans = this.value.shiftRight(n);
+        return new BigInteger(ans);
+    }
+
+    public toNumber() : number {
+        return this.value.toJSNumber();
     }
 
     public equals(x : BigInteger) : boolean {
