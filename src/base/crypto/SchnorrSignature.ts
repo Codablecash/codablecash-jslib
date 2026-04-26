@@ -3,8 +3,8 @@ import { BigInteger } from "../../db/numeric/BigInteger";
 
 
 export class SchnorrSignature {
-    private e : BigInteger;
-    private y : BigInteger;
+    public e : BigInteger;
+    public y : BigInteger;
 
     constructor(e : BigInteger, y : BigInteger) {
         this.e = e.copy();

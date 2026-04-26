@@ -61,6 +61,10 @@ export class Schnorr {
         return sig;
     }
 
+    public static verifySig(sig : SchnorrSignature, p : BigInteger, data : Uint8Array, size : number) {
+        return this.verify(sig.e, sig.y, p, data, size);
+    }
+
     public static verify(e : BigInteger, y : BigInteger, p : BigInteger, data : Uint8Array, size : number) : boolean {
         let eP = p.modPow(e, SchnorrConsts.Q);
         let yG = SchnorrConsts.G.modPow(y, SchnorrConsts.Q);
