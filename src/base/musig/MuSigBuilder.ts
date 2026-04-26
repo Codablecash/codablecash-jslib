@@ -2,6 +2,7 @@ import { ArrayList } from "../../db/base/ArrayList";
 import { BigInteger } from "../../db/numeric/BigInteger";
 import { Secp256k1Point } from "../ecda/Secp256k1Point";
 import { IMuSigSigner } from "./IMuSigSigner";
+import { MuSigHashBuilder } from "./MuSigHashBuilder";
 
 
 export class MuSigBuilder {
@@ -27,5 +28,51 @@ export class MuSigBuilder {
         this.signers.addElement(signer);
     }
 
-    
+    public sign(data : Uint8Array, length : number) {
+        // Xi = xG
+        // Call L = H(X1,X2,…)
+        this.calcL();
+
+        // Call X the sum of all H(L,Xi)Xi
+        this.calcX();
+
+        // Each signer chooses a random nonce ri, and shares Ri = riG with the other signers
+        // Call R the sum of the Ri points
+        this.calcR();
+
+        // Each signer computes si = ri + H(X,R,m)H(L,Xi)xi
+        // The final signature is (R,s) where s is the sum of the si values
+        this.calcs(data, length);
+
+        // FIXME return MuSig(this->R, this->s);
+    }
+
+    public calcL() : void {
+        const hashBuilder = new MuSigHashBuilder();
+
+        const maxLoop = this.signers.size();
+        for(let i = 0; i != maxLoop; ++i){
+            const signer = this.signers.get(i);
+
+            let Xi = signer.getxG();
+            hashBuilder.add(Xi);
+            this.XiList.addElement(Xi.copy())
+        }
+        hashBuilder.buildHash();
+
+        this.L = hashBuilder.getResultAsBigInteger();
+    }
+
+    public calcX() : void {
+
+    }
+
+    public calcR() : void {
+
+    }
+
+    public calcs(data : Uint8Array, length : number) : void {
+
+    }
+
 }

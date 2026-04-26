@@ -32,7 +32,11 @@ export class Secp256k1Point {
         this.y = new BigInteger(y.getValue());
     }
 
-    static getBasePoint() : Secp256k1Point {
+    public copy() : Secp256k1Point {
+        return new Secp256k1Point(this.x, this.y);
+    }
+
+    public static getBasePoint() : Secp256k1Point {
         return new Secp256k1Point(Secp256k1Point.gX, Secp256k1Point.gY);
     }
 
