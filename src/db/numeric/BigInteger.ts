@@ -68,6 +68,16 @@ export class BigInteger {
 
         return new BigInteger(res);
     }
+
+    public modSelf(mod : BigInteger) : BigInteger {
+        this.value = this.value.mod(mod.value);
+        if(this.value.isNegative()){
+            this.value = this.value.add(mod.value);
+        }
+
+        return this;
+    }
+
     public modInverse(val : BigInteger) : BigInteger {
         let ans = this.value.modInv(val.value);
         return new BigInteger(ans);
