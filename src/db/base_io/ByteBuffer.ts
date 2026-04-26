@@ -54,6 +54,10 @@ export class ByteBuffer {
         return this.lim;
     }
 
+    public capacity() : number {
+        return this.cap;
+    }
+
     public get() : number {
         if(this.remaining() < 1){
             throw new BufferOverflowException("get()");
