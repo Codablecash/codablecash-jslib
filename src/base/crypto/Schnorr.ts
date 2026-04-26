@@ -1,5 +1,9 @@
+import { ByteBuffer } from "../../db/base_io/ByteBuffer";
 import { BigInteger } from "../../db/numeric/BigInteger";
 import { SchnorrKeyPair } from "./SchnorrKeyPair";
+
+import sha256 from "fast-sha256";
+import { SchnorrSignature } from "./SchnorrSignature";
 
 export class SchnorrConsts {
     public static readonly Q : BigInteger = new BigInteger(0xff66c4652cbb54e13e4cc75898014aef72332e147343a95031cf416ca9f77ce7n);
@@ -10,12 +14,51 @@ export class SchnorrConsts {
 export class Schnorr {
     public static readonly keyLength = 256;
 
-    public static generateKey(seed : BigInteger){
+    public static generateKey(seed : BigInteger) : SchnorrKeyPair {
         let s  = seed.mod(SchnorrConsts.Q_1);
 
         let p = SchnorrConsts.G.modPow(s, SchnorrConsts.Q);
 
         return new SchnorrKeyPair(s, p);
+    }
+
+    public static generateKeyRandom() : SchnorrKeyPair {
+        let s = BigInteger.ramdom();
+        return this.generateKey(s);
+    }
+
+    public static sign(s : BigInteger, p : BigInteger, data : Uint8Array, size : number) : SchnorrSignature {
+        let r = BigInteger.ramdom().modSelf(SchnorrConsts.Q_1);
+        let powG = SchnorrConsts.G.modPow(r, SchnorrConsts.Q);
+
+        let e : BigInteger;
+        {
+            let buff = powG.toBinary();
+
+            let count = buff.capacity();
+            const hashinLen = count + size;
+
+            let hashinbuff = ByteBuffer.allocateWithEndian(hashinLen, true);
+            let datab = Buffer.from(data);
+            hashinbuff.putBuffer(datab);
+
+            hashinbuff.putByteBuffer(buff);
+
+            let hashindata = buff.toUint8Array();
+            let shaData = sha256(hashindata);
+            let shaDataBuff = Buffer.from(shaData);
+
+            let hashByteBuffer = new ByteBuffer(shaData.length);
+            hashByteBuffer.putBuffer(shaDataBuff);
+
+            e = hashByteBuffer.toBigInteger();
+        }
+
+        powG = s.multiply(e);
+        let y = r.subtractSelf(powG).modSelf(SchnorrConsts.Q_1);
+
+        let sig = new SchnorrSignature(e, y);
+        return sig;
     }
 }
 

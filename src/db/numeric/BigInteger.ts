@@ -47,6 +47,11 @@ export class BigInteger {
         let ans = this.value.subtract(val.value);
         return new BigInteger(ans);
     }
+    public subtractSelf(val : BigInteger) : BigInteger {
+        this.value = this.value.subtract(val.value);
+        return this;
+    }
+
     public multiply(val : BigInteger) {
         let ans = this.value.multiply(val.value);
         return new BigInteger(ans);
