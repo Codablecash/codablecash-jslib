@@ -1,4 +1,5 @@
 import { BigInteger } from "../../db/numeric/BigInteger";
+import { SchnorrKeyPair } from "./SchnorrKeyPair";
 
 export class SchnorrConsts {
     public static readonly Q : BigInteger = new BigInteger(0xff66c4652cbb54e13e4cc75898014aef72332e147343a95031cf416ca9f77ce7n);
@@ -9,6 +10,12 @@ export class SchnorrConsts {
 export class Schnorr {
     public static readonly keyLength = 256;
 
-    
+    public static generateKey(seed : BigInteger){
+        let s  = seed.mod(SchnorrConsts.Q_1);
+
+        let p = SchnorrConsts.G.modPow(s, SchnorrConsts.Q);
+
+        return new SchnorrKeyPair(s, p);
+    }
 }
 
