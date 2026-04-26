@@ -25,6 +25,7 @@ export class ByteBuffer {
         
         let inst = new ByteBuffer(length);
         inst.putBuffer(dataBuffer);
+        inst.position(0);
 
         return inst;
     }

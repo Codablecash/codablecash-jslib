@@ -13,7 +13,7 @@ export class MuSigHashBuilder {
     }
 
     public add(pt : Secp256k1Point) : void {
-        let buff = pt.to65Bytes();
+        const buff = pt.to65Bytes();
         buff.position(0);
 
         this.list.addElement(buff);
@@ -27,8 +27,11 @@ export class MuSigHashBuilder {
     }
 
     public addArray(data : number[], length : number) {
+        const buff = ByteBuffer.wrapWithEndian(data, length, true);
+        buff.position(0);
 
-    }
+        this.list.addElement(buff);
+    } 
 
     public buildHash() {
 
