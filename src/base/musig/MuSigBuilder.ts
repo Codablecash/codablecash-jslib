@@ -2,6 +2,7 @@ import { ArrayList } from "../../db/base/ArrayList";
 import { BigInteger } from "../../db/numeric/BigInteger";
 import { Secp256k1Point } from "../ecda/Secp256k1Point";
 import { IMuSigSigner } from "./IMuSigSigner";
+import { MuSig } from "./MuSig";
 import { MuSigHashBuilder } from "./MuSigHashBuilder";
 
 
@@ -44,7 +45,7 @@ export class MuSigBuilder {
         // The final signature is (R,s) where s is the sum of the si values
         this.calcs(data, length);
 
-        // FIXME return MuSig(this->R, this->s);
+        return new MuSig(this.R, this.s);
     }
 
     public calcL() : void {
