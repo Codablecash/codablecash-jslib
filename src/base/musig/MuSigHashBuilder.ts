@@ -7,11 +7,11 @@ import sha256 from "fast-sha256";
 
 export class MuSigHashBuilder {
     private list : ArrayList<ByteBuffer>;
-    private sha256 : number[];
+    private sha256 : Buffer;
 
     constructor(){
         this.list = new ArrayList<ByteBuffer>();
-        this.sha256 = Array.from({length: 32});
+        this.sha256 = Buffer.from({length: 32});
     }
 
     public add(pt : Secp256k1Point) : void {
@@ -47,7 +47,8 @@ export class MuSigHashBuilder {
 
         let data = buff.toUint8Array();
 
-        // sha256(data);
+        let shaData = sha256(data);
+        this.sha256 = Buffer.from(shaData);
     }
 
     private binarySize() : number {
@@ -62,8 +63,10 @@ export class MuSigHashBuilder {
     }
 
     public getResultAsBigInteger() : BigInteger {
-        // FIXME
+        let buff = ByteBuffer.allocateWithEndian(32, true);
+        buff.putBuffer(this.sha256);
+        buff.position(0);
 
-        return new BigInteger(0n);
+        return buff.toBigInteger();
     }
 }
