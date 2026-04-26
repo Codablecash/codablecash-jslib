@@ -20,12 +20,42 @@ export class ByteBuffer {
         this.pos = 0;
     }
 
+    public static wrapWithEndian(data : Uint8Array, length : number, bigEngian : boolean) : ByteBuffer {
+        const dataBuffer = Buffer.from(data);
+        
+        let inst = new ByteBuffer(length);
+        inst.putBuffer(dataBuffer);
+        inst.position(0);
+
+        return inst;
+    }
+
+    public static allocateWithEndian(capacity : number, bigEndian : boolean) : ByteBuffer {
+        let inst = new ByteBuffer(capacity);
+         return inst;
+    }
+
+    public toUint8Array() : Uint8Array {
+        let ar = new Uint8Array(this.cap);
+
+        for(let i = 0; i != this.cap; ++i){
+            let val = this.geti(i);
+            ar[i] = val;
+        }
+        
+        return ar;
+    }
+
     public position(i : number) : void {
         this.pos = i;
     }
 
     public limit() : number {
         return this.lim;
+    }
+
+    public capacity() : number {
+        return this.cap;
     }
 
     public get() : number {
@@ -35,6 +65,7 @@ export class ByteBuffer {
 
         return this.data.readInt8(this.pos++);
     }
+
     public getByteBuffer(length : number) {
         if(this.remaining() < length){
             throw new BufferOverflowException("getByteBuffer()");
@@ -43,9 +74,9 @@ export class ByteBuffer {
         let buff = Buffer.allocate(length);
 
         this.data.copy(buff, 0, this.pos, this.pos + length);
-        this.pos += 8;
+        this.pos += length;
 
-        let ret = new ByteBuffer(8);
+        let ret = new ByteBuffer(length);
         ret.putBuffer(buff);
         ret.position(0);
 

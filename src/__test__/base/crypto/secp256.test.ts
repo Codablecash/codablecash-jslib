@@ -31,6 +31,18 @@ describe('Secp256k1Point test', () => {
     let pt2 = pt.add(pt);
     let pt4 = pt2.add(pt2);
 
+    // e493dbf1c10d80f3581e4904930b1404cc6c13900ee0758474fa94abe8c4cd13, 51ed993ea0d455b75642e2098ea51448d967ae33bfbdfe40cfe97bdc47739922"
+    {
+      const str = pt4.getX().toString(16);
+      let ansstr = "e493dbf1c10d80f3581e4904930b1404cc6c13900ee0758474fa94abe8c4cd13".toLowerCase();
+      expect(str === ansstr).toBe(true);
+    }
+    {
+      const str = pt4.getY().toString(16);
+      let ansstr = "51ed993ea0d455b75642e2098ea51448d967ae33bfbdfe40cfe97bdc47739922".toLowerCase();
+      expect(str === ansstr).toBe(true);
+    }
+
     let ptadd4 = pt.add(pt).add(pt).add(pt);
 
     let bl = pt4.equals(ptadd4);

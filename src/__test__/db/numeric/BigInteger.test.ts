@@ -53,6 +53,10 @@ describe('BigInteger test', () => {
     let ans = a.equals(b);
 
     expect(a.equals(b)).toBe(true);
+
+    let str = a.toString(16);
+    let ansstr = "79BE667EF9DCBBAC55A06295CE870B07029BFCDB2DCE28D959F2815B16F81798".toLowerCase();
+    expect(str === ansstr).toBe(true);
   })
 
 })

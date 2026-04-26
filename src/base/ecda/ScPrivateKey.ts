@@ -8,7 +8,7 @@ export class ScPrivateKey {
 
     private keyvalue : BigInteger;
 
-    constructor(seed : BigInteger, solt : bigint){
+    constructor(seed = BigInteger.ramdom(), solt : bigint = 1n) {
         let pow = new BigInteger(solt);
 
         this.keyvalue = seed.multiply(pow).mod(ScPrivateKey.p);
@@ -23,5 +23,9 @@ export class ScPrivateKey {
 
     public compareTo(other : ScPrivateKey) : number {
         return this.keyvalue.compareTo(other.keyvalue);
+    }
+
+    public getKeyvalue() : BigInteger {
+        return this.keyvalue;
     }
 }
