@@ -24,4 +24,8 @@ export class ScPrivateKey {
     public compareTo(other : ScPrivateKey) : number {
         return this.keyvalue.compareTo(other.keyvalue);
     }
+
+    public getKeyvalue() : BigInteger {
+        return this.keyvalue;
+    }
 }

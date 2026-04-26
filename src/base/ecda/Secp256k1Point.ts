@@ -27,6 +27,13 @@ export class Secp256k1Point {
         return this.y;
     }
 
+    public toString() {
+        let ret = "x : ";
+        ret += this.x.toString();
+        ret += ", y : ";
+        ret += this.y.toString();
+    }
+
     constructor(x =  Secp256k1Point.gX, y =  Secp256k1Point.gY){
         this.x = new BigInteger(x.getValue());
         this.y = new BigInteger(y.getValue());

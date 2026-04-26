@@ -1,5 +1,6 @@
-import { it } from "node:test"
 import { ScPrivateKey } from "../../../base/ecda/ScPrivateKey"
+import { MuSigBuilder } from "../../../base/musig/MuSigBuilder";
+import { SimpleMuSigSigner } from "../../../base/musig/SimpleMuSigSigner";
 
 
 describe('Musig test', () => {
@@ -7,6 +8,29 @@ describe('Musig test', () => {
         let key01 = new ScPrivateKey();
         let key02 = new ScPrivateKey();
 
+        let builder = new MuSigBuilder();
+        builder.addSigner(new SimpleMuSigSigner(key01.getKeyvalue()));
+	    builder.addSigner(new SimpleMuSigSigner(key02.getKeyvalue()));
 
+        let datastr = "dasdasflgjk;lfdjgk;ldfgjioviypiyvoucsormi;umguarce,@gaopcpopcxrufnkxeyfyen";
+
+        let data = new TextEncoder().encode(datastr);
+        let length = data.length;
+
+        // sign
+        let sig = builder.sign(data, length);
+
+        let list = builder.getSigners();
+        const maxLoop = list.size();
+        for(let i = 0; i != maxLoop; ++i){
+            let signer = list.get(i);
+            let Xi = signer.getxG();
+
+            sig.addXi(Xi);
+        }
+
+        let bl = sig.verify(data, length);
+        expect(bl).toBe(true);
     })
+
 })

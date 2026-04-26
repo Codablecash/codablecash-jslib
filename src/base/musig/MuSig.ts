@@ -14,6 +14,12 @@ export class MuSig {
         this.XiList = new ArrayList<Secp256k1Point>();
     }
 
+    public toString() : string {
+        let ret = "R :";
+
+        return ret;
+    }
+
     public addXi(Xi : Secp256k1Point) : void {
         this.XiList.addElement(Xi);
     }
