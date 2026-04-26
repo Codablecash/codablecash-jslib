@@ -83,6 +83,8 @@ export class MuSigBuilder {
         }
     }
 
+    // Each signer chooses a random nonce ri, and shares Ri = riG with the other signers
+    // Call R the sum of the Ri points
     public calcR() : void {
         let result = new Secp256k1Point(Secp256k1Point.Zero, Secp256k1Point.Zero);
 
@@ -97,8 +99,31 @@ export class MuSigBuilder {
         this.R = result;
     }
 
+    /*
+    * 	 Each signer computes si = ri + H(X,R,m)H(L,Xi)xi
+    *	 The final signature is (R,s) where s is the sum of the si values
+    */
     public calcs(data : Uint8Array, length : number) : void {
+        let HXRm = new BigInteger(0n);
+        {
+            let hashBuilder = new MuSigHashBuilder();
+            hashBuilder.add(this.X);
+            hashBuilder.add(this.R);
+            hashBuilder.addArray(data, length);
+            hashBuilder.buildHash();
 
+            HXRm = hashBuilder.getResultAsBigInteger(); //.mod(Secp256k1Point::n);
+        }
+
+        let maxLoop = this.signers.size();
+        for(let i = 0; i != maxLoop; ++i){
+            let signer = this.signers.get(i);
+
+            let si = signer.gets(HXRm, this.L);
+            this.s.addSelf(si);
+        }
+
+        this.s.modSelf(Secp256k1Point.n);
     }
 
 }

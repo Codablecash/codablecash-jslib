@@ -20,7 +20,7 @@ export class ByteBuffer {
         this.pos = 0;
     }
 
-    public static wrapWithEndian(data : number[], length : number, bigEngian : boolean) : ByteBuffer {
+    public static wrapWithEndian(data : Uint8Array, length : number, bigEngian : boolean) : ByteBuffer {
         const dataBuffer = Buffer.from(data);
         
         let inst = new ByteBuffer(length);

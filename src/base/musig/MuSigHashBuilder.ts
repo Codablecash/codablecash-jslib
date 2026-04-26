@@ -28,7 +28,7 @@ export class MuSigHashBuilder {
         this.list.addElement(buff);
     }
 
-    public addArray(data : number[], length : number) {
+    public addArray(data : Uint8Array, length : number) {
         const buff = ByteBuffer.wrapWithEndian(data, length, true);
         buff.position(0);
 
