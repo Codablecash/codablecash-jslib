@@ -13,6 +13,10 @@ describe('Client Connection test', () => {
 
             await client.connect("127.0.0.1", 6543);
 
+            let str = "Hello world.";
+            const uint8Array = new TextEncoder().encode(str);
+
+            client.write(uint8Array);
 
             client.close();
         }

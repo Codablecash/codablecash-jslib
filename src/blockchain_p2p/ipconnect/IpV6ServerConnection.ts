@@ -1,4 +1,7 @@
+import { IpClientConnection } from "./IpClientConnection";
 import { IServerSocket } from "./IServerSocket";
+import { ISeverSocketDataListner } from "./IServerSocketDataListner";
+
 import net = require('net');
 
 export class IpV6ServerConnection implements IServerSocket {
@@ -6,15 +9,22 @@ export class IpV6ServerConnection implements IServerSocket {
     private host : string;
     private port : number;
 
-    constructor(){
+    private dataListner? : ISeverSocketDataListner;
+
+    constructor(listner? : ISeverSocketDataListner){
+        this.dataListner = listner == null ? undefined : listner;
+  
+
         this.server = net.createServer((socket: net.Socket) =>{
             socket.on('data', (data: Buffer) => {
-                socket.write(`Echo: ${data.toString()}`);
+                if(this.dataListner != null){
+                    const clientSoclet = new IpClientConnection(socket);
 
+                }
             });
 
             socket.on('end', () => {
-                console.log('server closed.' + this.host);
+                // console.log('server closed.' + this.host);
             });
 
             socket.on('error', (err: Error) => {
@@ -36,7 +46,16 @@ export class IpV6ServerConnection implements IServerSocket {
         });
     }
 
-    public close() : void {
-        this.server.close();
+    public close() : Promise<void> {
+          return new Promise<void>((resolve, reject) => {
+            this.server.close((err?: Error) => {
+                if (err) {
+                    reject(err);
+                }
+                else{
+                     resolve();
+                }
+            });
+        });
     }
 }

@@ -1,4 +1,8 @@
+import { ByteBuffer } from "../../db/base_io/ByteBuffer";
+import { IpClientConnection } from "./IpClientConnection";
 import { IServerSocket } from "./IServerSocket";
+import { ISeverSocketDataListner } from "./IServerSocketDataListner";
+
 import net = require('net');
 
 export class IpV4ServerConnection implements IServerSocket {
@@ -6,16 +10,25 @@ export class IpV4ServerConnection implements IServerSocket {
     private host : string;
     private port : number;
 
+    private dataListner? : ISeverSocketDataListner;
+
     constructor(){
         this.server = net.createServer((socket: net.Socket) =>{
             socket.on('data', (data: Buffer) => {
-                console.log(`受信: ${data.toString()}`);
-                socket.write(`Echo: ${data.toString()}`);
+                if(this.dataListner != null){
+                    const clientSoclet = new IpClientConnection(socket);
+                    const buff = new ByteBuffer(data.length);
+                    buff.putBuffer(data);
+                    buff.position(0);
 
+                    this.dataListner.onData(clientSoclet, buff);
+                }
+               
+                // socket.write(`Echo: ${data.toString()}`);
             });
 
             socket.on('end', () => {
-                //console.log('server closed.' + this.host);
+                // console.log('server closed.' + this.host);
             });
 
             socket.on('error', (err: Error) => {
@@ -52,6 +65,5 @@ export class IpV4ServerConnection implements IServerSocket {
                 }
             });
         });
-        
     }
 }
