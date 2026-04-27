@@ -13,7 +13,6 @@ export class IpV6ServerConnection implements IServerSocket {
 
     constructor(listner? : ISeverSocketDataListner){
         this.dataListner = listner == null ? undefined : listner;
-  
 
         this.server = net.createServer((socket: net.Socket) =>{
             socket.on('data', (data: Buffer) => {

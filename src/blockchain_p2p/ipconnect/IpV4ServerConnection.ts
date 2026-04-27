@@ -12,7 +12,9 @@ export class IpV4ServerConnection implements IServerSocket {
 
     private dataListner? : ISeverSocketDataListner;
 
-    constructor(){
+    constructor(listner? : ISeverSocketDataListner){
+        this.dataListner = listner == null ? undefined : listner;
+        
         this.server = net.createServer((socket: net.Socket) =>{
             socket.on('data', (data: Buffer) => {
                 if(this.dataListner != null){
