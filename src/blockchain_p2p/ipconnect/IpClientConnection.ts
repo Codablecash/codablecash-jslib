@@ -37,6 +37,10 @@ export class IpClientConnection implements IClientSocket {
 
                 resolve(buff);
             });
+
+            this.socket.on('error', (err) => {
+                reject(err);
+            });
         });
     }
 

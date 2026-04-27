@@ -9,7 +9,6 @@ export class IpV6ServerConnection implements IServerSocket {
     constructor(){
         this.server = net.createServer((socket: net.Socket) =>{
             socket.on('data', (data: Buffer) => {
-                console.log(`受信: ${data.toString()}`);
                 socket.write(`Echo: ${data.toString()}`);
 
             });

@@ -32,9 +32,12 @@ export class IpV4ServerConnection implements IServerSocket {
         this.port = port;
     }
     
-    public listen() : void {
-        this.server.listen(this.port, this.host, () => {
-            console.log("TCP Server: Server listening on " + this.host + ":" + this.port);
+    public listen() : Promise<void> {
+        return new Promise<void>((resolve) => {
+            this.server.listen(this.port, this.host, () => {
+                console.log("TCP Server: Server listening on " + this.host + ":" + this.port);
+                resolve();
+            });
         });
     }
 
