@@ -46,6 +46,10 @@ export class ByteBuffer {
         return ar;
     }
 
+    public toString() : string {
+        return this.data.toString();
+    }
+
     public position(i : number) : void {
         this.pos = i;
     }
