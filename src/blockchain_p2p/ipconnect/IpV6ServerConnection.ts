@@ -1,7 +1,7 @@
 import { IServerSocket } from "./IServerSocket";
 import net = require('net');
 
-export class IpV4ServerConnection implements IServerSocket {
+export class IpV6ServerConnection implements IServerSocket {
     private server: net.Server;
     private host : string;
     private port : number;
@@ -31,9 +31,8 @@ export class IpV4ServerConnection implements IServerSocket {
         this.host = host;
         this.port = port;
     }
-    
     public listen() : void {
-        this.server.listen(this.port, this.host, () => {
+        this.server.listen(this.port, "::", () => {
             console.log("TCP Server: Server listening on " + this.host + ":" + this.port);
         });
     }
