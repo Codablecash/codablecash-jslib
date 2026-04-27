@@ -25,8 +25,6 @@ export class IpV4ServerConnection implements IServerSocket {
 
                     this.dataListner.onData(clientSoclet, buff);
                 }
-               
-                // socket.write(`Echo: ${data.toString()}`);
             });
 
             socket.on('end', () => {
