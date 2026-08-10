@@ -12,6 +12,7 @@
   "author": "Tomohiro Iizuka",
   "license": "MIT",
   "dependencies": {
+    "@babel/core": "^8.0.1",
     "big-integer": "^1.6.52",
     "bigint-buffer": "^1.1.5",
     "fast-sha256": "^1.3.0",
