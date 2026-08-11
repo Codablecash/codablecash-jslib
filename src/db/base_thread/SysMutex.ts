@@ -9,7 +9,7 @@ export class SysMutex {
     constructor() {
         this.lock = new AsyncLock();
         
-        let r : bigint = BigInteger.getRandomBigInt(32);
+        let r : bigint = BigInteger.getRandomBigInt(256);
         this.key = r.toString();
     }
 
