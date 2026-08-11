@@ -12,8 +12,8 @@ export class SynchronizedLock {
     }
    
     public wait() :void {
-        Atomics.wait(this.int32, 0, 0);
         Atomics.store(this.int32, 0, 0);
+        Atomics.wait(this.int32, 0, 0);
     }
 
     public notify() : void {
