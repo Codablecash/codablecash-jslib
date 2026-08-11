@@ -1,4 +1,5 @@
 import AsyncLock = require("async-lock");
+import { BigInteger } from "../numeric/BigInteger";
 
 
 export class SysMutex {
@@ -8,8 +9,8 @@ export class SysMutex {
     constructor() {
         this.lock = new AsyncLock();
         
-        let obj : Object = new Object();
-        this.key = obj.toString();
+        let r : bigint = BigInteger.getRandomBigInt(32);
+        this.key = r.toString();
     }
 
     public acqire (callback : () => void ) : void {
