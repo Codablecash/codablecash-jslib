@@ -1,6 +1,7 @@
 
 
-const path = require('path');
+// const path = require('path');
+import path from 'node:path';
 import fs from 'node:fs';
 
 
@@ -20,14 +21,26 @@ export class CFile {
         return path.isAbsolute(this.pathname);
     }
     public exists() : boolean {
-        return path.exists(this.pathname);
+        return fs.existsSync(this.pathname);
+    }
+    public isDirectory() : boolean {
+        const status = fs.statSync(this.pathname);
+        return status.isDirectory();
+    }
+    public isFile() : boolean {
+        const status = fs.statSync(this.pathname);
+        return status.isFile();       
     }
 
     public mkdirs() : boolean {
-        let abs : string = path.resolve(this.pathname);
-        let res = fs.mkdirSync(this.pathname, {recursive : true});
+        let ex : boolean = this.exists();
 
-        return true;
+        if(!ex){
+            let abs : string = path.resolve(this.pathname);
+            fs.mkdirSync(this.pathname, {recursive : true});
+        }
+
+        return !ex;
     }
 
 }

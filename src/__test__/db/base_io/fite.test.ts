@@ -17,7 +17,14 @@ describe('File test', () => {
 
     it('mkdirs', () => {
         let testDir = new CFile("out/file/mkdirs");
-        //let testDir = new CFile("out");
-        testDir.mkdirs();
+
+        
+
+        let bl = testDir.mkdirs();
+        expect(bl).toBe(true);
+
+        bl = testDir.mkdirs();
     })
+
+
 })
