@@ -18,12 +18,19 @@ describe('File test', () => {
     it('mkdirs', () => {
         let testDir = new CFile("out/file/mkdirs");
 
-        
+        testDir.deleteDir();
 
         let bl = testDir.mkdirs();
         expect(bl).toBe(true);
 
         bl = testDir.mkdirs();
+        expect(bl).toBe(false);
+
+        bl =  testDir.deleteDir();
+        expect(bl).toBe(true);
+
+        bl =  testDir.deleteDir();
+        expect(bl).toBe(false);
     })
 
 

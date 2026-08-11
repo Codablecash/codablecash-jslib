@@ -3,6 +3,7 @@
 // const path = require('path');
 import path from 'node:path';
 import fs from 'node:fs';
+import rmSync from 'node:fs';
 
 
 export class CFile {
@@ -41,6 +42,21 @@ export class CFile {
         }
 
         return !ex;
+    }
+
+    public deleteFile() : boolean {
+        let exec = this.exists() && this.isFile();
+        if(exec){
+            fs.rmSync(this.pathname);
+        }
+        return exec;
+    }
+    public deleteDir() : boolean {
+        let exec = this.exists() && this.isDirectory();
+        if(exec){
+            fs.rmdirSync(this.pathname);
+        }
+        return exec;      
     }
 
 }
