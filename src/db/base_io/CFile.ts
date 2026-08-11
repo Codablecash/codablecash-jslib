@@ -13,6 +13,10 @@ export class CFile {
         this.pathname = pathname;
     }
 
+    public toString() : string {
+        return this.pathname;
+    }
+
     public getAbsolutePath() : string {
         let abs : string = path.resolve(this.pathname);
 
@@ -59,4 +63,8 @@ export class CFile {
         return exec;      
     }
 
+    public get(seg : string) : CFile {
+        let newPath = path.join(this.pathname, seg);
+        return new CFile(newPath);
+    }
 }

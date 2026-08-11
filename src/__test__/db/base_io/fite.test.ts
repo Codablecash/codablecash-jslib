@@ -33,5 +33,13 @@ describe('File test', () => {
         expect(bl).toBe(false);
     })
 
+    it('get', () => {
+        let testDir = new CFile("out/file/get");
+
+        let newPath = testDir.get("base.bin");
+
+        let str = newPath.toString();
+        expect(str).toBe("out/file/get/base.bin");
+    })
 
 })
