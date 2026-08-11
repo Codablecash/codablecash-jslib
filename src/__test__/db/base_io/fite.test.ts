@@ -14,4 +14,10 @@ describe('File test', () => {
         bl = absFile.isAbsolute();
         expect(bl).toBe(true);
     })
+
+    it('mkdirs', () => {
+        let testDir = new CFile("out/file/mkdirs");
+        //let testDir = new CFile("out");
+        testDir.mkdirs();
+    })
 })
