@@ -67,4 +67,9 @@ export class CFile {
         let newPath = path.join(this.pathname, seg);
         return new CFile(newPath);
     }
+
+    public length() : number {
+        const status = fs.statSync(this.pathname);
+        return status.size;
+    }
 }
