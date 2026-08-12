@@ -1,7 +1,14 @@
+import { off } from "node:cluster";
 import { CFile } from "../base_io/CFile";
 import { FileDescriptor } from "./FileDescriptor";
 
 import fs from 'node:fs';
+
+enum SeekOrigin {
+    FROM_BEGINING = 0,
+    CURRENT_POS = 1,
+    FROM_END = 2
+};
 
 export class Os {
     public static openFile2Write(file : CFile, append : boolean, sync : boolean) : FileDescriptor {
@@ -24,7 +31,7 @@ export class Os {
 
         let fd = fs.openSync(path, flag);
 
-        let desc = new FileDescriptor(fd);
+        let desc = new FileDescriptor(fd, path);
         desc.setSync(sync);
         desc.setPosition(size);
 
@@ -36,7 +43,7 @@ export class Os {
         let flag : string = "r";
 
         let fd = fs.openSync(path, flag);
-        let desc = new FileDescriptor(fd);
+        let desc = new FileDescriptor(fd, path);
         return desc;
     }
 
@@ -51,7 +58,7 @@ export class Os {
         }
 
         let fd = fs.openSync(path, flag);
-        let desc = new FileDescriptor(fd);
+        let desc = new FileDescriptor(fd, path);
         return desc;
     }
 
@@ -68,5 +75,21 @@ export class Os {
             fs.closeSync(fd);
         }
 
+    }
+
+    public seekFile(desc : FileDescriptor, offset : number, origin : SeekOrigin) : void {
+        let position = 0;
+
+        if(origin == SeekOrigin.FROM_BEGINING){
+            position = offset;
+        }
+        else if(origin = SeekOrigin.CURRENT_POS){
+            position = desc.getPosition() + offset;
+        }
+        else {
+            position = desc.length() + offset;
+        }
+
+        desc.setPosition(position);
     }
 }
