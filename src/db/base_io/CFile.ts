@@ -1,6 +1,4 @@
 
-
-// const path = require('path');
 import path from 'node:path';
 import fs from 'node:fs';
 import rmSync from 'node:fs';
