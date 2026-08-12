@@ -77,7 +77,7 @@ export class Os {
 
     }
 
-    public static seekFile(desc : FileDescriptor, offset : number, origin : SeekOrigin) : void {
+    public static seekFile(desc : FileDescriptor, offset : number, origin : SeekOrigin) : number {
         let position = 0;
 
         if(origin == SeekOrigin.FROM_BEGINING){
@@ -91,6 +91,8 @@ export class Os {
         }
 
         desc.setPosition(position);
+
+        return position;
     }
 
     public static async readFile(desc : FileDescriptor, data : Uint8Array, length : number) : Promise<number> {
