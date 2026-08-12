@@ -55,5 +55,9 @@ export class Os {
         return desc;
     }
 
-    
+    public syncFile(desc : FileDescriptor) : void {
+        let fd = desc.getFd();
+        fs.fdatasyncSync(fd);
+    }
+
 }

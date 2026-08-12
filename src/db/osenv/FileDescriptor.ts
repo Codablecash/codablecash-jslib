@@ -11,6 +11,10 @@ export class FileDescriptor {
         this.sync = false;
     }
 
+    public getFd() : number {
+        return this.fd;
+    }
+
     public setSync(bl : boolean) : void {
         this.sync = bl;
     }
@@ -21,7 +25,7 @@ export class FileDescriptor {
     public setPosition(pos : number) : void {
         this.position = pos;
     }
-    
+
 
     public isOpened() : boolean {
         return this.fd > 0;
