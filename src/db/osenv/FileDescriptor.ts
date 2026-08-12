@@ -14,6 +14,9 @@ export class FileDescriptor {
     public getFd() : number {
         return this.fd;
     }
+    public setFd(fd : number) : void {
+        this.fd = fd;
+    }
 
     public setSync(bl : boolean) : void {
         this.sync = bl;

@@ -60,4 +60,13 @@ export class Os {
         fs.fdatasyncSync(fd);
     }
 
+    public closeFileDescriptor(desc : FileDescriptor) : void {
+        if(desc.isOpened()){
+            let fd = desc.getFd();
+
+            desc.setFd(0);
+            fs.closeSync(fd);
+        }
+
+    }
 }
