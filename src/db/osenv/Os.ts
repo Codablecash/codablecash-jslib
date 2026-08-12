@@ -99,7 +99,7 @@ export class Os {
             let position = desc.getPosition();
             
             fs.read(fd, data, 0, length, position, (err, bytesRead, buff) => {
-                if (err) throw err;
+                if (err) resolve(-1);
 
                 if(bytesRead > 0){
                     desc.incPosition(bytesRead);
@@ -110,5 +110,20 @@ export class Os {
         });
     }
 
+    public static async write2File(desc : FileDescriptor, data : Uint8Array, length : number) : Promise<number> {
+        return new Promise<number>((resolve, reject) => {
+            let fd = desc.getFd();
+            let position = desc.getPosition();
 
+            fs.write(fd, data, 0, length, position, (err, bytesRead, buff) => {
+                if (err) resolve(-1);
+
+                if(bytesRead > 0){
+                    desc.incPosition(bytesRead);
+                }
+
+                resolve(bytesRead);
+            });
+        });
+    }
 }
