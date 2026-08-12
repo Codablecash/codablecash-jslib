@@ -1,9 +1,8 @@
-import { off } from "node:cluster";
 import { CFile } from "../base_io/CFile";
 import { FileDescriptor } from "./FileDescriptor";
 
 import fs from 'node:fs';
-import { buffer } from "node:stream/consumers";
+
 
 enum SeekOrigin {
     FROM_BEGINING = 0,
@@ -102,8 +101,14 @@ export class Os {
             fs.read(fd, data, 0, length, position, (err, bytesRead, buff) => {
                 if (err) throw err;
 
+                if(bytesRead > 0){
+                    desc.incPosition(bytesRead);
+                }
+
                 resolve(bytesRead);
             });
         });
     }
+
+
 }

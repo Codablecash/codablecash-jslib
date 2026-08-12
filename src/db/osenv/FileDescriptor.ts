@@ -29,6 +29,9 @@ export class FileDescriptor {
     public isSync() : boolean {
         return this.sync;
     }
+    public incPosition(n : number) : void {
+        this.position += n;
+    }
 
     public setPosition(pos : number) : void {
         this.position = pos;
