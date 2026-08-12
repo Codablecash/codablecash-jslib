@@ -3,6 +3,7 @@ import { CFile } from "../base_io/CFile";
 import { FileDescriptor } from "./FileDescriptor";
 
 import fs from 'node:fs';
+import { buffer } from "node:stream/consumers";
 
 enum SeekOrigin {
     FROM_BEGINING = 0,
@@ -38,7 +39,7 @@ export class Os {
         return desc;
     }
 
-    public openFile2Read(file : CFile) : FileDescriptor {
+    public static openFile2Read(file : CFile) : FileDescriptor {
         let path = file.toString();
         let flag : string = "r";
 
@@ -47,7 +48,7 @@ export class Os {
         return desc;
     }
 
-    public openFile2ReadWrite(file : CFile, sync : boolean) : FileDescriptor {
+    public static openFile2ReadWrite(file : CFile, sync : boolean) : FileDescriptor {
         let path = file.toString();
 
         let flag : string;
@@ -62,12 +63,12 @@ export class Os {
         return desc;
     }
 
-    public syncFile(desc : FileDescriptor) : void {
+    public static syncFile(desc : FileDescriptor) : void {
         let fd = desc.getFd();
         fs.fdatasyncSync(fd);
     }
 
-    public closeFileDescriptor(desc : FileDescriptor) : void {
+    public static closeFileDescriptor(desc : FileDescriptor) : void {
         if(desc.isOpened()){
             let fd = desc.getFd();
 
@@ -77,7 +78,7 @@ export class Os {
 
     }
 
-    public seekFile(desc : FileDescriptor, offset : number, origin : SeekOrigin) : void {
+    public static seekFile(desc : FileDescriptor, offset : number, origin : SeekOrigin) : void {
         let position = 0;
 
         if(origin == SeekOrigin.FROM_BEGINING){
@@ -91,5 +92,18 @@ export class Os {
         }
 
         desc.setPosition(position);
+    }
+
+    public static async readFile(desc : FileDescriptor, data : Uint8Array, length : number) : Promise<number> {
+        return new Promise<number>((resolve, reject) => {
+            let fd = desc.getFd();
+            let position = desc.getPosition();
+            
+            fs.read(fd, data, 0, length, position, (err, bytesRead, buff) => {
+                if (err) throw err;
+
+                resolve(bytesRead);
+            });
+        });
     }
 }
