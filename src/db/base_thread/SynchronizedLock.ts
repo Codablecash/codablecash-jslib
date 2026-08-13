@@ -1,10 +1,12 @@
+import { SysMutex } from "./SysMutex";
 
 
-export class SynchronizedLock {
+export class SynchronizedLock extends SysMutex {
     private sab: SharedArrayBuffer;
     private int32: Int32Array;
 
     constructor() {
+        super();
         this.sab = new SharedArrayBuffer(1024);
         this.int32 = new Int32Array(this.sab);
 
