@@ -28,7 +28,11 @@ export class RawLinkedList<T extends IComparable> {
     public iterator() : RawLinkedListIterator<T> {
         let it = new RawLinkedListIterator<T>(this);
         return it;
-    } 
+    }
+
+    public add(data : T) : void {
+        this.addLast(data);
+    }
 
     protected addLast(data : T) : RawLinkedListElement<T> {
         let element = new RawLinkedListElement<T>(data);
@@ -52,6 +56,8 @@ export class RawLinkedList<T extends IComparable> {
         this.length++;
         return element;
     }
+
+
 }
 
 export class RawLinkedListElement<T extends IComparable> {
