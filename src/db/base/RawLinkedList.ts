@@ -34,8 +34,8 @@ export class RawLinkedList<T extends IComparable> {
         this.addLast(data);
     }
 
-    public __add(index : number, element: T) : RawLinkedListElement<T> | null {
-        let newElement : RawLinkedListElement<T> | null = null;
+    public __add(index : number, element: T) : RawLinkedListElement<T> {
+        let newElement : RawLinkedListElement<T>;
         if(index == this.length){
             newElement = this.addLast(element);
         }

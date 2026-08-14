@@ -4,6 +4,7 @@ import { RawLinkedListElement } from "../base/RawLinkedList";
 import { FileDescriptor } from "../osenv/FileDescriptor";
 import { DiskCacheManager } from "./DiskCacheManager";
 import { MMapSegment } from "./MMapSegment";
+import { FileIOException } from "../osenv/FileIOException";
 
 
 export class MMapSegments {
@@ -69,6 +70,28 @@ export class MMapSegments {
 
     public requestCacheOut(seg : MMapSegment) : void {
         this.removeList.addElement(seg);
+    }
+
+    public async getSegment(fpos : number, cache : DiskCacheManager, fd : FileDescriptor) : Promise<MMapSegment> {
+        if(this.fileSize <= fpos){
+            throw new FileIOException("fpos is over the file size.");
+        }
+
+        await this.cacheOutSegmentIndex(fd);
+
+        let index = (fpos / this.segmentSize);
+
+        let seg = this.segIndex.get(index);
+        if(seg != null && seg.data != null){
+            cache.fireCacheHit(seg);
+            return seg.data;
+        }
+
+        let newSeg = await this.newSegment(fpos, fd);
+        let segElement = cache.registerCache(newSeg);
+        this.segIndex.setElement(segElement, index);
+
+        return newSeg;       
     }
 
     public async newSegment(fpos : number, fd : FileDescriptor) : Promise<MMapSegment> {
