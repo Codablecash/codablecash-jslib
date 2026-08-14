@@ -19,7 +19,7 @@ export class DiskCacheManager {
     public fireCacheRemoved(seg : RawLinkedListElement<MMapSegment>) : void {
         let data = seg.data;
         this.currentSize -= (data != null) ? data.segmentSize() : 0;
-        this.cache.remove(seg);
+        this.cache.removeElement(seg);
     }
 
     public registerCache(newSeg : MMapSegment) : RawLinkedListElement<MMapSegment> | null {
@@ -41,7 +41,7 @@ export class DiskCacheManager {
 
         return newElement;
     }
-
+ 
     public size() : number {
         return this.currentSize;
     }

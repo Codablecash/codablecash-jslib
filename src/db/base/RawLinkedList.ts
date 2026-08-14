@@ -97,8 +97,18 @@ export class RawLinkedList<T extends IComparable> {
         return element;
     }
 
-    public remove(del : RawLinkedListElement<T>) : void {
-        this.removeElement(del);
+    public remove(data : T){
+        let index = this.indexOf(data);
+		if(index < 0){
+			return false;
+		}
+
+		let del = this.getElement(index);
+        if(del != null){
+            this.removeElement(del);
+        }
+		
+        return true;
     }
 
     public removeByIndex(index : number) : T | null {
@@ -113,7 +123,7 @@ export class RawLinkedList<T extends IComparable> {
         return ret;
     }
 
-    protected removeElement(element : RawLinkedListElement<T>) : void {
+    public removeElement(element : RawLinkedListElement<T>) : void {
         if(element === this.root){
             if(element.next != null){
                 element.next.prev = null;
@@ -141,6 +151,22 @@ export class RawLinkedList<T extends IComparable> {
 		this.length--;       
     }
 
+    public indexOf(obj : T) {
+        let target = new RawLinkedListElement<T>(obj);
+
+        let index = 0;
+        let it = new RawLinkedListIterator<T>(this);
+        while(it.hasNext()){
+            let d = it.nextElement();
+
+            if(d != null && this.compareFunctor(target, d) == 0){
+                return index;
+            }
+            ++index;
+        }
+        return -1;
+    }
+
     public moveElementToTop(element : RawLinkedListElement<T>) : void {
 		if(element === this.root){
 			return;
@@ -162,6 +188,20 @@ export class RawLinkedList<T extends IComparable> {
 
 		this.root = element;       
     }
+
+	public get(index : number) : T | null {
+		let i = 0;
+		let it = new RawLinkedListIterator<T>(this); // = iterator();
+		while(it.hasNext()){
+			let d = it.next();
+
+			if(i == index){
+				return d;
+			}
+			++i;
+		}
+		return null;
+	}
 
     protected getElement(index : number) : RawLinkedListElement<T> | null {
         let i = 0;
