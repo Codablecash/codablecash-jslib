@@ -44,7 +44,7 @@ export class MMapSegments {
                 let data = seg.data;
 
                 if(data?.isDirty()){
-                    data.writeBack(fd);
+                    await data.writeBack(fd);
                 }
 
                 diskManager.fireCacheRemoved(seg);
@@ -107,5 +107,20 @@ export class MMapSegments {
         await seg.loadData(fd);
 
         return seg;
+    }
+
+    public async sync(flushDisk : boolean, fd : FileDescriptor) : Promise<void> {
+        await this.cacheOutSegmentIndex(fd);
+
+        let maxLoop = this.segIndex.size();
+        for(let i = 0; i != maxLoop; ++i){
+            let seg = this.segIndex.get(i);
+
+            if(seg != null && seg.data != null && seg.data.isDirty()){
+                let data = seg.data;
+                
+                await data.writeBack(fd);
+            }
+        }
     }
 }
