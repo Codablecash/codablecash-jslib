@@ -1,7 +1,5 @@
 
 
-export class IComparable {
-    compareTo(other : IComparable | null) : number {
-        return 0;
-    }
+export interface IComparable {
+    compareTo(other : IComparable | null) : number;
 }

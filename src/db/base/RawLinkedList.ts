@@ -4,8 +4,7 @@ import { IComparable } from "./IComparable";
 type RawLinkedListCmp<T extends IComparable> = (x : RawLinkedListElement<T>, y : RawLinkedListElement<T>) => number;
 
 function defaultCompare<T extends IComparable>(x : RawLinkedListElement<T>, y : RawLinkedListElement<T>) : number {
-
-    return 0;
+    return x.compareTo(y);
 }
 
 
@@ -31,6 +30,28 @@ export class RawLinkedList<T extends IComparable> {
         return it;
     } 
 
+    protected addLast(data : T) : RawLinkedListElement<T> {
+        let element = new RawLinkedListElement<T>(data);
+        if(this.root == null){
+            this.root = element;
+            this.last = element;
+
+            element.prev = null;
+            element.next = null;
+
+            this.length++;
+            return element;
+        }
+
+        this.last?.setNext(element);
+
+        element.prev = this.last;
+        element.next = null;
+        this.last = element;
+
+        this.length++;
+        return element;
+    }
 }
 
 export class RawLinkedListElement<T extends IComparable> {
@@ -44,6 +65,10 @@ export class RawLinkedListElement<T extends IComparable> {
         this.prev = null;
     }
 
+    public setNext(d : RawLinkedListElement<T>) {
+        this.next = d;
+    }
+
     public compareTo(other : RawLinkedListElement<T>) : number {
         if(this.data == null){
             if(other.data == null){
@@ -54,9 +79,7 @@ export class RawLinkedListElement<T extends IComparable> {
             }
         }
 
-        let d = other != null ? other.data : null;
-
-        return this.data.compareTo(d);
+        return this.data.compareTo(other.data);
     }
 }
 
