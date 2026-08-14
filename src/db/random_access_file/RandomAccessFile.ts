@@ -33,7 +33,7 @@ export class RandomAccessFile {
         return this.file.exists();
     }
 
-    public open(sync : boolean) {
+    public async open(sync : boolean) {
         this.fd = Os.openFile2ReadWrite(this.file, sync);
 
         if(!this.fd.isOpened()){
@@ -47,7 +47,7 @@ export class RandomAccessFile {
 	    this.mmapSegments = new MMapSegments(this.fileSize, segmentSize);
 
         if(this.fileSize == 0){
-            this.setLength(this.pageSize * RandomAccessFile.PAGE_NUM_CACHE);
+            await this.setLength(this.pageSize * RandomAccessFile.PAGE_NUM_CACHE);
         }
     }
 

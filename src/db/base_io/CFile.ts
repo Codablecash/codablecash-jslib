@@ -56,7 +56,7 @@ export class CFile {
     public deleteDir() : boolean {
         let exec = this.exists() && this.isDirectory();
         if(exec){
-            fs.rmdirSync(this.pathname);
+            fs.rmSync(this.pathname, { recursive: true, force: true });
         }
         return exec;      
     }
