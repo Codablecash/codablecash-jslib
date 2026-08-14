@@ -1,3 +1,4 @@
+import { off } from "node:cluster";
 import { IComparable } from "../base/IComparable";
 import { FileDescriptor } from "../osenv/FileDescriptor";
 import { FileIOException } from "../osenv/FileIOException";
@@ -61,5 +62,20 @@ export class MMapSegment implements IComparable {
         if(ret != this.mappedSize){
             throw new FileIOException("Failed in writing a segment.");
         }
+    }
+
+    public getPtr2Read(offset : number, count : number) : Uint8Array<ArrayBuffer>{
+        let size = this.buffer.length - offset;
+
+        let ptr = this.buffer.slice(offset, offset + count);
+        return ptr;
+    }
+
+    public remains(offset : number) : number {
+        return this.mappedSize - offset;
+    }
+
+    public setDirty(bl : boolean) : void {
+        this.dirty = bl;
     }
 }

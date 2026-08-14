@@ -1,3 +1,4 @@
+import { off } from "node:cluster";
 import { CFile } from "../base_io/CFile";
 import { FileDescriptor } from "../osenv/FileDescriptor";
 import { FileIOException } from "../osenv/FileIOException";
@@ -50,14 +51,39 @@ export class RandomAccessFile {
         }
     }
 
-    public close() {
+    public async close() {
         if(this.fd != null && !this.fd.isOpened()) {
             return;
         }
 
         if(this.mmapSegments != null && this.fd != null){
-            this.mmapSegments.clearElements(this.diskCacheManager, this.fd);
+            await this.mmapSegments.clearElements(this.diskCacheManager, this.fd);
             Os.closeFileDescriptor(this.fd);
+        }
+    }
+
+    public async read(fpos : number, buff : Uint8Array, count : number) {
+        let segSize = this.getSegmentSize();
+
+        let buffpos = 0;
+        let count2Read = count;
+        let currentfpos = fpos;
+        while(count2Read > 0 && this.fd != null){
+            let seg = await this.mmapSegments?.getSegment(currentfpos, this.diskCacheManager, this.fd);
+
+            if(seg != undefined){
+                let offset = currentfpos % segSize;
+                //ptr = seg.getPtr(offset);
+                let cnt = seg.remains(offset);
+                cnt = cnt > count2Read ? count2Read : cnt;
+
+                let ptr = seg.getPtr2Read(offset, cnt);
+
+                buff.set(ptr, buffpos);
+                buffpos += cnt;
+                count2Read -= cnt;
+		        currentfpos += cnt;
+            }
         }
     }
 
