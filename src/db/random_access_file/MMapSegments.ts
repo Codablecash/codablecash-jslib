@@ -46,9 +46,8 @@ export class MMapSegments {
                     data.writeBack(fd);
                 }
 
-                // FIXME
+                diskManager.fireCacheRemoved(seg);
             }
-
         }
     }
 
