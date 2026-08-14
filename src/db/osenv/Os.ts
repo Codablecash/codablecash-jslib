@@ -4,7 +4,7 @@ import { FileDescriptor } from "./FileDescriptor";
 import fs from 'node:fs';
 
 
-enum SeekOrigin {
+export enum SeekOrigin {
     FROM_BEGINING = 0,
     CURRENT_POS = 1,
     FROM_END = 2

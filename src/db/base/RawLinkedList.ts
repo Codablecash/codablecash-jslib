@@ -57,7 +57,37 @@ export class RawLinkedList<T extends IComparable> {
         return element;
     }
 
+    public remove(del : RawLinkedListElement<T>) : void {
+        this.removeElement(del);
+    }
 
+    protected removeElement(element : RawLinkedListElement<T>) : void {
+        if(element === this.root){
+            if(element.next != null){
+                element.next.prev = null;
+            }
+            this.root = element.next;
+
+            if(element === this.last){
+                this.last = element.prev;
+            }
+            this.length--;
+            return;
+        }
+        else if(element === this.last){
+			element.prev?.setNext(null);
+			this.last = element.prev;
+
+			this.length--;
+
+			return;
+        }
+
+ 		element.next?.setPrev(element.prev);
+		element.prev?.setNext(element.next);
+
+		this.length--;       
+    }
 }
 
 export class RawLinkedListElement<T extends IComparable> {
@@ -71,8 +101,11 @@ export class RawLinkedListElement<T extends IComparable> {
         this.prev = null;
     }
 
-    public setNext(d : RawLinkedListElement<T>) {
+    public setNext(d : RawLinkedListElement<T> | null) {
         this.next = d;
+    }
+    public setPrev(d : RawLinkedListElement<T> | null) {
+        this.prev = d;
     }
 
     public compareTo(other : RawLinkedListElement<T>) : number {

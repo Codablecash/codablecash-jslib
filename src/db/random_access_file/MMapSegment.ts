@@ -1,4 +1,7 @@
 import { IComparable } from "../base/IComparable";
+import { FileDescriptor } from "../osenv/FileDescriptor";
+import { FileIOException } from "../osenv/FileIOException";
+import { Os, SeekOrigin } from "../osenv/Os";
 import { MMapSegments } from "./MMapSegments";
 
 
@@ -21,5 +24,29 @@ export class MMapSegment implements IComparable {
         let otherPos = other != null ? (other as MMapSegment).position : 0;
 
         return this.position - otherPos;
+    }
+
+    public getPosition() : number {
+        return this.position;
+    }
+
+    public isDirty() : boolean {
+        return this.dirty;
+    }
+
+    public async writeBack(fd : FileDescriptor) : Promise<number> {
+        let ret = Os.seekFile(fd, this.position, SeekOrigin.FROM_BEGINING);
+
+        ret = await Os.write2File(fd, this.buffer, this.mappedSize);
+        if(ret != this.mappedSize){
+            throw new FileIOException("Failed in writing a segment.");
+        }
+        this.dirty = false;
+
+        return ret;
+    }
+
+    public segmentSize() : number {
+        return this.mappedSize;
     }
 }

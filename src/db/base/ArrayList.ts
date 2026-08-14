@@ -23,6 +23,16 @@ export class ArrayList<T> {
         this.numArray++;
     }
 
+    public setElement(ptr : T | null, index : number) : void {
+        this.root[index] = ptr;
+    }
+
+    public reset() {
+        this.numArray = 0;
+        this.cursor = 0;
+        this.sorted = true;
+    }
+
     private realloc() {
         let size = this.currentSize * 2;
 
