@@ -34,6 +34,46 @@ export class RawLinkedList<T extends IComparable> {
         this.addLast(data);
     }
 
+    public __add(index : number, element: T) : RawLinkedListElement<T> | null {
+        let newElement : RawLinkedListElement<T> | null = null;
+        if(index == this.length){
+            newElement = this.addLast(element);
+        }
+        else {
+            let e = this.getElement(index);
+            newElement = new RawLinkedListElement(element);
+
+            if(e != null){
+                this.addBefore(e, newElement);
+            }
+        }
+
+        return newElement;
+    }
+
+    public addBefore(lastElement : RawLinkedListElement<T>, element : RawLinkedListElement<T>) : void {
+		if(lastElement.prev == null){ // is root
+			lastElement.prev = element;
+
+			this.root = element;
+			this.root.setNext(lastElement);
+
+			this.length++;
+
+			return;
+		}
+
+		let parentOfLast = lastElement.prev;
+
+		parentOfLast.next = element;
+		lastElement.prev = element;
+
+		element.prev = parentOfLast;
+		element.next = lastElement;
+
+		this.length++;
+    }
+
     protected addLast(data : T) : RawLinkedListElement<T> {
         let element = new RawLinkedListElement<T>(data);
         if(this.root == null){
@@ -59,6 +99,18 @@ export class RawLinkedList<T extends IComparable> {
 
     public remove(del : RawLinkedListElement<T>) : void {
         this.removeElement(del);
+    }
+
+    public removeByIndex(index : number) : T | null {
+        let del = this.getElement(index);
+        if(del == null){
+            return null;
+        }
+
+        let ret = del.data;
+        this.removeElement(del);
+
+        return ret;
     }
 
     protected removeElement(element : RawLinkedListElement<T>) : void {
@@ -109,6 +161,29 @@ export class RawLinkedList<T extends IComparable> {
 		element.prev = null;
 
 		this.root = element;       
+    }
+
+    protected getElement(index : number) : RawLinkedListElement<T> | null {
+        let i = 0;
+        let it = new RawLinkedListIterator<T>(this);
+        while(it.hasNext()){
+            let e = it.nextElement();
+
+            if(i == index){
+                return e;
+            }
+            ++i;
+        }
+
+        return null;
+    }
+
+    public getLastElement() : RawLinkedListElement<T> | null {
+        return this.last;
+    }
+
+    public size() : number {
+        return this.length;
     }
 }
 

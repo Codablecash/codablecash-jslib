@@ -21,4 +21,28 @@ export class DiskCacheManager {
         this.currentSize -= (data != null) ? data.segmentSize() : 0;
         this.cache.remove(seg);
     }
+
+    public registerCache(newSeg : MMapSegment) : RawLinkedListElement<MMapSegment> | null {
+        if(this.maxCache <= this.currentSize){
+            let outSeg = this.cache.getLastElement();
+            
+            // request delete from segment index
+            if(outSeg != null && outSeg.data != null){
+                let segdata = outSeg.data;
+                segdata.requestCacheOut();
+                this.currentSize -= segdata.segmentSize();
+
+                this.cache.removeByIndex(this.cache.size() - 1);
+            }
+        }
+
+        let newElement = this.cache.__add(0, newSeg);
+        this.currentSize += newSeg.segmentSize();
+
+        return newElement;
+    }
+
+    public size() : number {
+        return this.currentSize;
+    }
 }

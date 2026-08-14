@@ -67,4 +67,8 @@ export class MMapSegments {
 
         this.removeList.reset();
     }
+
+    public requestCacheOut(seg : MMapSegment) : void {
+        this.removeList.addElement(seg);
+    }
 }

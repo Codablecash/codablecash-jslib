@@ -49,4 +49,8 @@ export class MMapSegment implements IComparable {
     public segmentSize() : number {
         return this.mappedSize;
     }
+
+    public requestCacheOut() : void {
+        this.parent.requestCacheOut(this);
+    }
 }
