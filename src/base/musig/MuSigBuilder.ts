@@ -59,9 +59,11 @@ export class MuSigBuilder {
         for(let i = 0; i != maxLoop; ++i){
             const signer = this.signers.get(i);
 
-            let Xi = signer.getxG();
-            hashBuilder.add(Xi);
-            this.XiList.addElement(Xi.copy())
+            if(signer != null){
+                let Xi = signer.getxG();
+                hashBuilder.add(Xi);
+                this.XiList.addElement(Xi.copy())
+            }
         }
         hashBuilder.buildHash();
 
@@ -76,15 +78,17 @@ export class MuSigBuilder {
         for(let i = 0; i != maxLoop; ++i){
             let Xi = this.XiList.get(i);
 
-            const hashBuilder = new MuSigHashBuilder();
-            hashBuilder.addBigInteger(this.L);
-            hashBuilder.add(Xi);
-            hashBuilder.buildHash();
+            if(Xi != null){
+                const hashBuilder = new MuSigHashBuilder();
+                hashBuilder.addBigInteger(this.L);
+                hashBuilder.add(Xi);
+                hashBuilder.buildHash();
 
-            let hash = hashBuilder.getResultAsBigInteger();
-            let value = Xi.multiple(hash);
+                let hash = hashBuilder.getResultAsBigInteger();
+                let value = Xi.multiple(hash);
 
-            result = result.add(value);
+                result = result.add(value);
+            }
         }
 
         this.X = result;
@@ -99,8 +103,10 @@ export class MuSigBuilder {
         for(let i = 0; i != maxLoop; ++i){
             let signer = this.signers.get(i);
 
-            let Ri = signer.getrG();
-            result = result.add(Ri);
+            if(signer != null){
+                let Ri = signer.getrG();
+                result = result.add(Ri);
+            }
         }
 
         this.R = result;
@@ -126,8 +132,10 @@ export class MuSigBuilder {
         for(let i = 0; i != maxLoop; ++i){
             let signer = this.signers.get(i);
 
-            let si = signer.gets(HXRm, this.L);
-            this.s.addSelf(si);
+            if(signer != null){
+                let si = signer.gets(HXRm, this.L);
+                this.s.addSelf(si);
+            }
         }
 
         this.s.modSelf(Secp256k1Point.n);

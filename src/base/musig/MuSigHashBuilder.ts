@@ -42,7 +42,11 @@ export class MuSigHashBuilder {
         let maxLoop = this.list.size();
         for(let i = 0; i != maxLoop; ++i){
             let b  = this.list.get(i);
-            buff.putByteBuffer(b);
+
+            if(b != null){
+                buff.putByteBuffer(b);
+            }
+            
         }
 
         let data = buff.toUint8Array();
@@ -57,7 +61,10 @@ export class MuSigHashBuilder {
         const maxLoop = this.list.size();
         for(let i = 0; i != maxLoop; ++i){
             let b  = this.list.get(i);
-            total += b.limit();
+
+            if(b != null){
+                total += b.limit();
+            }
         }
         return total;
     }
