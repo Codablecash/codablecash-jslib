@@ -71,6 +71,10 @@ export class MMapSegment implements IComparable {
         return ptr;
     }
 
+    public getPtr() : Uint8Array {
+        return this.buffer;
+    }
+
     public remains(offset : number) : number {
         return this.mappedSize - offset;
     }

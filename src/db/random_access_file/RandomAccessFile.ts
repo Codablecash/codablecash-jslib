@@ -62,7 +62,7 @@ export class RandomAccessFile {
         }
     }
 
-    public async read(fpos : number, buff : Uint8Array, count : number) {
+    public async read(fpos : number, buff : Uint8Array, count : number) : Promise<number> {
         let segSize = this.getSegmentSize();
 
         let buffpos = 0;
@@ -84,6 +84,49 @@ export class RandomAccessFile {
                 count2Read -= cnt;
 		        currentfpos += cnt;
             }
+        }
+
+        return count;
+    }
+
+    public async write(fpos : number, buff : Uint8Array, count : number) {
+        let segSize = this.getSegmentSize();
+
+        let buffoffset = 0;
+      	let count2Write = count;
+	    let currentfpos = fpos;
+        while(count2Write > 0){
+            // check capacity
+            {
+                let currentSize = this.fileSize;
+                let writeEndPos = currentfpos + count2Write;
+                if(writeEndPos >= currentSize){
+                    let newLength = currentSize + this.pageSize * 4;
+                    this.setLength(newLength);
+                }               
+            }
+
+            if(this.mmapSegments != null && this.fd != null){
+                let seg = await this.mmapSegments.getSegment(currentfpos, this.diskCacheManager, this.fd);
+
+                let ptr = seg.getPtr();
+
+                let offset = currentfpos % segSize;
+                let cnt = seg.remains(offset);
+                cnt = cnt > count2Write ? count2Write : cnt;
+
+                // memcpy
+                let sl = buff.slice(buffoffset, buffoffset + cnt);
+                ptr.set(sl);
+
+                //ptr.set()
+                seg.setDirty(true);
+
+                count2Write -= cnt;
+                currentfpos += cnt;
+                buffoffset += cnt;
+            }
+		    
         }
     }
 
