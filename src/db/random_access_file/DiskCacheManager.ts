@@ -12,6 +12,10 @@ export class DiskCacheManager {
         this.currentSize = 0;
     }
 
+    public fireCacheHit(seg : RawLinkedListElement<MMapSegment>) : void {
+        this.cache.moveElementToTop(seg);
+    }
+
     public fireCacheRemoved(seg : RawLinkedListElement<MMapSegment>) : void {
         let data = seg.data;
         this.currentSize -= (data != null) ? data.segmentSize() : 0;

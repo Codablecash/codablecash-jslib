@@ -88,6 +88,28 @@ export class RawLinkedList<T extends IComparable> {
 
 		this.length--;       
     }
+
+    public moveElementToTop(element : RawLinkedListElement<T>) : void {
+		if(element === this.root){
+			return;
+		}
+
+ 		if(this.last === element){
+			this.last = element.prev;
+		}
+
+		element.prev?.setNext(element.next);
+
+		if(element.next != null){
+			element.next.setPrev(element.prev);
+		}
+
+		this.root?.setPrev(element);
+		element.next = this.root;
+		element.prev = null;
+
+		this.root = element;       
+    }
 }
 
 export class RawLinkedListElement<T extends IComparable> {
