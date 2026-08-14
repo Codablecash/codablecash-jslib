@@ -70,4 +70,19 @@ export class MMapSegments {
     public requestCacheOut(seg : MMapSegment) : void {
         this.removeList.addElement(seg);
     }
+
+    public async newSegment(fpos : number, fd : FileDescriptor) : Promise<MMapSegment> {
+        let offset = fpos % this.segmentSize;
+        let segPos = fpos - offset;
+
+        let segSize = this.fileSize - segPos;
+        if(segSize > this.segmentSize){
+            segSize = this.segmentSize;
+        }
+
+        let seg = new MMapSegment(segSize, segPos, this);
+        await seg.loadData(fd);
+
+        return seg;
+    }
 }

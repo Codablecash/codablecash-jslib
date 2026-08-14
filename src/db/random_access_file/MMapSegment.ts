@@ -53,4 +53,13 @@ export class MMapSegment implements IComparable {
     public requestCacheOut() : void {
         this.parent.requestCacheOut(this);
     }
+
+    public async loadData(fd : FileDescriptor) : Promise<void> {
+        let ret = Os.seekFile(fd, this.position, SeekOrigin.FROM_BEGINING);
+
+        ret = await Os.readFile(fd, this.buffer, this.mappedSize);
+        if(ret != this.mappedSize){
+            throw new FileIOException("Failed in writing a segment.");
+        }
+    }
 }
