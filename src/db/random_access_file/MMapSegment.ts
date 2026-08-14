@@ -1,7 +1,8 @@
+import { IComparable } from "../base/IComparable";
 import { MMapSegments } from "./MMapSegments";
 
 
-export class MMapSegment {
+export class MMapSegment implements IComparable {
     protected mappedSize : number;
     protected position : number;
     protected buffer : Uint8Array;
@@ -16,5 +17,9 @@ export class MMapSegment {
         this.dirty = false;
     }
 
-    
+    public compareTo(other : IComparable | null) : number {
+        let otherPos = other != null ? (other as MMapSegment).position : 0;
+
+        return this.position - otherPos;
+    }
 }

@@ -2,7 +2,7 @@
 export class ArrayList<T> {
     private numArray : number;
     private currentSize : number;
-    private root : T[];
+    private root : (T | null)[];
     private cursor : number;
     private sorted : boolean;
 
@@ -14,7 +14,7 @@ export class ArrayList<T> {
         this.sorted = true;
     }
 
-    public addElement(ptr : T){
+    public addElement(ptr : T | null){
         if(this.currentSize <= this.numArray){
             this.realloc();
         }
@@ -35,7 +35,7 @@ export class ArrayList<T> {
         this.root = newPtr;
     }
 
-    private __copy(dest : T[], dest_start : number, src : T[], src_start : number, count : number) : void {
+    private __copy(dest : (T | null)[], dest_start : number, src : (T | null)[], src_start : number, count : number) : void {
         let d = dest_start;
         let s = src_start;
 
@@ -47,7 +47,7 @@ export class ArrayList<T> {
     public size() : number {
         return this.numArray;
     }
-    public get(pos : number) : T {
+    public get(pos : number) : T | null{
         return this.root[pos];
     }
 }
