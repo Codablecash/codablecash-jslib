@@ -33,6 +33,38 @@ export class MMapSegments {
         return (fileSize % segmentSize) == 0 ? fileSize / segmentSize : (fileSize / segmentSize) + 1;
     }
 
+    public async onResized(fileSize : number, fd : FileDescriptor, diskManager : DiskCacheManager) : Promise<void> {
+        await this.cacheOutSegmentIndex(fd);
+
+        let lastTopSegment = this.segIndex.size() - 1;
+
+        let newNumSegments = this.getNumSegments(fileSize, this.segmentSize);
+
+        let diffSize = newNumSegments - this.numSegments;
+        for(let i = 0; i != diffSize; ++i){
+            this.segIndex.addElement(null);
+        }
+
+        this.numSegments = newNumSegments;
+        this.fileSize = fileSize;
+
+        // hadle last seg
+        if(lastTopSegment < 0 || this.segIndex.get(lastTopSegment) == null){
+            return;
+        }
+
+        let segElement = this.segIndex.get(lastTopSegment);
+        if(segElement != null && segElement.data != null && segElement.data.isDirty()){
+            let seg = segElement.data;
+            await seg.writeBack(fd);
+        }
+
+        this.segIndex.setElement(null, lastTopSegment);
+        if(segElement != null){
+            diskManager.fireCacheRemoved(segElement);
+        }
+    }
+
     public async clearElements(diskManager : DiskCacheManager, fd : FileDescriptor) {
         await this.cacheOutSegmentIndex(fd);
 
