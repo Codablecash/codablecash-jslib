@@ -34,7 +34,7 @@ export class FileStore {
         return body.exists() && header.exists();
     }
 
-    public createStore(del : boolean, defaultSize : number){
+    public async createStore(del : boolean, defaultSize : number){
         let baseDir = new CFile(this.dir);
         if(!baseDir.exists()){
             baseDir.mkdirs();
@@ -44,7 +44,12 @@ export class FileStore {
             this.deleteLastFiles(baseDir);
         }
 
+        this.openFile(baseDir, false);
+        await this.file?.setLength(defaultSize);
 
+        this.openHeaderFile(baseDir, false);
+
+        this.close();
     }
 
     public deleteFiles() {
@@ -52,7 +57,7 @@ export class FileStore {
         this.deleteLastFiles(baseDir);
     }
 
-    private deleteLastFiles(baseDir : CFile){
+    protected deleteLastFiles(baseDir : CFile){
         let filename = this.name + ".bin";
         let storeFile = baseDir.get(filename);
         if(storeFile.exists()){
@@ -66,5 +71,42 @@ export class FileStore {
         }
     }
 
-    
+    public async open(sync : boolean) : Promise<void> {
+        let baseDir = new CFile(this.dir);
+
+        await this.openFile(baseDir, sync);
+        await this.openHeaderFile(baseDir, sync);
+    }
+
+    public async openFile(baseDir : CFile, sync : boolean) : Promise<void> {
+        let filename = this.name + ".bin";
+        let storeFile = baseDir.get(filename);
+
+        this.file = new RandomAccessFile(storeFile, this.cacheManager);
+        await this.file.open(sync);
+    }
+
+    public async openHeaderFile(baseDir : CFile, sync : boolean) : Promise<void> {
+        let headerfilename = this.name + "-header.bin";
+        let storeHeaderFile = baseDir.get(headerfilename);
+
+        this.headerFile = new RandomAccessFile(storeHeaderFile, this.cacheManager);
+        await this.headerFile.open(sync);
+    }
+
+    public isOpened() : boolean {
+        return this.file != null;
+    }
+
+    public async close() {
+        if(this.headerFile != null){
+            await this.headerFile.close();
+            this.headerFile = null;
+        }
+
+        if(this.file != null){
+            await this.file.close();
+            this.file = null;
+        }
+    }
 }
