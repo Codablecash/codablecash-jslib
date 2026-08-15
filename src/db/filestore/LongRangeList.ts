@@ -2,6 +2,7 @@ import { ArrayList } from "../base/ArrayList";
 import { ByteBuffer } from "../base_io/ByteBuffer";
 import { LongRange } from "./LongRange";
 import { LongRangeHitStatus } from "./LongRangeHitStatus";
+import { LongRangeIterator } from "./LongRangeIterator";
 
 
 export class LongRangeList {
@@ -315,6 +316,10 @@ export class LongRangeList {
         }
 
         return list;
+    }
+
+    public iterator() : LongRangeIterator {
+	    return new LongRangeIterator(this);
     }
 
 }

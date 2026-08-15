@@ -24,6 +24,10 @@ export class LongRange {
         this.max = value;
     }
 
+    public hasNext(value : number) : boolean {
+        return this.max > value;
+    }
+
     public compare(value : number) : number {
         if(this.min <= value && value <= this.max){
             return 0;
