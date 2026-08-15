@@ -87,6 +87,21 @@ export class LongRangeList {
 
         this.addRange(min, max);
     }
+
+    private removeInclusion(range : LongRange){
+        let minStatus = this.hitStatus(range.getMin(), range, true);
+        let maxStatus = this.hitStatus(range.getMax(), range, false);
+
+        let minPos = minStatus.getHigherIncludePos(this.list.size());
+        let maxPos = maxStatus.getLowerIncludePos(); // getHighPos(this.list.size()) - 1;
+
+        let length = maxPos - minPos + 1;
+        for(let i = 0; i < length; ++i){
+            this.list.remove(minPos);
+        }
+
+        return length;
+    }
     
     private hitStatus(value : number, range : LongRange, findHigher : boolean) : LongRangeHitStatus {
         let status = new LongRangeHitStatus(range);

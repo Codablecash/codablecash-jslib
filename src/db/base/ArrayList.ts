@@ -64,4 +64,26 @@ export class ArrayList<T> {
     public isEmpty() : boolean {
 		return this.numArray == 0;
 	}
+
+    public remove(index : number) : T | null
+	{
+		let ptr = this.get(index);
+		this.removeRange(index, 1);
+
+		return ptr;
+	}
+
+	public removeRange(index : number, length : number) : void
+	{
+		let copySize = (this.numArray - index - length);
+		if(copySize > 0){
+			for(let i = 0; i < copySize; i++){
+				this.root[index + i] = this.root[index + i + length];
+			}
+			//__move(this->root, index, this->root, index + length, copySize);
+		}
+
+		this.numArray = this.numArray - length;
+		this.cursor -= length;
+	}
 }
