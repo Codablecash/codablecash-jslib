@@ -13,4 +13,14 @@ describe('LongRange test', () => {
             expect(val == 10).toBe(true);
         }
     })
+
+    it('emptyIterator', () => {
+        let list = new LongRangeList();
+        
+        let it = list.iterator();
+
+        while(it.hasNext()){
+            let val = it.next();
+        }
+    })
 })
