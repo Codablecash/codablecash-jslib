@@ -24,6 +24,22 @@ export class VariableBlockHandle implements IBlockHandle {
 		this.fpos = fpos;
 	}
 
+    public async realloc(length : number) {
+        let handle = await this.store.realloc(this.fpos, length);
+
+        let other = <VariableBlockHandle>handle;
+        let b = other.moveBuffer();
+
+        if(b != null){ // guard
+             this.setBuffer(b);
+        }
+       
+        // update handle
+        this.fpos = handle.getFpos();
+
+        return this.store.getBlockList(this.fpos);
+    }
+
     public needRealloc(list : ArrayList<VariableBlock>, length : number) : boolean {
         if(this.store != null){
             let header = this.store.getHeader();

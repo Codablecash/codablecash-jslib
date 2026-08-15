@@ -105,7 +105,7 @@ export class VariableBlockFileStore extends FileStore implements IBlockFileStore
         }
     }
 
-    public async realloc(fpos : number, size : number) {
+    public async realloc(fpos : number, size : number) : Promise<IBlockHandle> {
         if((this.header != null && this.header.isEmpty()) || (this.header != null && this.header.availableCapacity() < size) ){
             // extend file size
             await this.extendFile();
