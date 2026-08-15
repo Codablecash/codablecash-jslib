@@ -39,9 +39,27 @@ export class VariableBlockFileStore extends FileStore implements IBlockFileStore
         catch(error){
             this.internalClear();
 
+            throw new BlockFileStorageException("Failed in creating block file store");
+        }
+    }
+
+    public async open(sync : boolean) {
+        await this.__open(sync);
+
+        if(this.headerFile != null){ // guard
+            this.header = new VariableBlockHeader(this.headerFile);
+        }
+
+        try{
+
+        }catch(error){
+            this.internalClear();
+            await super.close();
+
             throw new BlockFileStorageException("Failed in opening block file store");
         }
     }
+        
 
     public internalClear() {
         if(this.header != null){
