@@ -23,6 +23,24 @@ export class VariableBlockHeader {
         return this.blockUnitSize;
     }
 
+    public allocMaxFragment(range : LongRange,	size : number) : VariableBlock {
+        let maxAvailable = this.availableWithRange(range);
+        if(size > maxAvailable){
+            return this.allocateAll(range);
+        }
+
+        let numBlock = this.getNumAllocationBlocks(size);
+
+        let fpos = range.getMin() * this.blockUnitSize;
+        let block = new VariableBlock(this.blockUnitSize * numBlock, fpos, /*used*/ size, /*nextfpos*/0, null);
+
+        let min = range.getMin();
+        let allocatedRange = new LongRange(min, min + numBlock - 1);
+
+        (this.availableArea != null) && this.availableArea.removeRange(allocatedRange);
+        
+        return block;
+    }
 
     public getNumAllocationBlocks(size : number) {
         let remain = size - (this.blockUnitSize - VariableBlock.HEADER_SIZE);
