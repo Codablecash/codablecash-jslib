@@ -142,6 +142,47 @@ export class VariableBlockFileStore extends FileStore implements IBlockFileStore
 */
     }
 
+    public async alloc(size : number) {
+        if((this.header != null && this.header.isEmpty()) || (this.header != null && this.header.availableCapacity() < size) ){
+            // extend file size
+            this.extendFile();
+        }
+        
+        let sizeRemain = size;
+
+	    let list = new ArrayList<VariableBlock>();
+
+        let lastBlock : VariableBlock|null = null;
+
+        do{
+            if(this.header != null) { // guard
+                let block = this.header.allocMaxFragment(sizeRemain);
+                sizeRemain -= block.getUsedSize();
+
+                if(lastBlock != null){
+                    lastBlock.setNextfpos(block.getfPos());
+                }
+
+                list.addElement(block);
+                lastBlock = block;
+            }
+        }
+        while(sizeRemain > 0);
+
+        let maxLoop = list.size();
+        for(let i = 0; i != maxLoop; ++i){
+            let block = list.get(i);
+            
+            if(this.body != null && block != null){
+                await block.writeBack(this.body);
+            }
+        }
+
+        this.sync(false);
+
+        return this.blocksToHandle(list);
+    }
+
     public blocksToHandle(list : ArrayList<VariableBlock>) {
         let handle = new VariableBlockHandle(this);
         {

@@ -120,7 +120,7 @@ export class VariableBlock {
         return this.currentfPos;
     }
 
-    public setNextPos(fpos : number) : void {
+    public setNextfpos(fpos : number) : void {
         this.nextfpos = fpos;
     }
 
