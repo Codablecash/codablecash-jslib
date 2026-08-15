@@ -1,5 +1,6 @@
 import { ArrayList } from "../base/ArrayList";
 import { ByteBuffer } from "../base_io/ByteBuffer";
+import { BlockFileStorageException } from "../filestore_block/BlockFileStorageException";
 import { IBlockHandle } from "../filestore_block/IBlockHandle";
 import { VariableBlock } from "./VariableBlock";
 import { VariableBlockFileStore } from "./VariableBlockFileStore";
@@ -22,6 +23,19 @@ export class VariableBlockHandle implements IBlockHandle {
     public setFpos(fpos : number) : void {
 		this.fpos = fpos;
 	}
+
+    public needRealloc(list : ArrayList<VariableBlock>, length : number) : boolean {
+        if(this.store != null){
+            let header = this.store.getHeader();
+            let blockUnitSize = header != null ? header.getBlockUnitSize() : 0;
+
+            let availbleSize = this.getAvailableSize(list);
+            let leftUnused = availbleSize > length ? availbleSize - length : 0;
+            return (length > availbleSize) || (leftUnused >= blockUnitSize);
+        }
+
+        throw new BlockFileStorageException("Failed in VariableBlockHandle.needRealloc");
+    }
 
     public getAvailableSize(list : ArrayList<VariableBlock>) : number {
         let ret = 0;
