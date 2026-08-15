@@ -25,6 +25,20 @@ export class VariableBlockHeader {
         return this.blockUnitSize;
     }
 
+    public async createStore(del : boolean, defaultSize : number, blockUnitSize : number, extendBlocks : number) {
+        if(defaultSize % blockUnitSize != 0){
+            throw new FileIOException("createStore defaultSize % blockUnitSize != 0");
+        }
+
+        this.blockUnitSize = blockUnitSize;
+        this.extendBlocks = extendBlocks;
+        this.numBlocks = defaultSize / blockUnitSize;
+        this.availableArea = new LongRangeList();
+        this.availableArea.addRange(0, (defaultSize / blockUnitSize) - 1);
+
+        await this.sync(false);
+    }
+
     public extend() {
         let min = this.numBlocks;
         let max = min + this.extendBlocks - 1;
