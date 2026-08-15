@@ -24,8 +24,20 @@ export class VariableBlockHeader {
     }
 
 
+    public allocateAll(range : LongRange) {
+        let blockBytes = range.width() * this.blockUnitSize;
+        let used = blockBytes - VariableBlock.HEADER_SIZE;
 
-    
+        let fpos = range.getMin() * this.blockUnitSize;
+        let block = new VariableBlock(blockBytes, fpos, used, /*nextfpos*/0, null);
+
+        if(this.availableArea){ // guard
+            this.availableArea.removeRange(range);
+        }
+        
+        return block;
+    }
+
     public availableWithRange(range : LongRange) {
         let numBlocks = range.width();
 

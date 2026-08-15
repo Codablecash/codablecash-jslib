@@ -17,14 +17,14 @@ export class VariableBlock {
     // body
     private data : Uint8Array;
 
-    constructor(blockSize : number, fpos : number, used : number, nextfpos : number, data : Uint8Array) {
+    constructor(blockSize : number, fpos : number, used : number, nextfpos : number, data : Uint8Array | null) {
         this.blockSize = blockSize;
         this.currentfPos = fpos;
         this.used = used;
         this.nextfpos = nextfpos;
 
         this.data = new Uint8Array(this.dataSize());
-        if(this.data != null){
+        if(data != null){
             let sd = data.slice(0, used);
             this.data.set(sd, 0);
         }

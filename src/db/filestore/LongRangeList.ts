@@ -22,6 +22,41 @@ export class LongRangeList {
         return this.list.isEmpty();
     }
 
+    public removeRange(value : number | LongRange, max? : number) : void {
+        if(typeof value == "number" && max != undefined){
+            this.__removeRange(value, max);
+            return;
+        }
+
+        this._removeRange((value as unknown) as LongRange);
+    }
+
+    private __removeRange(min : number, max : number) : void {
+        let range = new LongRange(min, max);
+        this.removeRange(range);
+    }
+
+    private _removeRange(range : LongRange) : void {
+        let minStatus = this.hitStatus(range.getMin(), range, false);
+        let maxStatus = this.hitStatus(range.getMax(), range, true);
+
+        // check inclusion
+        this.removeInclusion(range);
+
+        // split
+        if(this.needSplit(minStatus, maxStatus, range)){
+            return;
+        }
+    }
+
+
+    public needSplit(minStatus : LongRangeHitStatus, maxStatus : LongRangeHitStatus, range : LongRange) : boolean {
+        /*
+
+        */
+       return false; // FIXME
+    }
+
     public addRange(value : number | LongRange, max? : number) {
         if(typeof value == "number"){
             if(max != undefined){
