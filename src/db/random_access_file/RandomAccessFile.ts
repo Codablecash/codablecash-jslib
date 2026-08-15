@@ -173,4 +173,14 @@ export class RandomAccessFile {
         await this.mmapSegments?.onResized(this.fileSize, this.fd, this.diskCacheManager);
     }
 
+    public async sync(flashDisk : boolean) : Promise<void> {
+        if(this.fd != null){
+            await this.mmapSegments?.sync(flashDisk, this.fd);
+
+            if(flashDisk){
+                Os.syncFile(this.fd);
+            }
+        }
+        
+    }
 }
