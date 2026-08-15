@@ -52,6 +52,43 @@ export class RawBitSet {
     }
 
 
+
+    public clear(pos? : number) {
+        if(pos == undefined){
+            this.__clear();
+            return;
+        }
+
+        if(!this._needClear) {
+            return ;
+        }
+        let arrayPos = pos >> RawBitSet.OFFSET;
+        if(arrayPos < this.actualArrayLength)
+        {
+            this.bits.set(this.bits.get(arrayPos) & (~(RawBitSet.TWO_N_ARRAY[pos & RawBitSet.RIGHT_BITS])), arrayPos);
+            if(this.bits.get(this.actualArrayLength - 1) == 0) {
+                this.isLengthActual = false;
+            }
+        }
+    }
+
+    public __clear() {
+        if(this._needClear){
+
+            for(let i = 0; i < this.bits.length; i ++ )
+            {
+                this.bits.set(0, i);
+            }
+            this.actualArrayLength = 0;
+            this.isLengthActual = true;
+            this._needClear = false;
+        }
+    }
+
+    public needClear() {
+        this._needClear = true;
+    }
+
     public nextSetBit(pos : number) {
         if(pos >= this.actualArrayLength << RawBitSet.OFFSET)
         {
@@ -82,18 +119,5 @@ export class RawBitSet {
         }
 
         return ret;
-    }
-
-    public clear() {
-        if(this._needClear){
-
-            for(let i = 0; i < this.bits.length; i ++ )
-            {
-                this.bits.set(0, i);
-            }
-            this.actualArrayLength = 0;
-            this.isLengthActual = true;
-            this._needClear = false;
-        }
     }
 }
