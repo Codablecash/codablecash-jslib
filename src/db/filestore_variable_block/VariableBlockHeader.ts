@@ -1,5 +1,6 @@
 import { LongRange } from "../filestore/LongRange";
 import { LongRangeList } from "../filestore/LongRangeList";
+import { FileIOException } from "../osenv/FileIOException";
 import { RandomAccessFile } from "../random_access_file/RandomAccessFile";
 import { VariableBlock } from "./VariableBlock";
 
@@ -23,7 +24,23 @@ export class VariableBlockHeader {
         return this.blockUnitSize;
     }
 
-    public allocMaxFragment(range : LongRange,	size : number) : VariableBlock {
+    public allocMaxFragment(value : LongRange | number, size? : number) {
+        if(typeof value == "number" && this.availableArea != null){
+            let range = this.availableArea.get(0);
+            
+            if(range != null && size != undefined){
+                return this.__allocMaxFragment(range, size);
+            }
+        }
+
+        if(size != undefined){
+            return this.__allocMaxFragment((value as unknown) as LongRange, size);
+        }
+        
+        throw new FileIOException("range error@allocMaxFragment");
+    }
+
+    private __allocMaxFragment(range : LongRange, size : number) : VariableBlock {
         let maxAvailable = this.availableWithRange(range);
         if(size > maxAvailable){
             return this.allocateAll(range);
