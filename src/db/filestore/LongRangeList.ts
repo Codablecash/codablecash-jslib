@@ -47,6 +47,32 @@ export class LongRangeList {
         if(this.needSplit(minStatus, maxStatus, range)){
             return;
         }
+
+        // no split
+        if(minStatus.hasIncluded()){
+            let r = minStatus.getIncluded();
+
+            if(r != null){
+                let remove = r.removeHigh(range.getMin());
+
+                if(remove){
+                    let idx = this.list.indexOfPtr(r);
+                    this.list.remove(idx);
+                }
+            }
+
+        }
+        if(maxStatus.hasIncluded()){
+            let r = maxStatus.getIncluded();
+
+            if(r != null){
+                let remove = r.removeLow(range.getMax());
+                if(remove){
+                    let idx = this.list.indexOfPtr(r);
+                    this.list.remove(idx);
+                }
+            }
+        }
     }
 
 

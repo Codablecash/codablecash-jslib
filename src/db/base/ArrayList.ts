@@ -86,4 +86,17 @@ export class ArrayList<T> {
 		this.numArray = this.numArray - length;
 		this.cursor -= length;
 	}
+
+    public indexOfPtr(ptr :T) : number {
+		let maxLoop = this.size();
+		for(let i = 0; i != maxLoop; ++i){
+			let other = this.get(i);
+
+			if(ptr === other){
+				return i;
+			}
+		}
+
+		return -1;
+	}
 }
