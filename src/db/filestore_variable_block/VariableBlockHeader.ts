@@ -25,7 +25,52 @@ export class VariableBlockHeader {
         return this.blockUnitSize;
     }
 
-    public async loadFile() {
+
+    public async sync(fileSync : boolean) {
+        await this.sync2File();
+        await this.file.sync(fileSync);
+    }
+        
+    public async sync2File() {
+        let headSize = 8 * 4;
+        let contentSize = this.availableArea != null ? this.availableArea.binarySize() : 0;
+        let binSize = headSize + contentSize;
+
+        let buff = ByteBuffer.allocateWithEndian(binSize, true);
+        
+        buff.putLong(binSize);
+        buff.putLong(this.blockUnitSize);
+        buff.putLong(this.extendBlocks);
+        buff.putLong(this.numBlocks);
+
+        this.availableArea && this.availableArea.toBinary(buff);
+	    buff.position(0);
+
+        // sync with file
+        this.file.setLength(binSize + headSize);
+
+        // file size
+        let buffSizeHeader = ByteBuffer.allocateWithEndian(headSize, true);
+        buffSizeHeader.putLong(binSize);
+        buffSizeHeader.putLong(this.blockUnitSize);
+        buffSizeHeader.putLong(this.extendBlocks);
+        buffSizeHeader.putLong(this.numBlocks);
+        buffSizeHeader.position(0);
+
+        let fpos = 0;
+        let binary = buffSizeHeader.toUint8Array();
+        fpos += await this.file.write(fpos, binary, headSize);
+
+        // content
+        binary = buff.toUint8Array().slice(headSize);
+        await this.file.write(fpos, binary, contentSize);
+
+        //binary = ((const char*)buff.array()) + headSize;
+        //int cnt = this.file.write(fpos, binary, contentSize);
+
+    }
+
+    public async loadFromFile() {
         let fpos = 0;
         let headSize = 8 * 4;
         let sizeHeaderBinary = new Uint8Array(headSize);
