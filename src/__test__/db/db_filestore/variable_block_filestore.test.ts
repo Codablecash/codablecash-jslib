@@ -1,6 +1,6 @@
 
 
-function akeTestData(start : number, length : number) {
+function makeTestData(start : number, length : number) {
 	let ptr = new Uint8Array(length);
 
 	for(let i = 0; i != length; ++i){
