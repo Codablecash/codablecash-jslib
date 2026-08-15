@@ -54,4 +54,108 @@ describe('LongRange test', () => {
             pos = bitset.nextSetBit(pos + 1);
         }
     })
+
+    it('addSimpleRangeIncluded', () => {
+        let bitset = new RawBitSet(128);
+
+        let list = new LongRangeList();
+
+        addRange(bitset, list, 10, 15);
+        addRange(bitset, list, 11, 13);
+
+        let pos = bitset.nextSetBit(0);
+
+        let it = list.iterator();
+        while(it.hasNext()){
+            let val = it.next();
+            expect(val == pos).toBe(true);
+
+            pos = bitset.nextSetBit(pos + 1);
+        }
+    })
+
+     it('addSimpleRangeLowJoin', () => {
+        let bitset = new RawBitSet(128);
+
+        let list = new LongRangeList();
+
+        addRange(bitset, list, 10, 15);
+        addRange(bitset, list, 16, 17);
+
+        let pos = bitset.nextSetBit(0);
+
+        let it = list.iterator();
+        while(it.hasNext()){
+            let val = it.next();
+            expect(val == pos).toBe(true);
+
+            pos = bitset.nextSetBit(pos + 1);
+        }
+    })
+
+     it('addSimpleRangeHighJoin', () => {
+        let bitset = new RawBitSet(128);
+
+        let list = new LongRangeList();
+
+        addRange(bitset, list, 10, 15);
+        addRange(bitset, list, 8, 9);
+
+        let pos = bitset.nextSetBit(0);
+
+        let it = list.iterator();
+        while(it.hasNext()){
+            let val = it.next();
+            expect(val == pos).toBe(true);
+
+            pos = bitset.nextSetBit(pos + 1);
+        }
+    })
+
+    it('addSinleRange', () => {
+        let bitset = new RawBitSet(128);
+
+        let list = new LongRangeList();
+
+        addRange(bitset, list, 8, 10);
+        list.assertList();
+
+        addRange(bitset, list, 12, 12);
+        list.assertList();
+
+        let pos = bitset.nextSetBit(0);
+
+        let it = list.iterator();
+        while(it.hasNext()){
+            let val = it.next();
+            expect(val == pos).toBe(true);
+
+            pos = bitset.nextSetBit(pos + 1);
+        }
+    })
+
+    it('addSinleRange02', () => {
+        let bitset = new RawBitSet(128);
+
+        let list = new LongRangeList();
+
+        addRange(bitset, list, 8, 10);
+        list.assertList();
+
+        addRange(bitset, list, 12, 12);
+        list.assertList();
+
+        addRange(bitset, list, 13, 13);
+        list.assertList();
+
+        let pos = bitset.nextSetBit(0);
+
+        let it = list.iterator();
+        while(it.hasNext()){
+            let val = it.next();
+            expect(val == pos).toBe(true);
+
+            pos = bitset.nextSetBit(pos + 1);
+        }
+    })
 })

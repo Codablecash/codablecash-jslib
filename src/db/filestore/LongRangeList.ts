@@ -1,5 +1,6 @@
 import { ArrayList } from "../base/ArrayList";
 import { ByteBuffer } from "../base_io/ByteBuffer";
+import { FileIOException } from "../osenv/FileIOException";
 import { LongRange } from "./LongRange";
 import { LongRangeHitStatus } from "./LongRangeHitStatus";
 import { LongRangeIterator } from "./LongRangeIterator";
@@ -228,7 +229,7 @@ export class LongRangeList {
 
         let mid = -1;
         do {
-            mid = (begin + end) / 2;
+            mid = Math.trunc((begin + end) / 2)
 
             midRange = this.list.get(mid);
             if(midRange != null){
@@ -322,5 +323,28 @@ export class LongRangeList {
 	    return new LongRangeIterator(this);
     }
 
+
+    public assertList() {
+        let lastRange = null;
+
+        let maxLoop = this.list.size();
+        for(let i = 0; i != maxLoop; ++i){
+            let range = this.list.get(i);
+
+            if(lastRange == null){
+                lastRange = range;
+                continue;
+            }
+
+            let rangeMin = range != null ? range.getMin() : -1;
+            let rangeMax = lastRange.getMax();
+
+            if(!(rangeMax < rangeMin)){
+                throw new FileIOException("Range assert");
+            }
+
+            lastRange = range;
+        }
+    }
 }
 
