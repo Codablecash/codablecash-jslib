@@ -32,4 +32,24 @@ export class VariableBlock {
     public dataSize() : number {
         return this.blockSize - this.headerSize();
     }
+
+    public getUsedSize() : number {
+        return this.used;
+    }
+
+    public getfPos() : number {
+        return this.currentPos;
+    }
+
+    public setNextfpos(fpos : number) : void {
+        this.nextfpos = fpos;
+    }
+
+    public getNExtPos() : number {
+        return this.nextfpos;
+    }
+
+    public getData() : Uint8Array {
+        return this.data;
+    }
 }
