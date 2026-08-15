@@ -23,6 +23,15 @@ export class VariableBlockHeader {
         return this.blockUnitSize;
     }
 
+
+
+    
+    public availableWithRange(range : LongRange) {
+        let numBlocks = range.width();
+
+        return (numBlocks * this.blockUnitSize) - VariableBlock.HEADER_SIZE;
+    }
+
     public isEmpty() : boolean {
 	    return this.availableArea != null && this.availableArea.isEmpty();
     }
