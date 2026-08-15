@@ -1,5 +1,7 @@
+import { ArrayList } from "../base/ArrayList";
 import { ByteBuffer } from "../base_io/ByteBuffer";
 import { IBlockHandle } from "../filestore_block/IBlockHandle";
+import { VariableBlock } from "./VariableBlock";
 import { VariableBlockFileStore } from "./VariableBlockFileStore";
 
 
@@ -21,7 +23,45 @@ export class VariableBlockHandle implements IBlockHandle {
 		this.fpos = fpos;
 	}
 
+    public async removeBlocks(list? : ArrayList<VariableBlock>) : Promise<void> {
+        if(list != undefined){
+            await this.__removeBlocks(list);
+            return;
+        }
+
+        let mylist = await this.store.getBlockList(this.fpos);
+
+        await this.removeBlocks(mylist);
+    }
+
+    private async __removeBlocks(list : ArrayList<VariableBlock>) : Promise<void> {
+        let header = this.store.getHeader();
+        let body = this.store.getBody();
+
+        let maxLoop = list.size();
+        for(let i = 0; i != maxLoop; ++i){
+            let block = list.get(i);
+
+            if(block != null && header != null && body != null){ // guard
+                await block.freeBlock(header, body);
+            }
+        }
+
+        await this.store.sync(false);
+    }
+
+    public size() : number {
+        return this.buffer != null ? this.buffer.limit() : 0;
+    }
+
     public setBuffer(buffer : ByteBuffer) {
         this.buffer = buffer;
+    }
+
+    public moveBuffer() : ByteBuffer | null {
+        let ret = this.buffer;
+        this.buffer = null;
+
+        return ret;
     }
 }

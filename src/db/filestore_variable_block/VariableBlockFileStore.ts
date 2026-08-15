@@ -23,6 +23,14 @@ export class VariableBlockFileStore extends FileStore implements IBlockFileStore
         this.body = null;
     }
 
+    public getHeader() {
+        return this.header;
+    }
+
+    public getBody() {
+        return this.body;
+    }
+
     public async createStore(del : boolean, defaultSize : number, blockUnitSize : number, extendBlocks : number = 1024) {
         let mod = defaultSize % blockUnitSize;
 
