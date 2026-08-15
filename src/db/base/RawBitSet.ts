@@ -51,7 +51,20 @@ export class RawBitSet {
         this.isLengthActual = true;       
     }
 
-
+    public set(pos : number) {
+        let len = (pos >> RawBitSet.OFFSET) + 1;
+        if(len > this.bits.length)
+        {
+            this.bits.growLength(len);
+        }
+        this.bits.set(this.bits.get(len - 1) | (RawBitSet.TWO_N_ARRAY[pos & RawBitSet.RIGHT_BITS]), len - 1);
+        if(len > this.actualArrayLength)
+        {
+            this.actualArrayLength = len;
+            this.isLengthActual = true;
+        }
+        this.needClear();
+    }
 
     public clear(pos? : number) {
         if(pos == undefined){
