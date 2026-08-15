@@ -39,7 +39,7 @@ export class VariableBlockHeader {
         await this.sync(false);
     }
 
-    public extend() {
+    public extend() : number {
         let min = this.numBlocks;
         let max = min + this.extendBlocks - 1;
 

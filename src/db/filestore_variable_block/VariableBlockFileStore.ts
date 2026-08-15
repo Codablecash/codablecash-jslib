@@ -59,8 +59,7 @@ export class VariableBlockFileStore extends FileStore implements IBlockFileStore
             throw new BlockFileStorageException("Failed in opening block file store");
         }
     }
-        
-
+    
     public internalClear() {
         if(this.header != null){
             this.header = null;
@@ -74,4 +73,24 @@ export class VariableBlockFileStore extends FileStore implements IBlockFileStore
         await super.close();
 	    this.internalClear();
     }
+
+    public async extendFile() {
+        if(this.header != null && this.body != null){
+            let numExtendedBlocks = this.header.extend();
+
+            let newLength = numExtendedBlocks * this.header.getBlockUnitSize();
+            this.body.extend(newLength);
+
+            await this.sync(false);
+        }
+    }
+
+    public async sync(fsync : boolean) {
+        if(this.header != null && this.body != null){
+            await this.header.sync(fsync);
+            await this.body.sync(fsync);
+        }
+    }
+
+    
 }
