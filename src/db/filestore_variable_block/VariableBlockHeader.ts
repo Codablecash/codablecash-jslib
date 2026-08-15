@@ -24,6 +24,19 @@ export class VariableBlockHeader {
     }
 
 
+    public getNumAllocationBlocks(size : number) {
+        let remain = size - (this.blockUnitSize - VariableBlock.HEADER_SIZE);
+        if(remain <= 0){
+            return 1;
+        }
+
+        // secondary
+        let num = remain / this.blockUnitSize;
+        let mod = remain % this.blockUnitSize;
+
+        return (mod == 0) ? num + 1 : num + 2; // add first block
+    }
+
     public allocateAll(range : LongRange) : VariableBlock {
         let blockBytes = range.width() * this.blockUnitSize;
         let used = blockBytes - VariableBlock.HEADER_SIZE;
