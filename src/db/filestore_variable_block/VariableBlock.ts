@@ -45,6 +45,45 @@ export class VariableBlock {
         }
     }
 
+    public write(buff : Uint8Array, length : number) : void {
+        let b = buff.slice(0, length);
+        this.data.set(b, 0);
+
+        this.used = length;
+    }
+
+    public static async load(body : VariableBlockFileBody, fpos : number, blockunit : number) {
+        let rfile = body.getFile();
+
+        let __fpos = fpos;
+
+        let tmp = new Uint8Array(VariableBlock.HEADER_SIZE);
+        __fpos += await rfile.read(__fpos, tmp, VariableBlock.HEADER_SIZE);
+
+        let buff = ByteBuffer.wrapWithEndian(tmp, VariableBlock.HEADER_SIZE, true);
+        let used = buff.getShort();
+        let nextfpos = buff.getLong();
+        let blockSize = VariableBlock.toBlockSize(used, blockunit);       
+
+        let data = new Uint8Array(used);
+
+        __fpos += await rfile.read(__fpos, data, used);
+
+        let block = new VariableBlock(blockSize, fpos, used, Number(nextfpos), data);
+        return block;
+    }
+
+    public static toBlockSize(used : number ,blockunit : number) : number {
+        let total = used + VariableBlock.HEADER_SIZE;
+        let mod = total % blockunit;
+        let ret = total - mod;
+        if(mod != 0){
+            ret += blockunit;
+        }
+
+        return ret;
+    }
+
     public headerSize() : number {
         return VariableBlock.HEADER_SIZE;
     }
