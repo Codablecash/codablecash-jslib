@@ -1,3 +1,4 @@
+import { ByteBuffer } from "../base_io/ByteBuffer";
 import { LongRange } from "../filestore/LongRange";
 import { LongRangeList } from "../filestore/LongRangeList";
 import { FileIOException } from "../osenv/FileIOException";
@@ -22,6 +23,39 @@ export class VariableBlockHeader {
 
     public getBlockUnitSize() : number {
         return this.blockUnitSize;
+    }
+
+    public async loadFile() {
+        let fpos = 0;
+        let headSize = 8 * 4;
+        let sizeHeaderBinary = new Uint8Array(headSize);
+
+        fpos += await this.file.read(fpos, sizeHeaderBinary, headSize);
+
+        let buffSizeHeader = ByteBuffer.allocateWithEndian(headSize, true);
+
+        buffSizeHeader.putUint8Array(sizeHeaderBinary, headSize);
+
+        buffSizeHeader.position(0);
+        let loadSize = buffSizeHeader.getLong();
+        this.blockUnitSize = Number(buffSizeHeader.getLong());
+        this.extendBlocks = Number(buffSizeHeader.getLong());
+        this.numBlocks = Number(buffSizeHeader.getLong());
+
+        let areaSize = Number(loadSize) - headSize;
+        if(areaSize < 4){
+            throw new FileIOException("File header format is broken");
+        }
+
+        let usedAreaBinary = new Uint8Array(areaSize);
+        fpos += await this.file.read(fpos, usedAreaBinary, areaSize);
+
+
+        let rangeBinary = ByteBuffer.allocateWithEndian(areaSize, true);
+        
+        rangeBinary.putUint8Array(usedAreaBinary, areaSize);
+        rangeBinary.position(0);
+        this.availableArea = LongRangeList.fromBinary(rangeBinary);
     }
 
     public reallocFirstMaxFragment(firstBlockPos : number, size : number) : VariableBlock {

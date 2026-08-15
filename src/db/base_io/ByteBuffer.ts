@@ -179,6 +179,19 @@ export class ByteBuffer {
         this.data.writeBigInt64BE(value, this.pos++);
         return this;
     }
+    public putUint8Array(src : Uint8Array, len : number) {
+        if (len > this.remaining()) {
+            throw new BufferOverflowException("put(src : Uint8Array, off : number, len : number)");
+        }
+
+        // Mem::memcpy(data->getRoot() + this->pos, src, len);
+        this.data.set(src, this.pos);
+
+        this.pos += len;
+
+        return this;
+    }
+
     public remaining() : number {
         return this.lim - this.pos;
     }

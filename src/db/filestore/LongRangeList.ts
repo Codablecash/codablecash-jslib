@@ -1,4 +1,5 @@
 import { ArrayList } from "../base/ArrayList";
+import { ByteBuffer } from "../base_io/ByteBuffer";
 import { LongRange } from "./LongRange";
 import { LongRangeHitStatus } from "./LongRangeHitStatus";
 
@@ -273,5 +274,48 @@ export class LongRangeList {
 
         return status;
     }
+
+    public binarySize() : number {
+        let size = 4;
+
+        let maxLoop = this.list.size();
+        for(let i = 0; i != maxLoop; ++i){
+            let range = this.list.get(i);
+
+            if(range != null){ // guard
+                size += range.binarySize();
+            }
+        }
+
+        return size;
+    }
+
+    public toBinary(buff : ByteBuffer) : void {
+        let size = this.size();
+        buff.putInt(size);
+
+        for(let i = 0; i != size; ++i){
+            let range = this.list.get(i);
+
+            if(range != null){ // guard
+                range.toBinary(buff);   
+            }
+        }
+    }
+
+    public static fromBinary(buff : ByteBuffer) {
+        let list = new LongRangeList();
+
+        let size = buff.getInt();
+
+        for(let i = 0; i != size; ++i){
+            let range = LongRange.fromBinary(buff);
+
+            list.addRange(range.getMin(), range.getMax());
+        }
+
+        return list;
+    }
+
 }
 
