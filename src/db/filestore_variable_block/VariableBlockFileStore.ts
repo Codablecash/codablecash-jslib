@@ -1,8 +1,10 @@
+import { ArrayList } from "../base/ArrayList";
 import { Exception } from "../base/Exception";
 import { FileStore } from "../filestore/FileStore";
 import { BlockFileStorageException } from "../filestore_block/BlockFileStorageException";
 import { IBlockFileStore } from "../filestore_block/IBlockFileStore";
 import { DiskCacheManager } from "../random_access_file/DiskCacheManager";
+import { VariableBlock } from "./VariableBlock";
 import { VariableBlockFileBody } from "./VariableBlockFileBody";
 import { VariableBlockHeader } from "./VariableBlockHeader";
 
@@ -92,5 +94,74 @@ export class VariableBlockFileStore extends FileStore implements IBlockFileStore
         }
     }
 
-    
+    public realloc(fpos : number, size : number) {
+        if((this.header != null && this.header.isEmpty()) || (this.header != null && this.header.availableCapacity() < size) ){
+            // extend file size
+            this.extendFile();
+        }
+
+/*
+	int64_t sizeRemain = size;
+
+	ArrayList<VariableBlock> list;
+	list.setDeleteOnExit();
+
+	// first block
+	uint16_t blockUnitSize = this->header->getBlockUnitSize();
+	uint64_t blockPos = fpos / blockUnitSize;
+
+	VariableBlock* firstBlock = this->header->reallocFirstMaxFragment(blockPos, sizeRemain);
+	sizeRemain -= firstBlock->getUsedSize();
+	list.addElement(firstBlock);
+
+	// second
+	VariableBlock* lastBlock = firstBlock;
+	while(sizeRemain > 0){
+		VariableBlock* block = this->header->allocMaxFragment(sizeRemain);
+		sizeRemain -= block->getUsedSize();
+
+		lastBlock->setNextfpos(block->getfPos());
+
+		list.addElement(block);
+		lastBlock = block;
+	}
+
+	assert(sizeRemain == 0);
+
+	int maxLoop = list.size();
+	for(int i = 0; i != maxLoop; ++i){
+		VariableBlock* block = list.get(i);
+		block->writeBack(this->body);
+	}
+
+	sync(false);
+
+	return blocksToHandle(&list);
+*/
+    }
+
+
+    public async getBlockList(fpos : number) {
+        if(this.body != null && this.header != null){
+            let blockUnitSize = this.header.getBlockUnitSize();
+
+            let list = new ArrayList<VariableBlock>();
+
+            let __fpos = fpos;
+
+            let block : VariableBlock | null = null;
+            do{
+                block = await VariableBlock.load(this.body, __fpos, blockUnitSize);
+                list.addElement(block);
+
+                __fpos = block.getNextPos();
+            }while(__fpos != 0);
+
+            return list;     
+        }
+        
+        throw new BlockFileStorageException("Failed in getBlockList()");
+    }
+
+
 }
