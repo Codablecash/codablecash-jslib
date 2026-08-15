@@ -1,11 +1,13 @@
 import { ArrayList } from "../base/ArrayList";
 import { Exception } from "../base/Exception";
+import { ByteBuffer } from "../base_io/ByteBuffer";
 import { FileStore } from "../filestore/FileStore";
 import { BlockFileStorageException } from "../filestore_block/BlockFileStorageException";
 import { IBlockFileStore } from "../filestore_block/IBlockFileStore";
 import { DiskCacheManager } from "../random_access_file/DiskCacheManager";
 import { VariableBlock } from "./VariableBlock";
 import { VariableBlockFileBody } from "./VariableBlockFileBody";
+import { VariableBlockHandle } from "./VariableBlockHandle";
 import { VariableBlockHeader } from "./VariableBlockHeader";
 
 
@@ -107,20 +109,20 @@ export class VariableBlockFileStore extends FileStore implements IBlockFileStore
 	list.setDeleteOnExit();
 
 	// first block
-	uint16_t blockUnitSize = this->header->getBlockUnitSize();
+	uint16_t blockUnitSize = this.header.getBlockUnitSize();
 	uint64_t blockPos = fpos / blockUnitSize;
 
-	VariableBlock* firstBlock = this->header->reallocFirstMaxFragment(blockPos, sizeRemain);
-	sizeRemain -= firstBlock->getUsedSize();
+	VariableBlock* firstBlock = this.header.reallocFirstMaxFragment(blockPos, sizeRemain);
+	sizeRemain -= firstBlock.getUsedSize();
 	list.addElement(firstBlock);
 
 	// second
 	VariableBlock* lastBlock = firstBlock;
 	while(sizeRemain > 0){
-		VariableBlock* block = this->header->allocMaxFragment(sizeRemain);
-		sizeRemain -= block->getUsedSize();
+		VariableBlock* block = this.header.allocMaxFragment(sizeRemain);
+		sizeRemain -= block.getUsedSize();
 
-		lastBlock->setNextfpos(block->getfPos());
+		lastBlock.setNextfpos(block.getfPos());
 
 		list.addElement(block);
 		lastBlock = block;
@@ -131,7 +133,7 @@ export class VariableBlockFileStore extends FileStore implements IBlockFileStore
 	int maxLoop = list.size();
 	for(int i = 0; i != maxLoop; ++i){
 		VariableBlock* block = list.get(i);
-		block->writeBack(this->body);
+		block.writeBack(this.body);
 	}
 
 	sync(false);
@@ -140,7 +142,55 @@ export class VariableBlockFileStore extends FileStore implements IBlockFileStore
 */
     }
 
+    public blocksToHandle(list : ArrayList<VariableBlock>) {
+        let handle = new VariableBlockHandle(this);
+        {
+            // let fpos = list.get(0).getfPos();
+            var blk = list.get(0);
+            let fpos = blk != null ? blk.getfPos() : 0;
 
+            handle.setFpos(fpos);
+        }
+
+        // datasize
+        let dataSize = 0;
+        let maxLoop = list.size();
+        for(let i = 0; i != maxLoop; ++i){
+            let block = list.get(i);
+
+            if(block != null){ // guard
+                dataSize += block.getUsedSize();
+            }
+        }
+
+        // copy
+        let buff = ByteBuffer.allocateWithEndian(dataSize, true);
+        handle.setBuffer(buff);
+
+        for(let i = 0; i != maxLoop; ++i){
+            let block = list.get(i);
+
+            if(block != null){ // guard
+                let length = block.getUsedSize();
+                let data : Uint8Array = block.getData();
+
+                buff.putUint8Array(data, length);
+            }
+        }
+
+        buff.position(0);
+
+        return handle;
+    }
+
+    public async get(fpos : number) {
+        let list = await this.getBlockList(fpos);
+
+        var handle = this.blocksToHandle(list);
+
+        return handle;
+    }
+    
     public async getBlockList(fpos : number) {
         if(this.body != null && this.header != null){
             let blockUnitSize = this.header.getBlockUnitSize();
