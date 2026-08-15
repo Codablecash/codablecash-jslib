@@ -158,4 +158,57 @@ describe('LongRange test', () => {
             pos = bitset.nextSetBit(pos + 1);
         }
     })
+
+    it('addSinleRange03', () => {
+        let bitset = new RawBitSet(128);
+
+        let list = new LongRangeList();
+
+        addRange(bitset, list, 8, 10);
+        list.assertList();
+
+        addRange(bitset, list, 12, 12);
+        list.assertList();
+
+        addRange(bitset, list, 13, 13);
+        list.assertList();
+
+        let pos = bitset.nextSetBit(0);
+
+        let it = list.iterator();
+        while(it.hasNext()){
+            let val = it.next();
+            expect(val == pos).toBe(true);
+
+            pos = bitset.nextSetBit(pos + 1);
+        }
+    })
+
+     it('addSinleRange04', () => {
+        let bitset = new RawBitSet(128);
+
+        let list = new LongRangeList();
+
+        addRange(bitset, list, 8, 10);
+        list.assertList();
+
+        addRange(bitset, list, 12, 12);
+        list.assertList();
+
+        addRange(bitset, list, 13, 13);
+        list.assertList();
+
+        addRange(bitset, list, 8, 13);
+        list.assertList();
+
+        let pos = bitset.nextSetBit(0);
+
+        let it = list.iterator();
+        while(it.hasNext()){
+            let val = it.next();
+            expect(val == pos).toBe(true);
+
+            pos = bitset.nextSetBit(pos + 1);
+        }
+    })
 })
