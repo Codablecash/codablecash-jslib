@@ -77,10 +77,42 @@ export class LongRangeList {
 
 
     public needSplit(minStatus : LongRangeHitStatus, maxStatus : LongRangeHitStatus, range : LongRange) : boolean {
-        /*
+        let minRange = minStatus.getIncluded();
+        let maxRange = maxStatus.getIncluded();
 
-        */
-       return false; // FIXME
+        if((minRange != null && maxRange != null && minRange != maxRange) ||
+                (minRange == null && maxRange == null)){
+            return false;
+        }
+
+        let highRangeStart = range.getMax();
+        let lowRangeStart = range.getMin();
+
+        let lowExists = minRange != null && minRange.getMin() < lowRangeStart;
+        let highExists = minRange != null && minRange.getMax() > highRangeStart;
+
+        if(lowExists && highExists && minRange != null){
+            let low = minRange.getMin();
+            let high = lowRangeStart - 1;
+
+            let newRange = new LongRange(low, high);
+
+            minRange.setMin(highRangeStart + 1);
+
+            this.insertRange(minStatus.includedPos, newRange);
+        }
+        else if(!lowExists && highExists && minRange != null){
+            minRange.setMin(highRangeStart + 1);
+        }
+        else if(lowExists && !highExists && minRange != null){
+            minRange.setMax(lowRangeStart - 1);
+        }
+        else{
+            let r = this.list.get(minStatus.includedPos);
+            this.list.remove(minStatus.includedPos);
+        }
+
+       return true;
     }
 
     public addRange(value : number | LongRange, max? : number) {
