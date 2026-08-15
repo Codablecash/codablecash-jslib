@@ -89,7 +89,7 @@ export class RandomAccessFile {
         return count;
     }
 
-    public async write(fpos : number, buff : Uint8Array, count : number) {
+    public async write(fpos : number, buff : Uint8Array, count : number) : Promise<number>{
         let segSize = this.getSegmentSize();
 
         let buffoffset = 0;
@@ -126,8 +126,9 @@ export class RandomAccessFile {
                 currentfpos += cnt;
                 buffoffset += cnt;
             }
-		    
         }
+
+        return count;
     }
 
     public getSegmentSize() : number {

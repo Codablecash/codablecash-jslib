@@ -1,9 +1,12 @@
+import { ByteBuffer } from "../base_io/ByteBuffer";
+import { FileIOException } from "../osenv/FileIOException";
+import { VariableBlockFileBody } from "./VariableBlockFileBody";
 
 export class VariableBlock {
     public static HEADER_SIZE = 2 + 8;
 
     private blockSize : number;
-    private currentPos : number;
+    private currentfPos : number;
 
     // header
     private nextfpos : number;
@@ -14,7 +17,7 @@ export class VariableBlock {
 
     constructor(blockSize : number, fpos : number, used : number, nextfpos : number, data : Uint8Array) {
         this.blockSize = blockSize;
-        this.currentPos = fpos;
+        this.currentfPos = fpos;
         this.used = used;
         this.nextfpos = nextfpos;
 
@@ -22,6 +25,23 @@ export class VariableBlock {
         if(this.data != null){
             let sd = data.slice(0, used);
             this.data.set(sd, 0);
+        }
+    }
+
+    public async writeBack(body : VariableBlockFileBody) : Promise<void> {
+        let rfile = body.getFile();
+
+        let fpos = this.currentfPos;
+        let buff = ByteBuffer.allocateWithEndian(VariableBlock.HEADER_SIZE, true); 
+		buff.putShort(this.used);
+		buff.putLong(this.nextfpos);
+
+        buff.position(0);
+        let d = buff.toUint8Array();
+        fpos += await rfile.write(fpos, d, buff.limit());
+
+        if((fpos - this.currentfPos) == this.blockSize){
+            throw new FileIOException("assert error at VariableBlock.writeBack().");
         }
     }
 
@@ -38,7 +58,7 @@ export class VariableBlock {
     }
 
     public getfPos() : number {
-        return this.currentPos;
+        return this.currentfPos;
     }
 
     public setNextfpos(fpos : number) : void {

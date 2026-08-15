@@ -1,6 +1,7 @@
 import { toBigIntBE, toBufferBE } from "bigint-buffer";
 import { BufferOverflowException } from "./BufferOverflowException";
 import { BigInteger } from "../numeric/BigInteger";
+import bigInt from "big-integer";
 
 const { Buffer } = require('node:buffer');
 
@@ -163,12 +164,19 @@ export class ByteBuffer {
         this.data.writeInt32BE(data, this.pos++);
         return this;
     }
-    public putLong(data : bigint) : ByteBuffer {
+    public putLong(data : bigint | number) : ByteBuffer {
         if(this.remaining() < 8){
             throw new BufferOverflowException("putLong(data : number)");
         }
 
-        this.data.writeBigInt64BE(data, this.pos++);
+        let value : bigint;
+        if(typeof data === "number"){
+            value = BigInt(data);
+        }else{
+            value = data;
+        }
+
+        this.data.writeBigInt64BE(value, this.pos++);
         return this;
     }
     public remaining() : number {
