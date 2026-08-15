@@ -25,6 +25,16 @@ export class VariableBlockHeader {
         return this.blockUnitSize;
     }
 
+    public extend() {
+        let min = this.numBlocks;
+        let max = min + this.extendBlocks - 1;
+
+        this.availableArea && this.availableArea.addRange(min, max);
+
+        this.numBlocks += this.extendBlocks;
+
+        return this.numBlocks;
+    }
 
     public async sync(fileSync : boolean) {
         await this.sync2File();
