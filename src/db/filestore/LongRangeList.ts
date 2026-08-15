@@ -10,6 +10,18 @@ export class LongRangeList {
         this.list = new ArrayList<LongRange>();
     }
 
+    public get(pos : number) {
+        return this.list.get(pos);
+    }
+
+    public size() {
+        return this.list.size();
+    }
+
+    public isEmpty() {
+        return this.list.isEmpty();
+    }
+
     public addRange(value : number | LongRange, max? : number) {
         if(typeof value == "number"){
             if(max != undefined){

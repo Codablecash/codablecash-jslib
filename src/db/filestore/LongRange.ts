@@ -64,4 +64,8 @@ export class LongRange {
     public equals(other : LongRange) {
         return this.min == other.min && this.max == other.max;
     }
+
+    public width() : number {
+    	return this.max - this.min + 1;
+    }
 }
