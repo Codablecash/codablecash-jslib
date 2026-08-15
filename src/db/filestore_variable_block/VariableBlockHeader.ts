@@ -24,7 +24,35 @@ export class VariableBlockHeader {
         return this.blockUnitSize;
     }
 
-    public allocMaxFragment(value : LongRange | number, size? : number) {
+    public reallocFirstMaxFragment(firstBlockPos : number, size : number) : VariableBlock {
+        let range = null;
+
+        if(this.availableArea != null){ //guard
+            let maxLoop = this.availableArea.size();
+            for(let i = 0; i != maxLoop; ++i){
+                let r = this.availableArea.get(i);
+
+                if(r != null){
+                    let min = r.getMin();
+                    let max = r.getMax();
+
+                    if(min <= firstBlockPos && firstBlockPos <= max){
+                        range = new LongRange(r.getMin(), r.getMax());
+                        range.setMin(firstBlockPos);
+                        break;
+                    }
+                }
+            }
+
+            if(range != null){ // guard
+                return this.allocMaxFragment(range, size);
+            }
+        }
+
+        throw new FileIOException("range error@reallocFirstMaxFragment");
+    }
+
+    public allocMaxFragment(value : LongRange | number, size? : number) : VariableBlock {
         if(typeof value == "number" && this.availableArea != null){
             let range = this.availableArea.get(0);
             
