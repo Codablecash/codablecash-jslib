@@ -86,13 +86,13 @@ export class VariableBlock {
         return ret;
     }
 
-    public freeBlock(header : VariableBlockHeader, body : VariableBlockFileBody){
+    public async freeBlock(header : VariableBlockHeader, body : VariableBlockFileBody){
         let blockUnitSize = header.getBlockUnitSize();
 
         let range = this.getLongRange(blockUnitSize);
         header.freeFragment(range);
 
-        body.resetHeader(this.currentfPos);
+        await body.resetHeader(this.currentfPos);
     }
 
     public getLongRange(blockUnitSize : number) : LongRange {

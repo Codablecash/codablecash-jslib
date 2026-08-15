@@ -84,7 +84,7 @@ export class VariableBlockFileStore extends FileStore implements IBlockFileStore
             let numExtendedBlocks = this.header.extend();
 
             let newLength = numExtendedBlocks * this.header.getBlockUnitSize();
-            this.body.extend(newLength);
+            await this.body.extend(newLength);
 
             await this.sync(false);
         }
@@ -100,7 +100,7 @@ export class VariableBlockFileStore extends FileStore implements IBlockFileStore
     public async realloc(fpos : number, size : number) {
         if((this.header != null && this.header.isEmpty()) || (this.header != null && this.header.availableCapacity() < size) ){
             // extend file size
-            this.extendFile();
+            await this.extendFile();
         }
 
         let sizeRemain = size;
@@ -148,7 +148,7 @@ export class VariableBlockFileStore extends FileStore implements IBlockFileStore
     public async alloc(size : number) {
         if((this.header != null && this.header.isEmpty()) || (this.header != null && this.header.availableCapacity() < size) ){
             // extend file size
-            this.extendFile();
+            await this.extendFile();
         }
         
         let sizeRemain = size;
