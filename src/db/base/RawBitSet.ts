@@ -2,11 +2,11 @@
 
 class BitsetArray {
     public length : number;
-	private buff : Uint8Array;
+	private buff : Uint32Array;
 
     constructor(numBits : number) {
         this.length = numBits;
-        this.buff = new Uint8Array(numBits);
+        this.buff = new Uint32Array(numBits);
         this.buff.fill(0);
     }
 
@@ -15,7 +15,7 @@ class BitsetArray {
     }
 
     public growLength(len : number) {
-        let tmp = new Uint8Array(len);
+        let tmp = new Uint32Array(len);
         tmp.fill(0);
 
         //Mem::memcpy(tmp, buff, length * sizeof(uint64_t));
@@ -110,7 +110,11 @@ export class RawBitSet {
         let idx = pos >> RawBitSet.OFFSET;
         if(this.bits.get(idx) != 0) {
             for(let j = pos & RawBitSet.RIGHT_BITS; j < RawBitSet.ELM_SIZE; j ++ ) {
-                if(((this.bits.get(idx) & (RawBitSet.TWO_N_ARRAY[j])) != 0)) {
+                let left = (this.bits).get(idx);
+                let right = (RawBitSet.TWO_N_ARRAY[j]);
+
+
+                if(((this.bits).get(idx) & (RawBitSet.TWO_N_ARRAY[j])) != 0){
                     return (idx << RawBitSet.OFFSET) + j;
                 }
             }
