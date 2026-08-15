@@ -11,11 +11,17 @@ export class LongRange {
         this.max = max;
     }
 
-    public getMin() {
+    public getMin() : number {
         return this.min;
     }
-    public getMax() {
+    public getMax() : number {
         return this.max;
+    }
+    public setMin(value : number) : void {
+        this.min = value;
+    }
+    public setMax(value : number) : void {
+        this.max = value;
     }
 
     public compare(value : number) : number {

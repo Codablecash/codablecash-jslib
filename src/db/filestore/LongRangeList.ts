@@ -38,47 +38,41 @@ export class LongRangeList {
         let minStatus = this.hitStatus(range.getMin(), range, false);
         let maxStatus = this.hitStatus(range.getMax(), range, true);
 
+        // check inclusion
+        let removedInc = this.removeInclusion(range);
 
+        if(minStatus.lowJoinable() && maxStatus.highJoinable()){
+            let removePos = maxStatus.getHighPos() - removedInc;
+            let rangeHigh = maxStatus.getHigh();
+            let rangeLow = minStatus.getLow();
 
-        /*
-	// check inclusion
-	int removedInc = removeInclusion(range);
+            if(rangeLow != null && rangeHigh != null){
+                rangeLow.setMin(rangeLow.getMin() < range.getMin() ? rangeLow.getMin() : range.getMin());
+                rangeLow.setMax(rangeHigh.getMax() > range.getMax() ? rangeHigh.getMax() : range.getMax());
 
-	if(minStatus->lowJoinable() && maxStatus->highJoinable()){
-		int removePos = maxStatus->getHighPos() - removedInc;
-		LongRange* rangeHigh = maxStatus->getHigh();
-		LongRange* rangeLow = minStatus->getLow();
+                if(rangeHigh != rangeLow){
+                    this.list.remove(removePos);
+                }
+            }
+        }
+        else if(!minStatus.lowJoinable() && maxStatus.highJoinable()){
+            let range2update = maxStatus.getHigh(); // high from range
+        
+            if(range2update != null){
+                range2update.setMin(range.getMin());
+            }
+        }
+        else if(minStatus.lowJoinable() && !maxStatus.highJoinable()){
+            let range2update = minStatus.getLow(); // low from range
 
-		rangeLow->setMin(rangeLow->getMin() < range->getMin() ? rangeLow->getMin() : range->getMin());
-		rangeLow->setMax(rangeHigh->getMax() > range->getMax() ? rangeHigh->getMax() : range->getMax());
-
-		if(rangeHigh != rangeLow){
-			list->remove(removePos);
-			delete rangeHigh;
-		}
-
-		delete range;
-	}
-	else if(!minStatus->lowJoinable() && maxStatus->highJoinable()){
-		LongRange* range2update = maxStatus->getHigh(); // high from range
-		assert(range2update != nullptr);
-
-		range2update->setMin(range->getMin());
-		delete range;
-	}
-	else if(minStatus->lowJoinable() && !maxStatus->highJoinable()){
-		LongRange* range2update = minStatus->getLow(); // low from range
-		assert(range2update != nullptr);
-
-		range2update->setMax(range->getMax());
-
-		delete range;
-	}
-	else { // if(!minStatus->lowJoinable() && !maxStatus->highJoinable()){
-		int insertPos = minStatus->lower != nullptr ? minStatus->lowerPos + 1 : 0;
-		insertRange(insertPos, range);
-	}
-        */
+            if(range2update != null){
+                range2update.setMax(range.getMax());
+            }
+        }
+        else { // if(!minStatus.lowJoinable() && !maxStatus.highJoinable()){
+            let insertPos = minStatus.lower != null ? minStatus.lowerPos + 1 : 0;
+            this.insertRange(insertPos, range);
+        }
     }
 
     private addRangeLongRange(range : LongRange){
@@ -103,6 +97,19 @@ export class LongRangeList {
         return length;
     }
     
+    private insertRange(pos : number, range : LongRange) {
+        let lastSize = this.list.size();
+
+        this.list.addElement(null);
+
+        for(let i = lastSize; i != pos; --i){
+            let r = this.list.get(i - 1);
+            this.list.setElement(r, i);
+        }
+
+        this.list.setElement(range, pos);
+    }
+        
     private hitStatus(value : number, range : LongRange, findHigher : boolean) : LongRangeHitStatus {
         let status = new LongRangeHitStatus(range);
 
