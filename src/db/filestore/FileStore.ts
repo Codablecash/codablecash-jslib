@@ -4,11 +4,11 @@ import { RandomAccessFile } from "../random_access_file/RandomAccessFile";
 
 
 export class FileStore {
-    private cacheManager : DiskCacheManager;
-    private file : RandomAccessFile | null;
-    private headerFile : RandomAccessFile | null;
-    private dir : string;
-    private name : string;
+    protected cacheManager : DiskCacheManager;
+    protected file : RandomAccessFile | null;
+    protected headerFile : RandomAccessFile | null;
+    protected dir : string;
+    protected name : string;
 
     constructor(dir : string, name : string, cacheManager : DiskCacheManager){
         this.cacheManager = cacheManager;
@@ -34,7 +34,7 @@ export class FileStore {
         return body.exists() && header.exists();
     }
 
-    public async createStore(del : boolean, defaultSize : number){
+    public async __createStore(del : boolean, defaultSize : number){
         let baseDir = new CFile(this.dir);
         if(!baseDir.exists()){
             baseDir.mkdirs();
@@ -71,7 +71,7 @@ export class FileStore {
         }
     }
 
-    public async open(sync : boolean) : Promise<void> {
+    public async __open(sync : boolean) : Promise<void> {
         let baseDir = new CFile(this.dir);
 
         await this.openFile(baseDir, sync);
