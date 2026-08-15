@@ -1,6 +1,8 @@
 import { ByteBuffer } from "../base_io/ByteBuffer";
+import { LongRange } from "../filestore/LongRange";
 import { FileIOException } from "../osenv/FileIOException";
 import { VariableBlockFileBody } from "./VariableBlockFileBody";
+import { VariableBlockHeader } from "./VariableBlockHeader";
 
 export class VariableBlock {
     public static HEADER_SIZE = 2 + 8;
@@ -82,6 +84,24 @@ export class VariableBlock {
         }
 
         return ret;
+    }
+
+    public freeBlock(header : VariableBlockHeader, body : VariableBlockFileBody){
+        let blockUnitSize = header.getBlockUnitSize();
+
+        let range = this.getLongRange(blockUnitSize);
+        header.freeFragment(range);
+
+        body.resetHeader(this.currentfPos);
+    }
+
+    public getLongRange(blockUnitSize : number) : LongRange {
+        let min = this.currentfPos / blockUnitSize;
+        let numBlocks = this.blockSize / blockUnitSize;
+
+        let max = min + numBlocks - 1;
+
+        return new LongRange(min, max);
     }
 
     public headerSize() : number {
