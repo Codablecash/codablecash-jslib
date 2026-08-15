@@ -5,14 +5,14 @@ import { RandomAccessFile } from "../random_access_file/RandomAccessFile";
 
 export class VariableBlockHeader {
 	private file : RandomAccessFile;
-	private availableArea : LongRangeList;
+	private availableArea : LongRangeList | null;
 	private blockUnitSize : number;
 	private numBlocks : number;
 	private extendBlocks : number;
 
     constructor(file : RandomAccessFile) {
         this.file = file;
-        this.availableArea = 0;
+        this.availableArea = null;
         this.blockUnitSize = 0;
         this.numBlocks = 0;
         this.extendBlocks = 0;
@@ -23,6 +23,6 @@ export class VariableBlockHeader {
     }
 
     public freeFragment(range : LongRange) {
-        
+        // this.availableArea.addRange(range);
     }
 }

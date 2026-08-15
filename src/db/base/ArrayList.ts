@@ -60,4 +60,8 @@ export class ArrayList<T> {
     public get(pos : number) : T | null{
         return this.root[pos];
     }
+
+    public isEmpty() : boolean {
+		return this.numArray == 0;
+	}
 }
