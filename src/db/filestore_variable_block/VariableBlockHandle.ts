@@ -23,6 +23,26 @@ export class VariableBlockHandle implements IBlockHandle {
 		this.fpos = fpos;
 	}
 
+    public getAvailableSize(list : ArrayList<VariableBlock>) : number {
+        let ret = 0;
+
+        let maxLoop = list.size();
+        for(let i = 0; i != maxLoop; ++i){
+            let block = list.get(i);
+
+            if(block != null){ // guard
+                let available = block.dataSize();
+                ret += available;
+            }
+        }
+
+        return ret;
+    }
+
+    public getBuffer() : ByteBuffer | null{
+        return this.buffer;
+    }
+
     public async removeBlocks(list? : ArrayList<VariableBlock>) : Promise<void> {
         if(list != undefined){
             await this.__removeBlocks(list);
