@@ -4,6 +4,7 @@ import { ByteBuffer } from "../base_io/ByteBuffer";
 import { FileStore } from "../filestore/FileStore";
 import { BlockFileStorageException } from "../filestore_block/BlockFileStorageException";
 import { IBlockFileStore } from "../filestore_block/IBlockFileStore";
+import { IBlockHandle } from "../filestore_block/IBlockHandle";
 import { DiskCacheManager } from "../random_access_file/DiskCacheManager";
 import { VariableBlock } from "./VariableBlock";
 import { VariableBlockFileBody } from "./VariableBlockFileBody";
@@ -96,50 +97,52 @@ export class VariableBlockFileStore extends FileStore implements IBlockFileStore
         }
     }
 
-    public realloc(fpos : number, size : number) {
+    public async realloc(fpos : number, size : number) {
         if((this.header != null && this.header.isEmpty()) || (this.header != null && this.header.availableCapacity() < size) ){
             // extend file size
             this.extendFile();
         }
 
-/*
-	int64_t sizeRemain = size;
+        let sizeRemain = size;
 
-	ArrayList<VariableBlock> list;
-	list.setDeleteOnExit();
+	    let list = new ArrayList<VariableBlock>();
 
-	// first block
-	uint16_t blockUnitSize = this.header.getBlockUnitSize();
-	uint64_t blockPos = fpos / blockUnitSize;
+        if(this.header != null){ // guard
+            // first block
+            let blockUnitSize = this.header.getBlockUnitSize();
+            let blockPos = fpos / blockUnitSize;
+    
+            let firstBlock = this.header.reallocFirstMaxFragment(blockPos, sizeRemain);
+            sizeRemain -= firstBlock.getUsedSize();
+            list.addElement(firstBlock);
 
-	VariableBlock* firstBlock = this.header.reallocFirstMaxFragment(blockPos, sizeRemain);
-	sizeRemain -= firstBlock.getUsedSize();
-	list.addElement(firstBlock);
+            // second
+            let lastBlock = firstBlock;
+            while(sizeRemain > 0){
+                let block = this.header.allocMaxFragment(sizeRemain);
+                sizeRemain -= block.getUsedSize();
 
-	// second
-	VariableBlock* lastBlock = firstBlock;
-	while(sizeRemain > 0){
-		VariableBlock* block = this.header.allocMaxFragment(sizeRemain);
-		sizeRemain -= block.getUsedSize();
+                lastBlock.setNextfpos(block.getfPos());
 
-		lastBlock.setNextfpos(block.getfPos());
+                list.addElement(block);
+                lastBlock = block;
+            }
 
-		list.addElement(block);
-		lastBlock = block;
-	}
+            let maxLoop = list.size();
+            for(let i = 0; i != maxLoop; ++i){
+                let block = list.get(i);
 
-	assert(sizeRemain == 0);
+                if(block != null && this.body != null){ // guard
+                     await block.writeBack(this.body);
+                }
+            }
 
-	int maxLoop = list.size();
-	for(int i = 0; i != maxLoop; ++i){
-		VariableBlock* block = list.get(i);
-		block.writeBack(this.body);
-	}
+            await this.sync(false);
 
-	sync(false);
+            return this.blocksToHandle(list);
+        }
 
-	return blocksToHandle(&list);
-*/
+        throw new BlockFileStorageException("Failed in realloc()");
     }
 
     public async alloc(size : number) {
@@ -183,7 +186,7 @@ export class VariableBlockFileStore extends FileStore implements IBlockFileStore
         return this.blocksToHandle(list);
     }
 
-    public blocksToHandle(list : ArrayList<VariableBlock>) {
+    public blocksToHandle(list : ArrayList<VariableBlock>) : IBlockHandle {
         let handle = new VariableBlockHandle(this);
         {
             // let fpos = list.get(0).getfPos();
