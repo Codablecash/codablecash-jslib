@@ -24,6 +24,55 @@ export class VariableBlockHandle implements IBlockHandle {
 		this.fpos = fpos;
 	}
 
+    public async write(bytes : Uint8Array, length : number) : Promise<void> {
+        let body = this.store.getBody();
+
+        let list = await this.store.getBlockList(this.fpos);
+	
+        // need realloc
+        if(this.needRealloc(list, length) && list != undefined){
+            await this.removeBlocks(list);
+            
+            list = await this.realloc(length);
+        }
+
+        // replace buffer
+        let cap = this.buffer != null ? this.buffer.capacity() : 0;
+        if(cap < length){
+            let b = ByteBuffer.allocateWithEndian(length, true);
+            this.setBuffer(b);
+        }
+
+        if(this.buffer != null){
+            this.buffer.position(0);
+            this.buffer.putUint8Array(bytes, length);
+            this.buffer.position(0);
+            
+            let ptr = this.buffer.toUint8Array();
+            let ptrpos = 0;
+
+            let writeRemain = length;
+
+            let maxLoop = list.size();
+            for(let i = 0; i != maxLoop; ++i){
+                let block = list.get(i);
+
+                if(block != null && body != null){ // guard
+                    let writeLength = (writeRemain > block.dataSize()) ? block.dataSize() : writeRemain;
+
+                    var sl = ptr.slice(ptrpos, writeLength);
+
+                    block.write(sl, writeLength);
+                    ptrpos += writeLength;
+                    writeRemain -= writeLength;
+
+                    await block.writeBack(body);
+                }
+
+            }
+        }
+    }
+
     public async realloc(length : number) {
         let handle = await this.store.realloc(this.fpos, length);
 
