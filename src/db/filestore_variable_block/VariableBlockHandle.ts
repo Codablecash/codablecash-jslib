@@ -60,7 +60,7 @@ export class VariableBlockHandle implements IBlockHandle {
                 if(block != null && body != null){ // guard
                     let writeLength = (writeRemain > block.dataSize()) ? block.dataSize() : writeRemain;
 
-                    var sl = ptr.slice(ptrpos, writeLength);
+                    var sl = ptr.slice(ptrpos, ptrpos + writeLength);
 
                     block.write(sl, writeLength);
                     ptrpos += writeLength;
