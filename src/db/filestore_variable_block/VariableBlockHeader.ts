@@ -79,6 +79,7 @@ export class VariableBlockHeader {
         buffSizeHeader.putLong(this.blockUnitSize);
         buffSizeHeader.putLong(this.extendBlocks);
         buffSizeHeader.putLong(this.numBlocks);
+        
         buffSizeHeader.position(0);
 
         let fpos = 0;

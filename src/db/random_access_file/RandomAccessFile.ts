@@ -119,7 +119,7 @@ export class RandomAccessFile {
 
                 // memcpy
                 let sl = buff.slice(buffoffset, buffoffset + cnt);
-                ptr.set(sl);
+                ptr.set(sl, offset);
 
                 //ptr.set()
                 seg.setDirty(true);

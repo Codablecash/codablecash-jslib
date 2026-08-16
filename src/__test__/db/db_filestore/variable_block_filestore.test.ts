@@ -29,7 +29,7 @@ function checkTestData(start : number, data : Uint8Array, length: number) {
 }
 
 describe('TestVariableBlockFileStoreGroup', () => {
-/*
+
     it('case01', async () => {
 		let projectFolder = new CFile("out/random_access_file/case01");
 		projectFolder.deleteDir();
@@ -44,7 +44,7 @@ describe('TestVariableBlockFileStoreGroup', () => {
 
 		store.createStore(true, 256, 32);
     })
-*/
+
 	it('case02', () => {
 		let projectFolder = new CFile("out/random_access_file/case02");
 		projectFolder.deleteDir();
