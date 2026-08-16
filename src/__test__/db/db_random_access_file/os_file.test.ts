@@ -56,4 +56,36 @@ describe('OsFileTest', () => {
         }
         
     })
+
+    it('case02', async () => {
+        let projectFolder = new CFile("out/OsFileTest/case02");
+        projectFolder.deleteDir();
+        projectFolder.mkdirs();
+
+        let name = "out.bin";
+        let outFile = projectFolder.get(name);
+        
+        let datalen = 16384;
+        {
+            let fd = Os.openFile2ReadWrite(outFile, false);
+            let data = makeTestData(1, datalen);
+
+            let n = await Os.write2File(fd, data, datalen);
+
+            expect(n).toBe(datalen);
+
+            Os.closeFileDescriptor(fd);
+        }
+
+        {
+            let fd = Os.openFile2ReadWrite(outFile, false);
+            let data = new Uint8Array(datalen);
+            let n = await Os.readFile(fd, data, datalen);
+
+            checkTestData(1, data, datalen);
+
+            expect(n).toBe(datalen);
+        }
+        
+    })
 });

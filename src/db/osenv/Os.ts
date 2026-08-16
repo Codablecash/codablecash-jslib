@@ -118,7 +118,9 @@ export class Os {
             let position = desc.getPosition();
 
             fs.write(fd, data, 0, length, position, (err, bytesRead, buff) => {
-                if (err) resolve(-1);
+                if (err){
+                    reject(-1);
+                }
 
                 if(bytesRead > 0){
                     desc.incPosition(bytesRead);

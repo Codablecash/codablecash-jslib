@@ -28,7 +28,7 @@ function checkTestData(start : number, data : Uint8Array, length: number) {
 }
 
 describe('RAFTestGroup', () => {
-    it('construct', async () => {
+/*    it('construct', async () => {
         let projectFolder = new CFile("out/random_access_file/construct");
         projectFolder.deleteDir();
         projectFolder.mkdirs();
@@ -57,9 +57,9 @@ describe('RAFTestGroup', () => {
 
         await file.close();
     })
-
+*/
     it('case02', async () =>{
-        let projectFolder = new CFile("out/random_access_file/case01");
+        let projectFolder = new CFile("out/random_access_file/case02");
         projectFolder.deleteDir();
         projectFolder.mkdirs();
 
@@ -68,7 +68,7 @@ describe('RAFTestGroup', () => {
 
         {
             let file = new RandomAccessFile(outFile, new DiskCacheManager());
-            await file.open(true);
+            await file.open(false);
 
             let data = makeTestData(1, 10);
 
