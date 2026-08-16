@@ -8,7 +8,9 @@
     "build": "tsc",
     "prepare": "npm run build",
     "test": "jest",
-    "testunit" : "jest --testPathPatterns=variable_block_filestore.test"
+    "testunit" : "jest --testPathPatterns=variable_block_filestore.test",
+    "testraf" : "jest --testPathPatterns=random_access_file.test",
+    "testosf" : "jest --testPathPatterns=os_file.test"
   },
   "author": "Tomohiro Iizuka",
   "license": "MIT",

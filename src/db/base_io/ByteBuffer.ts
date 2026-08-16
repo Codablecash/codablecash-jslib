@@ -153,7 +153,7 @@ export class ByteBuffer {
         }
 
         this.data.writeInt16BE(data, this.pos);
-        this.pos++;
+        this.pos += 2;
         return this;
     }
     public putInt(data : number) : ByteBuffer {
@@ -161,7 +161,8 @@ export class ByteBuffer {
             throw new BufferOverflowException("put(data : number)");
         }
 
-        this.data.writeInt32BE(data, this.pos++);
+        this.data.writeInt32BE(data, this.pos);
+        this.pos += 4;
         return this;
     }
     public putLong(data : bigint | number) : ByteBuffer {
@@ -176,7 +177,8 @@ export class ByteBuffer {
             value = data;
         }
 
-        this.data.writeBigInt64BE(value, this.pos++);
+        this.data.writeBigInt64BE(value, this.pos);
+        this.pos += 8;
         return this;
     }
     public putUint8Array(src : Uint8Array, len : number) {

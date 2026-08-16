@@ -1,4 +1,5 @@
 import { CFile } from "../../../db/base_io/CFile";
+import { IBlockHandle } from "../../../db/filestore_block/IBlockHandle";
 import { VariableBlockFileStore } from "../../../db/filestore_variable_block/VariableBlockFileStore";
 import { DiskCacheManager } from "../../../db/random_access_file/DiskCacheManager";
 
@@ -63,6 +64,37 @@ describe('TestVariableBlockFileStoreGroup', () => {
 			await store.open(false);
 
 			await store.close();
+		}
+	})
+
+	it('alloc01', async() => {
+		let projectFolder = new CFile("out/random_access_file/alloc01");
+		projectFolder.deleteDir();
+		projectFolder.mkdirs();
+
+		let baseDirStr = projectFolder.getAbsolutePath();
+
+		let cacheManager = new DiskCacheManager();
+		let name = "file01";
+	
+		{
+			let store = new VariableBlockFileStore(baseDirStr, name, cacheManager);
+			await store.createStore(true, 256, 32);
+		}
+
+		let fpos;
+		{
+			let store = new VariableBlockFileStore(baseDirStr, name, cacheManager);
+			await store.open(false);
+
+			let data = makeTestData(3, 10);
+
+			let handle = await store.alloc(10);
+			await handle.write(data, 10);
+
+			fpos = handle.getFpos();
+
+			store.close();
 		}
 	})
 })

@@ -16,7 +16,7 @@ export class RandomAccessFile {
     private fd : FileDescriptor | null;
     private mmapSegments : MMapSegments | null;
 
-    private static PAGE_NUM_CACHE = 4;
+    public static PAGE_NUM_CACHE = 4;
 
     constructor(file : CFile, diskCacheManager : DiskCacheManager, pageSize : number = 4096){
         this.position = 0;
@@ -48,6 +48,7 @@ export class RandomAccessFile {
 
         if(this.fileSize == 0){
             await this.setLength(this.pageSize * RandomAccessFile.PAGE_NUM_CACHE);
+            await this.sync(true);
         }
     }
 
@@ -58,6 +59,7 @@ export class RandomAccessFile {
 
         if(this.mmapSegments != null && this.fd != null){
             await this.mmapSegments.clearElements(this.diskCacheManager, this.fd);
+            await this.sync(true);
             Os.closeFileDescriptor(this.fd);
         }
     }
@@ -166,7 +168,7 @@ export class RandomAccessFile {
             throw new FileIOException("RandomAccessFile filed in writing file 166.");
         }
 
-        let ret = Os.syncFile(this.fd);
+        Os.syncFile(this.fd);
 
         fpos = Os.seekFile(this.fd, 0, SeekOrigin.CURRENT_POS); // get the position of the last
 

@@ -64,7 +64,10 @@ export class VariableBlockFileStore extends FileStore implements IBlockFileStore
         }
 
         try{
-
+            if(this.header != null && this.file != null){
+                await this.header.loadFromFile();
+                this.body = new VariableBlockFileBody(this.file, this.header.getBlockUnitSize());
+            }
         }catch(error){
             this.internalClear();
             await super.close();

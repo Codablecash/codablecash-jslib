@@ -86,10 +86,11 @@ export class VariableBlockHeader {
         fpos += await this.file.write(fpos, binary, headSize);
 
         // content
-        binary = buff.toUint8Array().slice(headSize);
-        await this.file.write(fpos, binary, contentSize);
-
         //binary = ((const char*)buff.array()) + headSize;
+        binary = buff.toUint8Array().slice(headSize);
+        let cnt = await this.file.write(fpos, binary, contentSize);
+
+        
         //int cnt = this.file.write(fpos, binary, contentSize);
 
     }
