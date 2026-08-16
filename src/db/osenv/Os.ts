@@ -146,7 +146,7 @@ export class Os {
                 {
                     fd = fs.openSync(path, "a+")
                     let position = desc.getPosition();
-                    let n = fs.writeSync(fd, data, fileSize, addLength, position);
+                    let n = fs.writeSync(fd, data, firstLength, addLength, position);
                     desc.incPosition(n);
                     total += n;
 

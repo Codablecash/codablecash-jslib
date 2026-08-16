@@ -28,7 +28,7 @@ function checkTestData(start : number, data : Uint8Array, length: number) {
 }
 
 describe('RAFTestGroup', () => {
-/*    it('construct', async () => {
+    it('construct', async () => {
         let projectFolder = new CFile("out/random_access_file/construct");
         projectFolder.deleteDir();
         projectFolder.mkdirs();
@@ -37,7 +37,7 @@ describe('RAFTestGroup', () => {
         let outFile = projectFolder.get(name);
 
         let file = new RandomAccessFile(outFile, new DiskCacheManager());
-        await file.open(false);
+        file.open(false);
 
         file.close();
     })
@@ -57,7 +57,7 @@ describe('RAFTestGroup', () => {
 
         file.close();
     })
-*/
+
     it('case02', async () =>{
         let projectFolder = new CFile("out/random_access_file/case02");
         projectFolder.deleteDir();
@@ -77,6 +77,9 @@ describe('RAFTestGroup', () => {
             let result = new Uint8Array(10);
             file.read(0, result, 10);
 
+            let res= checkTestData(1, result, 10);
+            expect(res).toBe(true);
+
             file.close();
         }
 
@@ -84,6 +87,9 @@ describe('RAFTestGroup', () => {
             let fd = Os.openFile2ReadWrite(outFile, false);
             let data = new Uint8Array(10);
             let n = Os.readFile(fd, data, 10);
+
+            let res= checkTestData(1, data, 10);
+            expect(res).toBe(true);
 
             expect(n).toBe(10);
         }
