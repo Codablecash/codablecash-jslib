@@ -99,21 +99,27 @@ export class ByteBuffer {
             throw new BufferOverflowException("getShort()");
         }
 
-        return this.data.readInt16BE(this.pos++);
+        let res = this.data.readInt16BE(this.pos);
+        this.pos += 2;
+        return res;
     }
     public getInt() : number {
        if(this.remaining() < 4){
             throw new BufferOverflowException("getInt()");
         }
 
-        return this.data.readInt32BE(this.pos++);
+        let res = this.data.readInt32BE(this.pos);
+        this.pos += 4;
+        return res;
     }
     public getLong() : bigint {
        if(this.remaining() < 4){
             throw new BufferOverflowException("getInt()");
         }
 
-        return this.data.readBigInt64BE(this.pos++);
+        let res = this.data.readBigInt64BE(this.pos);
+        this.pos += 8;
+        return res;
     }
     public toBigInteger() : BigInteger {
         let val = toBigIntBE(this.data);

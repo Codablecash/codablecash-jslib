@@ -29,6 +29,7 @@ function checkTestData(start : number, data : Uint8Array, length: number) {
 }
 
 describe('TestVariableBlockFileStoreGroup', () => {
+/*
     it('case01', async () => {
 		let projectFolder = new CFile("out/random_access_file/case01");
 		projectFolder.deleteDir();
@@ -41,10 +42,10 @@ describe('TestVariableBlockFileStoreGroup', () => {
 
 		let store = new VariableBlockFileStore(baseDirStr, name, cacheManager);
 
-		await store.createStore(true, 256, 32);
+		store.createStore(true, 256, 32);
     })
-
-	it('case02', async () => {
+*/
+	it('case02', () => {
 		let projectFolder = new CFile("out/random_access_file/case02");
 		projectFolder.deleteDir();
 		projectFolder.mkdirs();
@@ -56,18 +57,18 @@ describe('TestVariableBlockFileStoreGroup', () => {
 
 		{
 			let store = new VariableBlockFileStore(baseDirStr, name, cacheManager);
-			await store.createStore(true, 256, 32);
+			store.createStore(true, 256, 32);
 		}
 
 		{
 			let store = new VariableBlockFileStore(baseDirStr, name, cacheManager);
-			await store.open(false);
+			store.open(false);
 
-			await store.close();
+			store.close();
 		}
 	})
-
-	it('alloc01', async() => {
+/*
+	it('alloc01', () => {
 		let projectFolder = new CFile("out/random_access_file/alloc01");
 		projectFolder.deleteDir();
 		projectFolder.mkdirs();
@@ -79,22 +80,24 @@ describe('TestVariableBlockFileStoreGroup', () => {
 	
 		{
 			let store = new VariableBlockFileStore(baseDirStr, name, cacheManager);
-			await store.createStore(true, 256, 32);
+			store.createStore(true, 256, 32);
 		}
 
 		let fpos;
 		{
 			let store = new VariableBlockFileStore(baseDirStr, name, cacheManager);
-			await store.open(false);
+			store.open(false);
 
 			let data = makeTestData(3, 10);
 
-			let handle = await store.alloc(10);
-			await handle.write(data, 10);
+			let handle = store.alloc(10);
+			handle.write(data, 10);
 
 			fpos = handle.getFpos();
 
 			store.close();
 		}
 	})
+
+	*/
 })

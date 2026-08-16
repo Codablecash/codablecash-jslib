@@ -10,7 +10,9 @@
     "test": "jest",
     "testvbf" : "jest --testPathPatterns=variable_block_filestore.test",
     "testraf" : "jest --testPathPatterns=random_access_file.test",
-    "testosf" : "jest --testPathPatterns=os_file.test"
+    "testosf" : "jest --testPathPatterns=os_file.test",
+    "testblong" : "jest --testPathPatterns=bytebuffer_long.test"
+    
   },
   "author": "Tomohiro Iizuka",
   "license": "MIT",
