@@ -38,8 +38,13 @@ describe('OsFileTest', () => {
             let fd = Os.openFile2ReadWrite(outFile, false);
             let data = makeTestData(1, 32);
 
-            let n = await Os.write2File(fd, data, 32);
+            let zero = new Uint8Array(32);
+            zero.fill(0);
+            let n = Os.write2File(fd, data, 32);
 
+            expect(n).toBe(32);
+
+            n = Os.write2File(fd, data, 32);
             expect(n).toBe(32);
 
             Os.closeFileDescriptor(fd);
@@ -48,7 +53,7 @@ describe('OsFileTest', () => {
         {
             let fd = Os.openFile2ReadWrite(outFile, false);
             let data = new Uint8Array(32);
-            let n = await Os.readFile(fd, data, 32);
+            let n = Os.readFile(fd, data, 32);
 
             checkTestData(1, data, 32);
 
@@ -80,7 +85,7 @@ describe('OsFileTest', () => {
         {
             let fd = Os.openFile2ReadWrite(outFile, false);
             let data = new Uint8Array(datalen);
-            let n = await Os.readFile(fd, data, datalen);
+            let n = Os.readFile(fd, data, datalen);
 
             checkTestData(1, data, datalen);
 

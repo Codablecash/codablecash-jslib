@@ -38,7 +38,7 @@ export class MMapSegment implements IComparable {
     public async writeBack(fd : FileDescriptor) : Promise<number> {
         let ret = Os.seekFile(fd, this.position, SeekOrigin.FROM_BEGINING);
 
-        ret = await Os.write2File(fd, this.buffer, this.mappedSize);
+        ret = Os.write2File(fd, this.buffer, this.mappedSize);
         if(ret != this.mappedSize){
             throw new FileIOException("MMapSegment Failed in writing a segment.");
         }
@@ -58,7 +58,7 @@ export class MMapSegment implements IComparable {
     public async loadData(fd : FileDescriptor) : Promise<void> {
         let ret = Os.seekFile(fd, this.position, SeekOrigin.FROM_BEGINING);
 
-        ret = await Os.readFile(fd, this.buffer, this.mappedSize);
+        ret = Os.readFile(fd, this.buffer, this.mappedSize);
         if(ret != this.mappedSize){
             throw new FileIOException("Failed in reading a segment.");
         }

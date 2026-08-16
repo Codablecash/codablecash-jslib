@@ -1,7 +1,7 @@
 import { CFile } from "../base_io/CFile";
 import { FileDescriptor } from "./FileDescriptor";
 
-import fs from 'node:fs';
+import fs, { writeSync } from 'node:fs';
 
 
 export enum SeekOrigin {
@@ -95,7 +95,13 @@ export class Os {
         return position;
     }
 
-    public static readFile(desc : FileDescriptor, data : Uint8Array, length : number) : Promise<number> {
+    public static readFile(desc : FileDescriptor, data : Uint8Array, length : number) : number {
+        let fd = desc.getFd();
+        let position = desc.getPosition();
+
+        let n = fs.readSync(fd, data, 0, length, position);
+        return n;
+        /*
         return new Promise<number>((resolve, reject) => {
             let fd = desc.getFd();
             let position = desc.getPosition();
@@ -110,9 +116,16 @@ export class Os {
                 resolve(bytesRead);
             });
         });
+        */
     }
 
-    public static write2File(desc : FileDescriptor, data : Uint8Array, length : number) : Promise<number> {
+    public static write2File(desc : FileDescriptor, data : Uint8Array, length : number) : number {
+        let fd = desc.getFd();
+        let position = desc.getPosition();
+        
+        return fs.writeSync(fd, data, 0, length, position);
+
+        /*
         return new Promise<number>((resolve, reject) => {
             let fd = desc.getFd();
             let position = desc.getPosition();
@@ -129,5 +142,6 @@ export class Os {
                 resolve(bytesRead);
             });
         });
+        */
     }
 }

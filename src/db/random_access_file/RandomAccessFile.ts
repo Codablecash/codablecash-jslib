@@ -156,14 +156,14 @@ export class RandomAccessFile {
         tmp.fill(0, 0, this.pageSize);
 
         for(let i = 0; i != numBlocks; ++i){
-            n = await Os.write2File(this.fd, tmp, this.pageSize);
+            n = Os.write2File(this.fd, tmp, this.pageSize);
 
             if(n != this.pageSize){
                 throw new FileIOException("RandomAccessFile filed in writing file 160.");
             }
         }
 
-        n = await Os.write2File(this.fd, tmp, modBytes);
+        n = Os.write2File(this.fd, tmp, modBytes);
         if(n != modBytes){
             throw new FileIOException("RandomAccessFile filed in writing file 166.");
         }
