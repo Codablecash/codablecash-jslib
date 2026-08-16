@@ -50,6 +50,8 @@ describe('OsFileTest', () => {
             let data = new Uint8Array(32);
             let n = await Os.readFile(fd, data, 32);
 
+            checkTestData(1, data, 32);
+
             expect(n).toBe(32);
         }
         
