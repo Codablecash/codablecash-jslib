@@ -35,7 +35,7 @@ export class MMapSegment implements IComparable {
         return this.dirty;
     }
 
-    public async writeBack(fd : FileDescriptor) : Promise<number> {
+    public writeBack(fd : FileDescriptor) : number {
         let ret = Os.seekFile(fd, this.position, SeekOrigin.FROM_BEGINING);
 
         ret = Os.write2File(fd, this.buffer, this.mappedSize);
@@ -55,7 +55,7 @@ export class MMapSegment implements IComparable {
         this.parent.requestCacheOut(this);
     }
 
-    public async loadData(fd : FileDescriptor) : Promise<void> {
+    public loadData(fd : FileDescriptor) : void {
         let ret = Os.seekFile(fd, this.position, SeekOrigin.FROM_BEGINING);
 
         ret = Os.readFile(fd, this.buffer, this.mappedSize);

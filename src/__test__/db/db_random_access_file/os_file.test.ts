@@ -44,8 +44,14 @@ describe('OsFileTest', () => {
 
             expect(n).toBe(32);
 
+            Os.syncFile(fd);
+
             n = Os.write2File(fd, data, 32);
             expect(n).toBe(32);
+
+            Os.syncFile(fd);
+
+            n = Os.write2File(fd, data, 0);
 
             Os.closeFileDescriptor(fd);
         }
@@ -75,9 +81,13 @@ describe('OsFileTest', () => {
             let fd = Os.openFile2ReadWrite(outFile, false);
             let data = makeTestData(1, datalen);
 
-            let n = await Os.write2File(fd, data, datalen);
+            Os.syncFile(fd);
+
+            let n = Os.write2File(fd, data, datalen);
 
             expect(n).toBe(datalen);
+
+            Os.syncFile(fd);
 
             Os.closeFileDescriptor(fd);
         }

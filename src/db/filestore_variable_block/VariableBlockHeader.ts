@@ -25,7 +25,7 @@ export class VariableBlockHeader {
         return this.blockUnitSize;
     }
 
-    public async createStore(del : boolean, defaultSize : number, blockUnitSize : number, extendBlocks : number) {
+    public createStore(del : boolean, defaultSize : number, blockUnitSize : number, extendBlocks : number) {
         if(defaultSize % blockUnitSize != 0){
             throw new FileIOException("createStore defaultSize % blockUnitSize != 0");
         }
@@ -36,7 +36,7 @@ export class VariableBlockHeader {
         this.availableArea = new LongRangeList();
         this.availableArea.addRange(0, (defaultSize / blockUnitSize) - 1);
 
-        await this.sync(false);
+        this.sync(false);
     }
 
     public extend() : number {
@@ -50,12 +50,12 @@ export class VariableBlockHeader {
         return this.numBlocks;
     }
 
-    public async sync(fileSync : boolean) {
-        await this.sync2File();
-        await this.file.sync(fileSync);
+    public sync(fileSync : boolean) : void {
+        this.sync2File();
+        this.file.sync(fileSync);
     }
         
-    public async sync2File() {
+    public sync2File() : void {
         let headSize = 8 * 4;
         let contentSize = this.availableArea != null ? this.availableArea.binarySize() : 0;
         let binSize = headSize + contentSize;
@@ -83,24 +83,24 @@ export class VariableBlockHeader {
 
         let fpos = 0;
         let binary = buffSizeHeader.toUint8Array();
-        fpos += await this.file.write(fpos, binary, headSize);
+        fpos += this.file.write(fpos, binary, headSize);
 
         // content
         //binary = ((const char*)buff.array()) + headSize;
         binary = buff.toUint8Array().slice(headSize);
-        let cnt = await this.file.write(fpos, binary, contentSize);
+        let cnt = this.file.write(fpos, binary, contentSize);
 
         
         //int cnt = this.file.write(fpos, binary, contentSize);
 
     }
 
-    public async loadFromFile() {
+    public loadFromFile() {
         let fpos = 0;
         let headSize = 8 * 4;
         let sizeHeaderBinary = new Uint8Array(headSize);
 
-        fpos += await this.file.read(fpos, sizeHeaderBinary, headSize);
+        fpos += this.file.read(fpos, sizeHeaderBinary, headSize);
 
         let buffSizeHeader = ByteBuffer.allocateWithEndian(headSize, true);
 
@@ -118,7 +118,7 @@ export class VariableBlockHeader {
         }
 
         let usedAreaBinary = new Uint8Array(areaSize);
-        fpos += await this.file.read(fpos, usedAreaBinary, areaSize);
+        fpos += this.file.read(fpos, usedAreaBinary, areaSize);
 
 
         let rangeBinary = ByteBuffer.allocateWithEndian(areaSize, true);

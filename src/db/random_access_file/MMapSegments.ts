@@ -33,8 +33,8 @@ export class MMapSegments {
         return (fileSize % segmentSize) == 0 ? Math.trunc(fileSize / segmentSize) : Math.trunc(fileSize / segmentSize) + 1;
     }
 
-    public async onResized(fileSize : number, fd : FileDescriptor, diskManager : DiskCacheManager) : Promise<void> {
-        await this.cacheOutSegmentIndex(fd);
+    public onResized(fileSize : number, fd : FileDescriptor, diskManager : DiskCacheManager) : void {
+        this.cacheOutSegmentIndex(fd);
 
         let lastTopSegment = this.segIndex.size() - 1;
 
@@ -56,7 +56,7 @@ export class MMapSegments {
         let segElement = this.segIndex.get(lastTopSegment);
         if(segElement != null && segElement.data != null && segElement.data.isDirty()){
             let seg = segElement.data;
-            await seg.writeBack(fd);
+            seg.writeBack(fd);
         }
 
         this.segIndex.setElement(null, lastTopSegment);
@@ -65,8 +65,8 @@ export class MMapSegments {
         }
     }
 
-    public async clearElements(diskManager : DiskCacheManager, fd : FileDescriptor) {
-        await this.cacheOutSegmentIndex(fd);
+    public clearElements(diskManager : DiskCacheManager, fd : FileDescriptor) : void {
+        this.cacheOutSegmentIndex(fd);
 
         let maxLoop = this.segIndex.size();
         for(let i = 0; i != maxLoop; ++i){
@@ -76,7 +76,7 @@ export class MMapSegments {
                 let data = seg.data;
 
                 if(data?.isDirty()){
-                    await data.writeBack(fd);
+                    data.writeBack(fd);
                 }
 
                 diskManager.fireCacheRemoved(seg);
@@ -84,7 +84,7 @@ export class MMapSegments {
         }
     }
 
-    private async cacheOutSegmentIndex(fd : FileDescriptor) {
+    private cacheOutSegmentIndex(fd : FileDescriptor) : void {
         let maxLoop = this.removeList.size();
         for(let i = 0; i != maxLoop; ++i){
             let seg = this.removeList.get(i);
@@ -93,7 +93,7 @@ export class MMapSegments {
             this.segIndex.setElement(null, index);
 
             if(seg?.isDirty() == true){
-                await seg.writeBack(fd);
+                seg.writeBack(fd);
             }
         }
 
@@ -104,12 +104,12 @@ export class MMapSegments {
         this.removeList.addElement(seg);
     }
 
-    public async getSegment(fpos : number, cache : DiskCacheManager, fd : FileDescriptor) : Promise<MMapSegment> {
+    public getSegment(fpos : number, cache : DiskCacheManager, fd : FileDescriptor) : MMapSegment {
         if(this.fileSize <= fpos){
             throw new FileIOException("fpos is over the file size.");
         }
 
-        await this.cacheOutSegmentIndex(fd);
+        this.cacheOutSegmentIndex(fd);
 
         let index = Math.trunc(fpos / this.segmentSize);
 
@@ -119,14 +119,14 @@ export class MMapSegments {
             return seg.data;
         }
 
-        let newSeg = await this.newSegment(fpos, fd);
+        let newSeg = this.newSegment(fpos, fd);
         let segElement = cache.registerCache(newSeg);
         this.segIndex.setElement(segElement, index);
 
         return newSeg;       
     }
 
-    public async newSegment(fpos : number, fd : FileDescriptor) : Promise<MMapSegment> {
+    public newSegment(fpos : number, fd : FileDescriptor) : MMapSegment{
         let offset = fpos % this.segmentSize;
         let segPos = fpos - offset;
 
@@ -136,13 +136,13 @@ export class MMapSegments {
         }
 
         let seg = new MMapSegment(segSize, segPos, this);
-        await seg.loadData(fd);
+        seg.loadData(fd);
 
         return seg;
     }
 
-    public async sync(flushDisk : boolean, fd : FileDescriptor) : Promise<void> {
-        await this.cacheOutSegmentIndex(fd);
+    public sync(flushDisk : boolean, fd : FileDescriptor) : void {
+        this.cacheOutSegmentIndex(fd);
 
         let maxLoop = this.segIndex.size();
         for(let i = 0; i != maxLoop; ++i){
@@ -151,7 +151,7 @@ export class MMapSegments {
             if(seg != null && seg.data != null && seg.data.isDirty()){
                 let data = seg.data;
                 
-                await data.writeBack(fd);
+                data.writeBack(fd);
             }
         }
     }

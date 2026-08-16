@@ -31,11 +31,11 @@ export class VariableBlockFileStore extends FileStore implements IBlockFileStore
         return this.body;
     }
 
-    public async createStore(del : boolean, defaultSize : number, blockUnitSize : number, extendBlocks : number = 1024) {
+    public createStore(del : boolean, defaultSize : number, blockUnitSize : number, extendBlocks : number = 1024) {
         let mod = defaultSize % blockUnitSize;
 
-        await this.__createStore(del, defaultSize);
-	    await this.__open(false);
+        this.__createStore(del, defaultSize);
+	    this.__open(false);
 
         if(this.headerFile != null){ // guard
             this.header = new VariableBlockHeader(this.headerFile);
@@ -56,8 +56,8 @@ export class VariableBlockFileStore extends FileStore implements IBlockFileStore
         }
     }
 
-    public async open(sync : boolean) {
-        await this.__open(sync);
+    public open(sync : boolean) {
+        this.__open(sync);
 
         if(this.headerFile != null){ // guard
             this.header = new VariableBlockHeader(this.headerFile);
@@ -65,12 +65,12 @@ export class VariableBlockFileStore extends FileStore implements IBlockFileStore
 
         try{
             if(this.header != null && this.file != null){
-                await this.header.loadFromFile();
+                this.header.loadFromFile();
                 this.body = new VariableBlockFileBody(this.file, this.header.getBlockUnitSize());
             }
         }catch(error){
             this.internalClear();
-            await super.close();
+            super.close();
 
             throw new BlockFileStorageException("Failed in opening block file store");
         }
@@ -85,33 +85,33 @@ export class VariableBlockFileStore extends FileStore implements IBlockFileStore
         }
     }
 
-    public async close() : Promise<void> {
-        await super.close();
+    public close() : void {
+        super.close();
 	    this.internalClear();
     }
 
-    public async extendFile() {
+    public extendFile() {
         if(this.header != null && this.body != null){
             let numExtendedBlocks = this.header.extend();
 
             let newLength = numExtendedBlocks * this.header.getBlockUnitSize();
-            await this.body.extend(newLength);
+            this.body.extend(newLength);
 
-            await this.sync(false);
+            this.sync(false);
         }
     }
 
-    public async sync(fsync : boolean) {
+    public sync(fsync : boolean) {
         if(this.header != null && this.body != null){
-            await this.header.sync(fsync);
-            await this.body.sync(fsync);
+            this.header.sync(fsync);
+            this.body.sync(fsync);
         }
     }
 
-    public async realloc(fpos : number, size : number) : Promise<IBlockHandle> {
+    public realloc(fpos : number, size : number) : Promise<IBlockHandle> {
         if((this.header != null && this.header.isEmpty()) || (this.header != null && this.header.availableCapacity() < size) ){
             // extend file size
-            await this.extendFile();
+            this.extendFile();
         }
 
         let sizeRemain = size;
@@ -144,22 +144,22 @@ export class VariableBlockFileStore extends FileStore implements IBlockFileStore
                 let block = list.get(i);
 
                 if(block != null && this.body != null){ // guard
-                     await block.writeBack(this.body);
+                    block.writeBack(this.body);
                 }
             }
 
-            await this.sync(false);
+            this.sync(false);
 
-            return this.blocksToHandle(list);
+            this.blocksToHandle(list);
         }
 
         throw new BlockFileStorageException("Failed in realloc()");
     }
 
-    public async alloc(size : number) {
+    public alloc(size : number) {
         if((this.header != null && this.header.isEmpty()) || (this.header != null && this.header.availableCapacity() < size) ){
             // extend file size
-            await this.extendFile();
+            this.extendFile();
         }
         
         let sizeRemain = size;
@@ -188,7 +188,7 @@ export class VariableBlockFileStore extends FileStore implements IBlockFileStore
             let block = list.get(i);
             
             if(this.body != null && block != null){
-                await block.writeBack(this.body);
+                block.writeBack(this.body);
             }
         }
 
@@ -238,15 +238,15 @@ export class VariableBlockFileStore extends FileStore implements IBlockFileStore
         return handle;
     }
 
-    public async get(fpos : number) {
-        let list = await this.getBlockList(fpos);
+    public get(fpos : number) {
+        let list = this.getBlockList(fpos);
 
         var handle = this.blocksToHandle(list);
 
         return handle;
     }
     
-    public async getBlockList(fpos : number) {
+    public getBlockList(fpos : number) {
         if(this.body != null && this.header != null){
             let blockUnitSize = this.header.getBlockUnitSize();
 
@@ -256,7 +256,7 @@ export class VariableBlockFileStore extends FileStore implements IBlockFileStore
 
             let block : VariableBlock | null = null;
             do{
-                block = await VariableBlock.load(this.body, __fpos, blockUnitSize);
+                block = VariableBlock.load(this.body, __fpos, blockUnitSize);
                 list.addElement(block);
 
                 __fpos = block.getNextPos();

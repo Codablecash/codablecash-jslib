@@ -103,22 +103,6 @@ export class Os {
         desc.incPosition(n);
 
         return n;
-        /*
-        return new Promise<number>((resolve, reject) => {
-            let fd = desc.getFd();
-            let position = desc.getPosition();
-            
-            fs.read(fd, data, 0, length, position, (err, bytesRead, buff) => {
-                if (err) resolve(-1);
-
-                if(bytesRead > 0){
-                    desc.incPosition(bytesRead);
-                }
-
-                resolve(bytesRead);
-            });
-        });
-        */
     }
 
     public static write2File(desc : FileDescriptor, data : Uint8Array, length : number) : number {
@@ -127,25 +111,7 @@ export class Os {
         
         let n = fs.writeSync(fd, data, 0, length, position);
         desc.incPosition(n);
-        
+
         return n;
-        /*
-        return new Promise<number>((resolve, reject) => {
-            let fd = desc.getFd();
-            let position = desc.getPosition();
-
-            fs.write(fd, data, 0, length, position, (err, bytesRead, buff) => {
-                if (err){
-                    reject(-1);
-                }
-
-                if(bytesRead > 0){
-                    desc.incPosition(bytesRead);
-                }
-
-                resolve(bytesRead);
-            });
-        });
-        */
     }
 }

@@ -39,7 +39,7 @@ describe('RAFTestGroup', () => {
         let file = new RandomAccessFile(outFile, new DiskCacheManager());
         await file.open(false);
 
-        await file.close();
+        file.close();
     })
 
     it('case01', async () =>{
@@ -51,11 +51,11 @@ describe('RAFTestGroup', () => {
         let outFile = projectFolder.get(name);
 
         let file = new RandomAccessFile(outFile, new DiskCacheManager());
-        await file.open(false);
+        file.open(false);
 
-        await file.setLength(file.getSegmentSize() + 128);
+        file.setLength(file.getSegmentSize() + 128);
 
-        await file.close();
+        file.close();
     })
 */
     it('case02', async () =>{
@@ -68,16 +68,16 @@ describe('RAFTestGroup', () => {
 
         {
             let file = new RandomAccessFile(outFile, new DiskCacheManager());
-            await file.open(false);
+            file.open(false);
 
             let data = makeTestData(1, 10);
 
-            await file.write(0, data, data.length);
+            file.write(0, data, data.length);
 
             let result = new Uint8Array(10);
-            await file.read(0, result, 10);
+            file.read(0, result, 10);
 
-            await file.close();
+            file.close();
         }
 
         {
@@ -90,12 +90,12 @@ describe('RAFTestGroup', () => {
 
         {
             let file = new RandomAccessFile(outFile, new DiskCacheManager());
-            await file.open(false);
+            file.open(false);
 
             let result = new Uint8Array(10);
-            await file.read(0, result, 10);
+            file.read(0, result, 10);
 
-            await file.close();
+            file.close();
         }
 
     })

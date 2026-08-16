@@ -30,7 +30,7 @@ export class VariableBlock {
         }
     }
 
-    public async writeBack(body : VariableBlockFileBody) : Promise<void> {
+    public writeBack(body : VariableBlockFileBody) : void {
         let rfile = body.getFile();
 
         let fpos = this.currentfPos;
@@ -40,7 +40,7 @@ export class VariableBlock {
 
         buff.position(0);
         let d = buff.toUint8Array();
-        fpos += await rfile.write(fpos, d, buff.limit());
+        fpos += rfile.write(fpos, d, buff.limit());
 
         if((fpos - this.currentfPos) == this.blockSize){
             throw new FileIOException("assert error at VariableBlock.writeBack().");
@@ -54,13 +54,13 @@ export class VariableBlock {
         this.used = length;
     }
 
-    public static async load(body : VariableBlockFileBody, fpos : number, blockunit : number) {
+    public static load(body : VariableBlockFileBody, fpos : number, blockunit : number) {
         let rfile = body.getFile();
 
         let __fpos = fpos;
 
         let tmp = new Uint8Array(VariableBlock.HEADER_SIZE);
-        __fpos += await rfile.read(__fpos, tmp, VariableBlock.HEADER_SIZE);
+        __fpos += rfile.read(__fpos, tmp, VariableBlock.HEADER_SIZE);
 
         let buff = ByteBuffer.wrapWithEndian(tmp, VariableBlock.HEADER_SIZE, true);
         let used = buff.getShort();
@@ -69,7 +69,7 @@ export class VariableBlock {
 
         let data = new Uint8Array(used);
 
-        __fpos += await rfile.read(__fpos, data, used);
+        __fpos += rfile.read(__fpos, data, used);
 
         let block = new VariableBlock(blockSize, fpos, used, Number(nextfpos), data);
         return block;
@@ -86,13 +86,13 @@ export class VariableBlock {
         return ret;
     }
 
-    public async freeBlock(header : VariableBlockHeader, body : VariableBlockFileBody){
+    public freeBlock(header : VariableBlockHeader, body : VariableBlockFileBody){
         let blockUnitSize = header.getBlockUnitSize();
 
         let range = this.getLongRange(blockUnitSize);
         header.freeFragment(range);
 
-        await body.resetHeader(this.currentfPos);
+        body.resetHeader(this.currentfPos);
     }
 
     public getLongRange(blockUnitSize : number) : LongRange {

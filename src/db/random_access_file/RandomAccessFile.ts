@@ -33,7 +33,7 @@ export class RandomAccessFile {
         return this.file.exists();
     }
 
-    public async open(sync : boolean) {
+    public open(sync : boolean) : void {
         this.fd = Os.openFile2ReadWrite(this.file, sync);
 
         if(!this.fd.isOpened()){
@@ -47,31 +47,31 @@ export class RandomAccessFile {
 	    this.mmapSegments = new MMapSegments(this.fileSize, segmentSize);
 
         if(this.fileSize == 0){
-            await this.setLength(this.pageSize * RandomAccessFile.PAGE_NUM_CACHE);
-            await this.sync(true);
+            this.setLength(this.pageSize * RandomAccessFile.PAGE_NUM_CACHE);
+            this.sync(true);
         }
     }
 
-    public async close() {
+    public close() : void {
         if(this.fd != null && !this.fd.isOpened()) {
             return;
         }
 
         if(this.mmapSegments != null && this.fd != null){
-            await this.mmapSegments.clearElements(this.diskCacheManager, this.fd);
-            await this.sync(true);
+            this.mmapSegments.clearElements(this.diskCacheManager, this.fd);
+            this.sync(true);
             Os.closeFileDescriptor(this.fd);
         }
     }
 
-    public async read(fpos : number, buff : Uint8Array, count : number) : Promise<number> {
+    public read(fpos : number, buff : Uint8Array, count : number) : number {
         let segSize = this.getSegmentSize();
 
         let buffpos = 0;
         let count2Read = count;
         let currentfpos = fpos;
         while(count2Read > 0 && this.fd != null){
-            let seg = await this.mmapSegments?.getSegment(currentfpos, this.diskCacheManager, this.fd);
+            let seg = this.mmapSegments?.getSegment(currentfpos, this.diskCacheManager, this.fd);
 
             if(seg != undefined){
                 let offset = currentfpos % segSize;
@@ -91,7 +91,7 @@ export class RandomAccessFile {
         return count;
     }
 
-    public async write(fpos : number, buff : Uint8Array, count : number) : Promise<number>{
+    public write(fpos : number, buff : Uint8Array, count : number) :  number {
         let segSize = this.getSegmentSize();
 
         let buffoffset = 0;
@@ -104,12 +104,12 @@ export class RandomAccessFile {
                 let writeEndPos = currentfpos + count2Write;
                 if(writeEndPos >= currentSize){
                     let newLength = currentSize + this.pageSize * 4;
-                    await this.setLength(newLength);
+                    this.setLength(newLength);
                 }               
             }
 
             if(this.mmapSegments != null && this.fd != null){
-                let seg = await this.mmapSegments.getSegment(currentfpos, this.diskCacheManager, this.fd);
+                let seg = this.mmapSegments.getSegment(currentfpos, this.diskCacheManager, this.fd);
 
                 let ptr = seg.getPtr();
 
@@ -137,7 +137,7 @@ export class RandomAccessFile {
         return this.pageSize * RandomAccessFile.PAGE_NUM_CACHE;
     }
 
-    public async setLength(newLength : number) : Promise<void> {
+    public setLength(newLength : number) : void {
         if(!this.fd?.isOpened()){
             throw new FileIOException("File is not opened.");
         }
@@ -163,6 +163,7 @@ export class RandomAccessFile {
             }
         }
 
+
         n = Os.write2File(this.fd, tmp, modBytes);
         if(n != modBytes){
             throw new FileIOException("RandomAccessFile filed in writing file 166.");
@@ -173,12 +174,12 @@ export class RandomAccessFile {
         fpos = Os.seekFile(this.fd, 0, SeekOrigin.CURRENT_POS); // get the position of the last
 
         this.fileSize = fpos;
-        await this.mmapSegments?.onResized(this.fileSize, this.fd, this.diskCacheManager);
+        this.mmapSegments?.onResized(this.fileSize, this.fd, this.diskCacheManager);
     }
 
-    public async sync(flashDisk : boolean) : Promise<void> {
+    public sync(flashDisk : boolean) : void {
         if(this.fd != null){
-            await this.mmapSegments?.sync(flashDisk, this.fd);
+            this.mmapSegments?.sync(flashDisk, this.fd);
 
             if(flashDisk){
                 Os.syncFile(this.fd);
