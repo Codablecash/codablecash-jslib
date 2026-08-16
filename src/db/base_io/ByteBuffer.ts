@@ -193,7 +193,8 @@ export class ByteBuffer {
         }
 
         // Mem::memcpy(data->getRoot() + this->pos, src, len);
-        this.data.set(src, this.pos);
+        let buff = src.slice(0, len);
+        this.data.set(buff, this.pos);
 
         this.pos += len;
 

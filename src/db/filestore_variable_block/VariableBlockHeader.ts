@@ -79,7 +79,6 @@ export class VariableBlockHeader {
         buffSizeHeader.putLong(this.blockUnitSize);
         buffSizeHeader.putLong(this.extendBlocks);
         buffSizeHeader.putLong(this.numBlocks);
-        
         buffSizeHeader.position(0);
 
         let fpos = 0;
@@ -161,8 +160,8 @@ export class VariableBlockHeader {
         if(typeof value == "number" && this.availableArea != null){
             let range = this.availableArea.get(0);
             
-            if(range != null && size != undefined){
-                return this.__allocMaxFragment(range, size);
+            if(range != null && size == undefined){
+                return this.__allocMaxFragment(range, value);
             }
         }
 

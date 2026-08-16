@@ -67,7 +67,7 @@ describe('TestVariableBlockFileStoreGroup', () => {
 			store.close();
 		}
 	})
-/*
+
 	it('alloc01', () => {
 		let projectFolder = new CFile("out/random_access_file/alloc01");
 		projectFolder.deleteDir();
@@ -99,5 +99,4 @@ describe('TestVariableBlockFileStoreGroup', () => {
 		}
 	})
 
-	*/
 })

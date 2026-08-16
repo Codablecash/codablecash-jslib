@@ -24,16 +24,16 @@ export class VariableBlockHandle implements IBlockHandle {
 		this.fpos = fpos;
 	}
 
-    public async write(bytes : Uint8Array, length : number) : Promise<void> {
+    public write(bytes : Uint8Array, length : number) : void {
         let body = this.store.getBody();
 
-        let list = await this.store.getBlockList(this.fpos);
+        let list = this.store.getBlockList(this.fpos);
 	
         // need realloc
         if(this.needRealloc(list, length) && list != undefined){
-            await this.removeBlocks(list);
+            this.removeBlocks(list);
             
-            list = await this.realloc(length);
+            list = this.realloc(length);
         }
 
         // replace buffer
@@ -66,15 +66,15 @@ export class VariableBlockHandle implements IBlockHandle {
                     ptrpos += writeLength;
                     writeRemain -= writeLength;
 
-                    await block.writeBack(body);
+                    block.writeBack(body);
                 }
 
             }
         }
     }
 
-    public async realloc(length : number) {
-        let handle = await this.store.realloc(this.fpos, length);
+    public realloc(length : number) : ArrayList<VariableBlock> {
+        let handle = this.store.realloc(this.fpos, length);
 
         let other = <VariableBlockHandle>handle;
         let b = other.moveBuffer();
@@ -122,18 +122,18 @@ export class VariableBlockHandle implements IBlockHandle {
         return this.buffer;
     }
 
-    public async removeBlocks(list? : ArrayList<VariableBlock>) : Promise<void> {
+    public removeBlocks(list? : ArrayList<VariableBlock>) : void {
         if(list != undefined){
-            await this.__removeBlocks(list);
+            this.__removeBlocks(list);
             return;
         }
 
-        let mylist = await this.store.getBlockList(this.fpos);
+        let mylist = this.store.getBlockList(this.fpos);
 
-        await this.removeBlocks(mylist);
+        this.removeBlocks(mylist);
     }
 
-    private async __removeBlocks(list : ArrayList<VariableBlock>) : Promise<void> {
+    private __removeBlocks(list : ArrayList<VariableBlock>) : void {
         let header = this.store.getHeader();
         let body = this.store.getBody();
 
@@ -142,11 +142,11 @@ export class VariableBlockHandle implements IBlockHandle {
             let block = list.get(i);
 
             if(block != null && header != null && body != null){ // guard
-                await block.freeBlock(header, body);
+                block.freeBlock(header, body);
             }
         }
 
-        await this.store.sync(false);
+        this.store.sync(false);
     }
 
     public size() : number {
