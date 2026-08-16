@@ -30,7 +30,7 @@ export class MMapSegments {
     }
 
     private getNumSegments(fileSize : number, segmentSize : number) : number {
-        return (fileSize % segmentSize) == 0 ? fileSize / segmentSize : (fileSize / segmentSize) + 1;
+        return (fileSize % segmentSize) == 0 ? Math.trunc(fileSize / segmentSize) : Math.trunc(fileSize / segmentSize) + 1;
     }
 
     public async onResized(fileSize : number, fd : FileDescriptor, diskManager : DiskCacheManager) : Promise<void> {
@@ -89,7 +89,7 @@ export class MMapSegments {
         for(let i = 0; i != maxLoop; ++i){
             let seg = this.removeList.get(i);
 
-            let index = (seg != null ? seg.getPosition() : 0) / this.segmentSize;
+            let index = Math.trunc((seg != null ? seg.getPosition() : 0) / this.segmentSize);
             this.segIndex.setElement(null, index);
 
             if(seg?.isDirty() == true){
@@ -111,7 +111,7 @@ export class MMapSegments {
 
         await this.cacheOutSegmentIndex(fd);
 
-        let index = (fpos / this.segmentSize);
+        let index = Math.trunc(fpos / this.segmentSize);
 
         let seg = this.segIndex.get(index);
         if(seg != null && seg.data != null){
