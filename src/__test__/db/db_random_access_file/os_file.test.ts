@@ -26,23 +26,6 @@ function checkTestData(start : number, data : Uint8Array, length: number) {
 }
 
 describe('OsFileTest', () => {
-/*
-    it('casesim01', async () => {
-        let projectFolder = new CFile("out/OsFileTest/casesim01");
-        projectFolder.deleteDir();
-        projectFolder.mkdirs();
-
-        let name = "out.bin";
-        let outFile = projectFolder.get(name);
-
-        {
-            let fd = Os.openFile2ReadWrite(outFile, false);
-            let data = makeTestData(1, 32);
-
-            Os.closeFileDescriptor(fd);
-        }
-    })
-*/
 
     it('case01', async () => {
         let projectFolder = new CFile("out/OsFileTest/case01");
@@ -84,7 +67,7 @@ describe('OsFileTest', () => {
         }
         
     })
-/*
+
     it('case02', async () => {
         let projectFolder = new CFile("out/OsFileTest/case02");
         projectFolder.deleteDir();
@@ -98,7 +81,7 @@ describe('OsFileTest', () => {
             let fd = Os.openFile2ReadWrite(outFile, false);
             let data = makeTestData(1, datalen);
 
-            n = Os.write2File(fd, data, datalen);
+            let n = Os.write2File(fd, data, datalen);
 
             expect(n).toBe(datalen);
 
@@ -118,5 +101,5 @@ describe('OsFileTest', () => {
         }
         
     })
-*/
+
 });

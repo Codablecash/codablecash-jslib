@@ -50,11 +50,16 @@ export class Os {
     public static openFile2ReadWrite(file : CFile, sync : boolean) : FileDescriptor {
         let path = file.toString();
 
+        if(!file.exists()){
+             let fd = fs.openSync(path, "a");
+             fs.closeSync(fd);
+        }
+
         let flag : string;
         if(sync){
-            flag = "ws+";
+            flag = "rs+";
         }else{
-            flag = "w+";
+            flag = "r+";
         }
 
         let fd = fs.openSync(path, flag);
@@ -152,6 +157,7 @@ export class Os {
                 // reopen
                 fd = fs.openSync(path, lastFlag);
                 desc.setFd(fd);
+                desc.setFileSize(maxPosition);
             }
 
         }
