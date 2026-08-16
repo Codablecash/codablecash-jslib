@@ -95,7 +95,7 @@ export class Os {
         return position;
     }
 
-    public static async readFile(desc : FileDescriptor, data : Uint8Array, length : number) : Promise<number> {
+    public static readFile(desc : FileDescriptor, data : Uint8Array, length : number) : Promise<number> {
         return new Promise<number>((resolve, reject) => {
             let fd = desc.getFd();
             let position = desc.getPosition();
@@ -112,7 +112,7 @@ export class Os {
         });
     }
 
-    public static async write2File(desc : FileDescriptor, data : Uint8Array, length : number) : Promise<number> {
+    public static write2File(desc : FileDescriptor, data : Uint8Array, length : number) : Promise<number> {
         return new Promise<number>((resolve, reject) => {
             let fd = desc.getFd();
             let position = desc.getPosition();

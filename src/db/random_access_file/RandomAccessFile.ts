@@ -144,7 +144,7 @@ export class RandomAccessFile {
         }
 
         let newSize = newLength - this.fileSize;
-        let numBlocks = newSize / this.pageSize;
+        let numBlocks = Math.trunc(newSize / this.pageSize);
         let modBytes =  newSize % this.pageSize;
 
         let fpos = Os.seekFile(this.fd, 0, SeekOrigin.FROM_END);
