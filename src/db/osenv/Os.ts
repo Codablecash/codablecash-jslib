@@ -100,6 +100,8 @@ export class Os {
         let position = desc.getPosition();
 
         let n = fs.readSync(fd, data, 0, length, position);
+        desc.incPosition(n);
+
         return n;
         /*
         return new Promise<number>((resolve, reject) => {
@@ -123,8 +125,10 @@ export class Os {
         let fd = desc.getFd();
         let position = desc.getPosition();
         
-        return fs.writeSync(fd, data, 0, length, position);
-
+        let n = fs.writeSync(fd, data, 0, length, position);
+        desc.incPosition(n);
+        
+        return n;
         /*
         return new Promise<number>((resolve, reject) => {
             let fd = desc.getFd();
