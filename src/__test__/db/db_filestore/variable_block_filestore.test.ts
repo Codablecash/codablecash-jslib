@@ -97,6 +97,24 @@ describe('TestVariableBlockFileStoreGroup', () => {
 
 			store.close();
 		}
+
+		{
+			let store = new VariableBlockFileStore(baseDirStr, name, cacheManager);
+			store.open(false);
+			
+			let handle = store.get(fpos);
+			let buff = handle.getBuffer();
+
+			let ar = buff?.toUint8Array();
+
+			let res : boolean = false;
+			if(ar != null){
+				res = checkTestData(3, ar, 10);
+			}
+			expect(res).toBe(true);
+
+			store.close();
+		}
 	})
 
 })
