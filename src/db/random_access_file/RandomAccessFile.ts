@@ -102,7 +102,7 @@ export class RandomAccessFile {
                 let writeEndPos = currentfpos + count2Write;
                 if(writeEndPos >= currentSize){
                     let newLength = currentSize + this.pageSize * 4;
-                    this.setLength(newLength);
+                    await this.setLength(newLength);
                 }               
             }
 
@@ -157,13 +157,13 @@ export class RandomAccessFile {
             n = await Os.write2File(this.fd, tmp, this.pageSize);
 
             if(n != this.pageSize){
-                throw new FileIOException("filed in writing file.");
+                throw new FileIOException("RandomAccessFile filed in writing file 160.");
             }
         }
 
         n = await Os.write2File(this.fd, tmp, modBytes);
         if(n != modBytes){
-            throw new FileIOException("filed in writing file.");
+            throw new FileIOException("RandomAccessFile filed in writing file 166.");
         }
 
         let ret = Os.syncFile(this.fd);

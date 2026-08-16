@@ -47,9 +47,9 @@ export class FileStore {
         this.openFile(baseDir, false);
         await this.file?.setLength(defaultSize);
 
-        this.openHeaderFile(baseDir, false);
+        await this.openHeaderFile(baseDir, false);
 
-        this.close();
+        await this.close();
     }
 
     public deleteFiles() {

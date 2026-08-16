@@ -40,7 +40,7 @@ export class MMapSegment implements IComparable {
 
         ret = await Os.write2File(fd, this.buffer, this.mappedSize);
         if(ret != this.mappedSize){
-            throw new FileIOException("Failed in writing a segment.");
+            throw new FileIOException("MMapSegment Failed in writing a segment.");
         }
         this.dirty = false;
 
@@ -60,7 +60,7 @@ export class MMapSegment implements IComparable {
 
         ret = await Os.readFile(fd, this.buffer, this.mappedSize);
         if(ret != this.mappedSize){
-            throw new FileIOException("Failed in writing a segment.");
+            throw new FileIOException("Failed in reading a segment.");
         }
     }
 
