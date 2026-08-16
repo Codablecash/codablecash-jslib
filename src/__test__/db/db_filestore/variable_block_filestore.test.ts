@@ -294,6 +294,18 @@ describe('TestVariableBlockFileStoreGroup', () => {
 				expect(res).toBe(true);
 			}
 
+			{
+				let handle = store.get(fpos02);
+				let buff = handle.getBuffer();
+
+				let ar = buff?.toUint8Array();
+
+				let res : boolean = false;
+				if(ar != null){
+					res = checkTestData(3, ar, 10);
+				}
+				expect(res).toBe(true);
+			}
 
 			store.close();
 		}
