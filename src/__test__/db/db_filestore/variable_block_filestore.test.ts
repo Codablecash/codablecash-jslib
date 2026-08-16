@@ -43,4 +43,26 @@ describe('TestVariableBlockFileStoreGroup', () => {
 		await store.createStore(true, 256, 32);
     })
 
+	it('case02', async () => {
+		let projectFolder = new CFile("out/random_access_file/case02");
+		projectFolder.deleteDir();
+		projectFolder.mkdirs();
+
+		let baseDirStr = projectFolder.getAbsolutePath();
+
+		let cacheManager = new DiskCacheManager();
+		let name = "file01";
+
+		{
+			let store = new VariableBlockFileStore(baseDirStr, name, cacheManager);
+			await store.createStore(true, 256, 32);
+		}
+
+		{
+			let store = new VariableBlockFileStore(baseDirStr, name, cacheManager);
+			await store.open(false);
+
+			await store.close();
+		}
+	})
 })
