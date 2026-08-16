@@ -34,15 +34,19 @@ export class VariableBlock {
         let rfile = body.getFile();
 
         let fpos = this.currentfPos;
-        let buff = ByteBuffer.allocateWithEndian(VariableBlock.HEADER_SIZE, true); 
-		buff.putShort(this.used);
-		buff.putLong(this.nextfpos);
+        {
+            let buff = ByteBuffer.allocateWithEndian(VariableBlock.HEADER_SIZE, true); 
+            buff.putShort(this.used);
+            buff.putLong(this.nextfpos);
 
-        buff.position(0);
-        let d = buff.toUint8Array();
-        fpos += rfile.write(fpos, d, buff.limit());
+            buff.position(0);
+            let d = buff.toUint8Array();
+            fpos += rfile.write(fpos, d, buff.limit());
+        }
+        
+        fpos += rfile.write(fpos, this.data, this.dataSize());
 
-        if((fpos - this.currentfPos) == this.blockSize){
+        if(!((fpos - this.currentfPos) == this.blockSize)){
             throw new FileIOException("assert error at VariableBlock.writeBack().");
         }
     }
