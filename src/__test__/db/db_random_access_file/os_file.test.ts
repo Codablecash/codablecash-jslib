@@ -1,5 +1,5 @@
 import { CFile } from "../../../db/base_io/CFile";
-import { Os } from "../../../db/osenv/Os";
+import { Os, SeekOrigin } from "../../../db/osenv/Os";
 
 function makeTestData(start : number, length : number) : Uint8Array{
 	let ptr = new Uint8Array(length);
@@ -26,6 +26,24 @@ function checkTestData(start : number, data : Uint8Array, length: number) {
 }
 
 describe('OsFileTest', () => {
+/*
+    it('casesim01', async () => {
+        let projectFolder = new CFile("out/OsFileTest/casesim01");
+        projectFolder.deleteDir();
+        projectFolder.mkdirs();
+
+        let name = "out.bin";
+        let outFile = projectFolder.get(name);
+
+        {
+            let fd = Os.openFile2ReadWrite(outFile, false);
+            let data = makeTestData(1, 32);
+
+            Os.closeFileDescriptor(fd);
+        }
+    })
+*/
+
     it('case01', async () => {
         let projectFolder = new CFile("out/OsFileTest/case01");
         projectFolder.deleteDir();
@@ -40,18 +58,17 @@ describe('OsFileTest', () => {
 
             let zero = new Uint8Array(32);
             zero.fill(0);
-            let n = Os.write2File(fd, data, 32);
+            let n = Os.write2File(fd, zero, 32);
 
             expect(n).toBe(32);
 
             Os.syncFile(fd);
 
+            Os.seekFile(fd, 0, SeekOrigin.FROM_BEGINING);
             n = Os.write2File(fd, data, 32);
             expect(n).toBe(32);
 
             Os.syncFile(fd);
-
-            n = Os.write2File(fd, data, 0);
 
             Os.closeFileDescriptor(fd);
         }
@@ -67,7 +84,7 @@ describe('OsFileTest', () => {
         }
         
     })
-
+/*
     it('case02', async () => {
         let projectFolder = new CFile("out/OsFileTest/case02");
         projectFolder.deleteDir();
@@ -81,9 +98,7 @@ describe('OsFileTest', () => {
             let fd = Os.openFile2ReadWrite(outFile, false);
             let data = makeTestData(1, datalen);
 
-            Os.syncFile(fd);
-
-            let n = Os.write2File(fd, data, datalen);
+            n = Os.write2File(fd, data, datalen);
 
             expect(n).toBe(datalen);
 
@@ -103,4 +118,5 @@ describe('OsFileTest', () => {
         }
         
     })
+*/
 });

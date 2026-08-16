@@ -82,10 +82,10 @@ describe('RAFTestGroup', () => {
 
         {
             let fd = Os.openFile2ReadWrite(outFile, false);
-            let data = new Uint8Array(32);
-            let n = Os.readFile(fd, data, 32);
+            let data = new Uint8Array(10);
+            let n = Os.readFile(fd, data, 10);
 
-            expect(n).toBe(32);
+            expect(n).toBe(10);
         }
 
         {

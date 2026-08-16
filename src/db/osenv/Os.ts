@@ -52,13 +52,18 @@ export class Os {
 
         let flag : string;
         if(sync){
-            flag = "as+";
+            flag = "ws+";
         }else{
-            flag = "a+";
+            flag = "w+";
         }
 
         let fd = fs.openSync(path, flag);
         let desc = new FileDescriptor(fd, path);
+        desc.setFlag(flag);
+
+        let fileSize = file.length();
+        desc.setFileSize(fileSize);
+
         return desc;
     }
 
@@ -107,11 +112,52 @@ export class Os {
 
     public static write2File(desc : FileDescriptor, data : Uint8Array, length : number) : number {
         let fd = desc.getFd();
-        let position = desc.getPosition();
-        
-        let n = fs.writeSync(fd, data, 0, length, position);
-        desc.incPosition(n);
 
-        return n;
+        let fileSize = desc.getFileSize();
+        let total = 0;
+
+        let position = desc.getPosition();
+        let maxPosition = position + length;
+        let firstLength = fileSize < maxPosition ? fileSize - position : length;
+        {
+
+            if(firstLength > 0){
+                let n = fs.writeSync(fd, data, 0, firstLength, position);
+                desc.incPosition(n);
+                total += n;
+            }
+
+        }
+
+        {
+            let addLength = fileSize < maxPosition ? maxPosition - fileSize : 0;
+            if(addLength > 0){
+                // switch to a+ mode;
+                let lastFlag = desc.getFlag();
+                let path = desc.getPath();
+
+                fs.closeSync(fd);
+
+                {
+                    fd = fs.openSync(path, "a+")
+                    let position = desc.getPosition();
+                    let n = fs.writeSync(fd, data, fileSize, addLength, position);
+                    desc.incPosition(n);
+                    total += n;
+
+                    fs.closeSync(fd);
+                }
+
+
+                // reopen
+                fd = fs.openSync(path, lastFlag);
+                desc.setFd(fd);
+            }
+
+        }
+
+
+        return total;
+
     }
 }
