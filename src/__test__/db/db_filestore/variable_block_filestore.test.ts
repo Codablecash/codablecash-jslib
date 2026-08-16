@@ -227,7 +227,7 @@ describe('TestVariableBlockFileStoreGroup', () => {
 	 * fragment is 2
 	 */
 	it('alloc04', () => {
-		let projectFolder = new CFile("out/random_access_file/alloc03");
+		let projectFolder = new CFile("out/random_access_file/alloc04");
 		projectFolder.deleteDir();
 		projectFolder.mkdirs();
 
@@ -290,6 +290,94 @@ describe('TestVariableBlockFileStoreGroup', () => {
 				let res : boolean = false;
 				if(ar != null){
 					res = checkTestData(3, ar, 100);
+				}
+				expect(res).toBe(true);
+			}
+
+			{
+				let handle = store.get(fpos02);
+				let buff = handle.getBuffer();
+
+				let ar = buff?.toUint8Array();
+
+				let res : boolean = false;
+				if(ar != null){
+					res = checkTestData(3, ar, 10);
+				}
+				expect(res).toBe(true);
+			}
+
+			store.close();
+		}
+	})
+
+	/**
+	 * fragment is 2 with realloc & extend
+	 */
+	it('alloc05', () => {
+		let projectFolder = new CFile("out/random_access_file/alloc05");
+		projectFolder.deleteDir();
+		projectFolder.mkdirs();
+
+		let baseDirStr = projectFolder.getAbsolutePath();
+
+		let cacheManager = new DiskCacheManager();
+		let name = "file01";
+		{
+			let store = new VariableBlockFileStore(baseDirStr, name, cacheManager);
+			store.createStore(true, 256, 32);
+		}
+
+		let fpos01, fpos02;
+		{
+			let store = new VariableBlockFileStore(baseDirStr, name, cacheManager);
+			store.open(false);
+
+			{
+				let handle = store.alloc(10);
+
+				let data = makeTestData(3, 10);
+				handle.write(data, 10);
+				fpos01 = handle.getFpos();				
+			}
+
+			{
+				let handle = store.alloc(10);
+
+				let data = makeTestData(3, 10);
+				handle.write(data, 10);
+				fpos02 = handle.getFpos();		
+			}
+
+			{
+				let handle = store.get(fpos01);
+				handle.removeBlocks();
+			}
+
+			{
+				let handle = store.alloc(10);
+
+				let data = makeTestData(3, 1000);
+				handle.write(data, 1000);
+				fpos01 = handle.getFpos();		
+			}
+
+			store.close();
+		}
+
+		{
+			let store = new VariableBlockFileStore(baseDirStr, name, cacheManager);
+			store.open(false);
+			
+			{
+				let handle = store.get(fpos01);
+				let buff = handle.getBuffer();
+
+				let ar = buff?.toUint8Array();
+
+				let res : boolean = false;
+				if(ar != null){
+					res = checkTestData(3, ar, 1000);
 				}
 				expect(res).toBe(true);
 			}
