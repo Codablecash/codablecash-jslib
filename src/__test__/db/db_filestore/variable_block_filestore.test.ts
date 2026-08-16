@@ -117,4 +117,38 @@ describe('TestVariableBlockFileStoreGroup', () => {
 		}
 	})
 
+	it('alloc02', () => {
+		let projectFolder = new CFile("out/random_access_file/alloc02");
+		projectFolder.deleteDir();
+		projectFolder.mkdirs();
+
+		let baseDirStr = projectFolder.getAbsolutePath();
+
+		let cacheManager = new DiskCacheManager();
+		let name = "file01";
+	
+		{
+			let store = new VariableBlockFileStore(baseDirStr, name, cacheManager);
+			store.createStore(true, 256, 32);
+		}
+
+		let fpos;
+		{
+			let store = new VariableBlockFileStore(baseDirStr, name, cacheManager);
+			store.open(false);
+
+
+			let handle = store.alloc(300);
+			let size = handle.size();
+			expect(size).toBe(300);
+
+			let data = makeTestData(3,300);
+			handle.write(data, 300);
+
+			fpos = handle.getFpos();
+
+			store.close();
+		}
+	})
+
 })

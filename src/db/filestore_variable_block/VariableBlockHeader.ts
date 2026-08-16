@@ -198,7 +198,7 @@ export class VariableBlockHeader {
         }
 
         // secondary
-        let num = remain / this.blockUnitSize;
+        let num = Math.trunc(remain / this.blockUnitSize);
         let mod = remain % this.blockUnitSize;
 
         return (mod == 0) ? num + 1 : num + 2; // add first block

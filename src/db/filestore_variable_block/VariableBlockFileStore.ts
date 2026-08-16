@@ -156,7 +156,7 @@ export class VariableBlockFileStore extends FileStore implements IBlockFileStore
         throw new BlockFileStorageException("Failed in realloc()");
     }
 
-    public alloc(size : number) {
+    public alloc(size : number) : IBlockHandle {
         if((this.header != null && this.header.isEmpty()) || (this.header != null && this.header.availableCapacity() < size) ){
             // extend file size
             this.extendFile();
