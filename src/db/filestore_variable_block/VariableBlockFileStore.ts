@@ -121,7 +121,7 @@ export class VariableBlockFileStore extends FileStore implements IBlockFileStore
         if(this.header != null){ // guard
             // first block
             let blockUnitSize = this.header.getBlockUnitSize();
-            let blockPos = fpos / blockUnitSize;
+            let blockPos = Math.trunc(fpos / blockUnitSize);
     
             let firstBlock = this.header.reallocFirstMaxFragment(blockPos, sizeRemain);
             sizeRemain -= firstBlock.getUsedSize();
@@ -150,7 +150,7 @@ export class VariableBlockFileStore extends FileStore implements IBlockFileStore
 
             this.sync(false);
 
-            this.blocksToHandle(list);
+            return this.blocksToHandle(list);
         }
 
         throw new BlockFileStorageException("Failed in realloc()");

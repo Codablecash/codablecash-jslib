@@ -116,7 +116,9 @@ describe('TestVariableBlockFileStoreGroup', () => {
 			store.close();
 		}
 	})
-
+	/**
+	 * Allocate with extending file
+	 */
 	it('alloc02', () => {
 		let projectFolder = new CFile("out/random_access_file/alloc02");
 		projectFolder.deleteDir();
@@ -149,6 +151,75 @@ describe('TestVariableBlockFileStoreGroup', () => {
 
 			store.close();
 		}
+
+		{
+			let store = new VariableBlockFileStore(baseDirStr, name, cacheManager);
+			store.open(false);
+			
+			let handle = store.get(fpos);
+			let buff = handle.getBuffer();
+
+			let ar = buff?.toUint8Array();
+
+			let res : boolean = false;
+			if(ar != null){
+				res = checkTestData(3, ar, 300);
+			}
+			expect(res).toBe(true);
+
+			store.close();
+		}
 	})
 
+	/**
+	 * large data than allocated
+	 **/
+	it('alloc03', () => {
+		let projectFolder = new CFile("out/random_access_file/alloc03");
+		projectFolder.deleteDir();
+		projectFolder.mkdirs();
+
+		let baseDirStr = projectFolder.getAbsolutePath();
+
+		let cacheManager = new DiskCacheManager();
+		let name = "file01";
+		{
+			let store = new VariableBlockFileStore(baseDirStr, name, cacheManager);
+			store.createStore(true, 256, 32);
+		}
+
+		let fpos;
+		{
+			let store = new VariableBlockFileStore(baseDirStr, name, cacheManager);
+			store.open(false);
+
+
+			let handle = store.alloc(10);
+
+			let data = makeTestData(3, 100);
+			handle.write(data, 100);
+
+			fpos = handle.getFpos();
+
+			store.close();
+		}
+
+		{
+			let store = new VariableBlockFileStore(baseDirStr, name, cacheManager);
+			store.open(false);
+			
+			let handle = store.get(fpos);
+			let buff = handle.getBuffer();
+
+			let ar = buff?.toUint8Array();
+
+			let res : boolean = false;
+			if(ar != null){
+				res = checkTestData(3, ar, 100);
+			}
+			expect(res).toBe(true);
+
+			store.close();
+		}
+	})
 })
