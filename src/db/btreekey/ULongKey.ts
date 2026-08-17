@@ -1,26 +1,68 @@
 import { ByteBuffer } from "../base_io/ByteBuffer";
 import { AbstractBtreeKey } from "../btree/AbstractBtreeKey";
+import { BtreeKeyFactory } from "./BtreeKeyFactory";
 
 export class ULongKey extends AbstractBtreeKey {
+    private value : bigint;
 
-    
+    constructor(v : number | bigint) {
+        super();
+
+        if(typeof v == "number"){
+            this.value = BigInt(v);
+        }
+        else {
+            this.value = v;
+        }
+    }
+
+    public getValue() {
+        return this.value;
+    }
+    public setValue(v : number | bigint) {
+        if(typeof v == "number"){
+            this.value = BigInt(v);
+        }
+        else {
+            this.value = v;
+        } 
+    }
+
     public binarySize(): number {
-        throw new Error("Method not implemented.");
+        let size : number = 4;
+        size += 8; // value
+
+        return size;
     }
-    public toBinary(out: ByteBuffer): void {
-        throw new Error("Method not implemented.");
+    public toBinary(out : ByteBuffer): void {
+        out.putInt(BtreeKeyFactory.ULONG_KEY);
+        out.putLong(this.value);
     }
+    public static fromBinary(input : ByteBuffer) {
+        let value = input.getLong();
+        return new ULongKey(value);
+    }
+
     public isInfinity(): boolean {
-        throw new Error("Method not implemented.");
+        return false;
     }
     public isNull(): boolean {
-        throw new Error("Method not implemented.");
+        return false;
     }
-    public compareTo(): number {
-        throw new Error("Method not implemented.");
+    public compareTo(key : AbstractBtreeKey): number {
+        if(key.isInfinity()){
+            return -1;
+        }
+        else if(key.isNull()){
+            return 1;
+        }
+
+        let ulkey = <ULongKey>(key);
+
+        return this.value > ulkey.value ? 1 : (this.value == ulkey.value ? 0 : -1);
     }
     public clone(): AbstractBtreeKey {
-        throw new Error("Method not implemented.");
+        return new ULongKey(this.value);
     }
 
 }

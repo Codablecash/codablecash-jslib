@@ -12,7 +12,7 @@ export abstract class AbstractBtreeKey implements IBlockObject {
 
     public abstract isInfinity() : boolean;
     public abstract isNull() : boolean;
-    public abstract compareTo() : number;
+    public abstract compareTo(key : AbstractBtreeKey) : number;
     public abstract clone() : AbstractBtreeKey;
 
     public copyData() : IBlockObject {
