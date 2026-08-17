@@ -26,4 +26,13 @@ export class BtreeStorage {
 
         this.rootFpos = 0;
     }
+
+    public close(){
+        if(this.store != null){
+            this.store.close();
+        }
+        if(this.cache != null){
+            this.cache.clear();
+        }
+    }
 }
