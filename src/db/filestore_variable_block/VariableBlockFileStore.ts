@@ -31,7 +31,7 @@ export class VariableBlockFileStore extends FileStore implements IBlockFileStore
         return this.body;
     }
 
-    public createStore(del : boolean, defaultSize : number, blockUnitSize : number, extendBlocks : number = 1024) {
+    public createStore(del : boolean, defaultSize : number, blockUnitSize : number, extendBlocks : number = 1024) : void {
         let mod = defaultSize % blockUnitSize;
 
         this.__createStore(del, defaultSize);
@@ -101,7 +101,7 @@ export class VariableBlockFileStore extends FileStore implements IBlockFileStore
         }
     }
 
-    public sync(fsync : boolean) {
+    public sync(fsync : boolean) : void {
         if(this.header != null && this.body != null){
             this.header.sync(fsync);
             this.body.sync(fsync);
@@ -238,7 +238,7 @@ export class VariableBlockFileStore extends FileStore implements IBlockFileStore
         return handle;
     }
 
-    public get(fpos : number) {
+    public get(fpos : number) : IBlockHandle {
         let list = this.getBlockList(fpos);
 
         var handle = this.blocksToHandle(list);
