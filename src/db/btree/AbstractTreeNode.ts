@@ -1,18 +1,24 @@
 import { ByteBuffer } from "../base_io/ByteBuffer";
 import { BtreeKeyFactory } from "../btreekey/BtreeKeyFactory";
+import { IBlockObject } from "../filestore_block/IBlockObject";
 import { AbstractBtreeKey } from "./AbstractBtreeKey";
 import { DataNode } from "./DataNode";
 import { NodeStructureException } from "./NodeStructureException";
 import { TreeNode } from "./TreeNode";
 
-export abstract class AbstractTreeNode {
-    private key : AbstractBtreeKey | null;
-    private fpos : number;
+export abstract class AbstractTreeNode implements IBlockObject {
+	public static readonly NODE : number = 0x01;
+	public static readonly DATA : number = 0x02;
+
+    protected key : AbstractBtreeKey | null;
+    protected fpos : number;
 
     constructor(key : AbstractBtreeKey | null) {
         this.key = key;
         this.fpos = 0;      
     }
+    
+    public abstract copyData(): IBlockObject;
 
     public abstract isData() : boolean;
     public getKey() : AbstractBtreeKey {

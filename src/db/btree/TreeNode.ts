@@ -1,16 +1,18 @@
 import { RawArrayPrimitive } from "../base/RawArrayPrimitive";
+import { IBlockObject } from "../filestore_block/IBlockObject";
 import { AbstractBtreeKey } from "./AbstractBtreeKey";
 import { AbstractTreeNode } from "./AbstractTreeNode";
 
 
 
 export class TreeNode extends AbstractTreeNode {
+
     private root : boolean;
     private leaf : boolean;
     private children : RawArrayPrimitive<number>;
 
     constructor(numChildren? : number, key? : AbstractBtreeKey, leaf? : boolean){
-        super(key != undefined ? key : null);
+        super((key != undefined && key != null) ? key : null);
 
         if(numChildren != undefined && key != undefined && leaf != undefined){
             this.root = false;
@@ -26,6 +28,10 @@ export class TreeNode extends AbstractTreeNode {
     
     public isData(): boolean {
         return false;
+    }
+
+    public copyData(): IBlockObject {
+        throw new Error("Method not implemented.");
     }
 
 }
