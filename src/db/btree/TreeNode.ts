@@ -1,10 +1,13 @@
 import { AbstractTreeNode } from "./AbstractTreeNode";
 
-export class DataNode extends AbstractTreeNode {
 
 
-    public isData(): boolean {
-        return true;
-    }
+export class TreeNode extends AbstractTreeNode {
     
+    
+    public isData(): boolean {
+        return false;
+    }
+
 }
+
