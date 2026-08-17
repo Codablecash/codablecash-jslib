@@ -38,7 +38,7 @@ export class ULongKey extends AbstractBtreeKey {
         out.putInt(BtreeKeyFactory.ULONG_KEY);
         out.putLong(this.value);
     }
-    public static fromBinary(input : ByteBuffer) {
+    public static fromBinary(input : ByteBuffer) : ULongKey {
         let value = input.getLong();
         return new ULongKey(value);
     }

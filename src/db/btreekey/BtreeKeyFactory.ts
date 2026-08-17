@@ -1,6 +1,8 @@
 import { ByteBuffer } from "../base_io/ByteBuffer";
 import { AbstractBtreeKey } from "../btree/AbstractBtreeKey";
+import { InfinityKey } from "./InfinityKey";
 import { KeyFormatException } from "./KeyFormatException";
+import { NullKey } from "./NullKey";
 import { ULongKey } from "./ULongKey";
 
 export class BtreeKeyFactory {
@@ -11,9 +13,9 @@ export class BtreeKeyFactory {
     public fromBinary(keyType : number, input : ByteBuffer) : AbstractBtreeKey {
         switch(keyType){
         case BtreeKeyFactory.NULL_KEY:
-            break;
+            return NullKey.fromBinary(input);
         case BtreeKeyFactory.INFINITY_KEY:
-            break;
+            return InfinityKey.fromBinary(input);
         case BtreeKeyFactory.ULONG_KEY:
             return ULongKey.fromBinary(input);
         default:

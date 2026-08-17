@@ -1,26 +1,36 @@
 import { ByteBuffer } from "../base_io/ByteBuffer";
 import { AbstractBtreeKey } from "../btree/AbstractBtreeKey";
+import { BtreeKeyFactory } from "./BtreeKeyFactory";
 
 export class NullKey extends AbstractBtreeKey {
 
 
     public binarySize(): number {
-        throw new Error("Method not implemented.");
+        let size = 4;
+        return size;
     }
     public toBinary(out: ByteBuffer): void {
-        throw new Error("Method not implemented.");
+        out.putInt(BtreeKeyFactory.NULL_KEY);
     }
+    public static fromBinary(input : ByteBuffer) : NullKey {
+        return new NullKey();
+    }
+    
     public isInfinity(): boolean {
-        throw new Error("Method not implemented.");
+        return false;
     }
     public isNull(): boolean {
-        throw new Error("Method not implemented.");
+        return true;
     }
+
     public compareTo(key : AbstractBtreeKey): number {
-        throw new Error("Method not implemented.");
+        if(key.isNull()){
+            return 0;
+        }
+        return -1;
     }
     public clone(): AbstractBtreeKey {
-        throw new Error("Method not implemented.");
+        return new NullKey();
     }
 
 }
