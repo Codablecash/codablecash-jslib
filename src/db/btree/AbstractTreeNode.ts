@@ -6,17 +6,21 @@ import { NodeStructureException } from "./NodeStructureException";
 import { TreeNode } from "./TreeNode";
 
 export abstract class AbstractTreeNode {
-    private key : AbstractBtreeKey;
+    private key : AbstractBtreeKey | null;
     private fpos : number;
 
-    constructor(key : AbstractBtreeKey) {
+    constructor(key : AbstractBtreeKey | null) {
         this.key = key;
         this.fpos = 0;      
     }
 
     public abstract isData() : boolean;
     public getKey() : AbstractBtreeKey {
-        return this.key;
+        if(this.key != null){
+            return this.key;
+        }
+        
+        throw new Error("null pointer at AbstractTreeNode.getKey()");
     }
     public setKey(key : AbstractBtreeKey) : void {
         this.key = key.clone();
@@ -30,12 +34,20 @@ export abstract class AbstractTreeNode {
     }
 
     public binarySize() {
+        if(this.key == null){
+            throw new Error("null pointer at AbstractTreeNode.binarySize()");
+        }
+        
         let size = this.key.binarySize();
         size += 8; // fpos
 
         return size;
     }
     public toBinary(out : ByteBuffer) : void {
+        if(this.key == null){
+            throw new Error("null pointer at AbstractTreeNode.toBinary()");
+        }
+
         this.key.toBinary(out);
         out.putLong(this.fpos);
     }
