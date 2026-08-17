@@ -11,17 +11,17 @@ export class TreeNode extends AbstractTreeNode {
     private leaf : boolean;
     private children : RawArrayPrimitive<number>;
 
-    constructor(numChildren? : number, key? : AbstractBtreeKey, leaf? : boolean){
+    constructor(isroot : boolean, numChildren? : number, key? : AbstractBtreeKey, leaf? : boolean){
         super((key != undefined && key != null) ? key : null);
 
         if(numChildren != undefined && key != undefined && leaf != undefined){
-            this.root = false;
+            this.root = isroot;
             this.leaf = leaf;
             this.children = new RawArrayPrimitive<number>(); 
             return;
         }       
 
-        this.root = false;
+        this.root = isroot;
         this.leaf = false;
         this.children = new RawArrayPrimitive<number>();
     }
@@ -33,6 +33,19 @@ export class TreeNode extends AbstractTreeNode {
     public copyData(): IBlockObject {
         throw new Error("Method not implemented.");
     }
+
+    public isRoot() {
+        return this.root;
+    }
+    public setIsRoot(isroot : boolean) {
+        this.root = isroot;
+    }
+
+    public isLeaf() {
+        return this.leaf;
+    }
+
+    
 
 }
 
