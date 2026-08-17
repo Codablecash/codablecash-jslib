@@ -57,7 +57,7 @@ export class RawArrayPrimitive<T> {
 			this.root = newPtr;
 			this.currentSize = size;
         }
-        
+
         let copySize = this.numArray - index;
         if(copySize > 0){
             for(let i = this.numArray - 1; i > index; --i){
@@ -67,5 +67,28 @@ export class RawArrayPrimitive<T> {
 
 		this.numArray++;
 		this.root[index] = value;
+    }
+
+    public size() : number {
+        return this.numArray;
+    }
+
+    public getRoot() : Array<T> {
+        return this.root;
+    }
+
+    public set(i : number, value : T) {
+        this.root[i] = value;
+    }
+
+    public remove(index : number, length : number = 1) {
+        let copySize = (this.numArray - index - length);
+        if(copySize > 0){
+            for(let i = 0; i < copySize; ++i){
+                this.root[index + i] = this.root[index + i + length];
+            }
+        }
+
+        this.numArray = this.numArray - length;
     }
 }
