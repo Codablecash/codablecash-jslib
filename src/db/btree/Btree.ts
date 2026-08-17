@@ -26,5 +26,12 @@ export class Btree {
         this.cacheManager = cacheManager;
         this.config = null;
     }
-    
+
+    public exists() : boolean {
+        return false;
+    }
+
+    public create(config : BtreeConfig) {
+        
+    }
 }
