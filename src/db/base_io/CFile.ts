@@ -70,4 +70,11 @@ export class CFile {
         const status = fs.statSync(this.pathname);
         return status.size;
     }
+
+    public move(destFile : CFile) : void {
+        let src = this.getAbsolutePath();
+        let dst = destFile.getAbsolutePath();
+
+        fs.renameSync(src, dst);
+    }
 }

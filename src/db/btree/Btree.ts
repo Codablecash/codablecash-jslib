@@ -37,4 +37,32 @@ export class Btree {
 
         newStore.create(this.cacheManager, config);  
     }
+
+    public static clearFiles(folder : CFile, name : string) {
+        let headerName = name + "-header.bin";
+        let bodyName = name + ".bin";
+
+        let headerFile = folder.get(headerName);
+        let bodyFile = folder.get(bodyName);
+
+        headerFile.deleteFile();
+        bodyFile.deleteFile();
+    }
+
+    public static renameFiles(folder : CFile, lastName : string, newName : string) {
+        let headerName = lastName + "-header.bin";
+        let bodyName = lastName + ".bin";
+  
+        let headerFile = folder.get(headerName);
+        let bodyFile = folder.get(bodyName);
+
+        let newHeaderName = newName + "-header.bin";
+        let newBodyName = newName + ".bin";
+
+        let newHeaderFile = folder.get(newHeaderName);
+        let newBodyFile = folder.get(newBodyName);
+
+        headerFile.move(newHeaderFile);
+        bodyFile.move(newBodyFile);
+    }
 }
