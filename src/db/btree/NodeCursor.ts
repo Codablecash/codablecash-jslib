@@ -257,6 +257,78 @@ export class NodeCursor {
         throw new NullPointerException("NodeCursor.setupTwoLists()");
     }
 
+    public gotoKey(key : AbstractBtreeKey) : IBlockObject | null{
+        this.gotoLeaf(key);
+
+        let current = this.top();
+
+        let nh = current.gotoEqMoreThanKey(key);
+        if(nh == null){
+            return null;
+        }
+
+        let nodePos = new NodePosition(nh.clone());
+        this.push(nodePos);
+
+        let dataFpos = nodePos.nextData();
+        let obj = this.store.loadData(dataFpos);
+
+        return obj;
+    }
+
+    public gotoLeaf(key : AbstractBtreeKey) : NodePosition {
+        let current = this.top();
+
+        // check data nodes
+        current.loadInnerNodes(this.store);
+
+        while(!current.isLeaf()){
+            let nextFpos = current.getNextChild(key);
+            let nh = this.store.loadNode(nextFpos);
+
+            current = new NodePosition(nh);
+            this.push(current);
+
+            current.loadInnerNodes(this.store);
+        }
+
+        return current;
+    }
+
+    public gotoLast() : IBlockObject | null {
+        let current = this.top();
+
+        // check data nodes
+        current.loadInnerNodes(this.store);
+        current.setLastPos();
+
+        while(!current.isLeaf()){
+            let nextFpos = current.previousNode();
+            let nh = this.store.loadNode(nextFpos);
+
+            current = new NodePosition(nh);
+            this.push(current);
+            current.loadInnerNodes(this.store);
+            current.setLastPos();
+        }
+
+        let nextFpos = current.previousNode();
+        if(nextFpos == 0){
+            return null;
+        }
+
+        let nh = this.store.loadNode(nextFpos);
+        current = new NodePosition(nh);
+        this.push(current);
+
+        //checkIsDataNode(current.getNodeHandle(), __FILE__, __LINE__);
+
+        let datafpos = current.previousData();
+
+        return this.store.loadData(datafpos);
+    }
+
+
     public find(key : AbstractBtreeKey) : IBlockObject {
         /*if(this.store != null){
             let leafNode = this.gotoLeaf(key);
