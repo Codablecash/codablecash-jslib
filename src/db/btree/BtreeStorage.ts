@@ -138,6 +138,27 @@ export class BtreeStorage {
         }
     }
 
+    public updateRootFpos(rootFpos : number) : void {
+        if(this.store != null){
+            this.rootFpos = rootFpos;
+
+            let handle = this.store.get(0);
+
+            let input = handle.getBuffer();
+            input.position(0);
+
+            let btreeHeader = BtreeHeaderBlock.fromBinary(input);
+            btreeHeader.setRootFpos(rootFpos);
+
+            let binarySize = btreeHeader.binarySize();
+            let buff = ByteBuffer.allocateWithEndian(binarySize, true);
+
+            btreeHeader.toBinary(buff);
+
+            handle.write(buff.toUint8Array(), binarySize);
+        }
+    }
+
     public loadHeader() : BtreeHeaderBlock {
         if(this.store != null) {
             // load 0 fpos
