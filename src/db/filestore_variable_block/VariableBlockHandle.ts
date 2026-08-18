@@ -1,4 +1,5 @@
 import { ArrayList } from "../base/ArrayList";
+import { NullPointerException } from "../base/NullPointerException";
 import { ByteBuffer } from "../base_io/ByteBuffer";
 import { BlockFileStorageException } from "../filestore_block/BlockFileStorageException";
 import { IBlockHandle } from "../filestore_block/IBlockHandle";
@@ -118,8 +119,11 @@ export class VariableBlockHandle implements IBlockHandle {
         return ret;
     }
 
-    public getBuffer() : ByteBuffer | null{
-        return this.buffer;
+    public getBuffer() : ByteBuffer {
+        if(this.buffer != null){
+            return this.buffer;
+        }
+        throw new NullPointerException("at VariableBlockHandle.getBuffer()");
     }
 
     public removeBlocks(list? : ArrayList<VariableBlock>) : void {

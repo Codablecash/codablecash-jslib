@@ -97,7 +97,7 @@ export class TreeNode extends AbstractTreeNode {
         return node;
     }
 
-    public getInnerNodeFpos(): RawArrayPrimitive<number> {
+    public getInnerNodeFpos() : RawArrayPrimitive<number> {
         return this.children;
     }
 

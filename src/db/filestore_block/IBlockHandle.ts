@@ -5,7 +5,7 @@ import { VariableBlock } from "../filestore_variable_block/VariableBlock";
 
 export interface IBlockHandle {
     getFpos() : number;
-    getBuffer() : ByteBuffer | null;
+    getBuffer() : ByteBuffer;
     size() : number;
 
     write(bytes : Uint8Array, length : number) : void;

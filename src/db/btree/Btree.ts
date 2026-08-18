@@ -87,4 +87,9 @@ export class Btree {
             this.config = header.getConfig();
         }
     }
+
+    public close() : void {
+        this.store?.close();
+    }
+    
 }

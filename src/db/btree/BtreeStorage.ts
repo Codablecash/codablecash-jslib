@@ -8,8 +8,11 @@ import { IBlockFileStore } from "../filestore_block/IBlockFileStore";
 import { VariableBlockFileStore } from "../filestore_variable_block/VariableBlockFileStore";
 import { DiskCacheManager } from "../random_access_file/DiskCacheManager";
 import { AbstractBtreeDataFactory } from "./AbstractBtreeDataFactory";
+import { AbstractTreeNode } from "./AbstractTreeNode";
 import { BtreeConfig } from "./BtreeConfig";
 import { BtreeHeaderBlock } from "./BtreeHeaderBlock";
+import { DataNode } from "./DataNode";
+import { NodeHandle } from "./NodeHandle";
 import { TreeNode } from "./TreeNode";
 
 
@@ -151,4 +154,49 @@ export class BtreeStorage {
         throw new NullPointerException("BtreeStorage.loadHeader()");
     }
 
+    public sync(syncDisk : boolean) {
+        this.store?.sync(syncDisk);
+    }
+
+    public loadRoot() : NodeHandle {
+        return this.loadNode(this.rootFpos);
+    }
+
+    public loadNode(fpos : number) : NodeHandle {
+        let ref = this.cache?.get(fpos);
+        if(ref != null && ref != undefined){
+            return new NodeHandle(ref);
+        }
+
+        if(this.store != null && this.cache != null){
+            let handle = this.store.get(fpos);
+
+            let buff = handle.getBuffer();
+            buff.position(0);
+
+            let node = BtreeStorage.makeNodeFromBinary(buff, this.factory);
+            //__ASSERT_POS(buff);
+            // assert(node.getFpos() == fpos);
+
+            this.cache.add(node);
+            ref = this.cache.get(fpos);
+
+            if(ref != null){
+                return new NodeHandle(ref);
+            }
+        }
+
+        throw new NullPointerException("BtreeStorage.loadNode()");
+    }
+
+    public static makeNodeFromBinary(buff : ByteBuffer, factory : BtreeKeyFactory) : AbstractTreeNode {
+        var nodeType = buff.get();
+
+        if(nodeType == AbstractTreeNode.NODE){
+            return TreeNode.fromBinary(buff, factory);
+        }
+
+        // assert(nodeType == AbstractTreeNode.DATA);
+        return DataNode.fromBinary(buff, factory);
+    }
 }

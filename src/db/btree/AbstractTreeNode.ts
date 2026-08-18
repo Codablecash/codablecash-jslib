@@ -64,14 +64,14 @@ export abstract class AbstractTreeNode implements IBlockObject {
         this.fpos = Number(input.getLong());
     }
 
-    public toDataNode(node : AbstractTreeNode) : DataNode {
+    public static toDataNode(node : AbstractTreeNode) : DataNode {
         if(!node.isData()){
             throw new NodeStructureException("Cast exception at toDataNode()");
         }
         return <DataNode>node;
     }
 
-    public toTreeNode(node : AbstractTreeNode) : TreeNode{
+    public static toTreeNode(node : AbstractTreeNode) : TreeNode{
         if(node.isData()){
             throw new NodeStructureException("Cast exception at toDataNode()");
         }
