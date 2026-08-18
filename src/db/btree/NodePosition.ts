@@ -321,4 +321,47 @@ export class NodePosition {
 
         return -1;
     }
+
+    public gotoEqLessThanKey(key : AbstractBtreeKey) : NodeHandle | null {
+        let maxLoop = this.innerCount;
+
+        for(let i = maxLoop - 1; i >= 0; --i){
+            let nh = this.innerNodes.get(i);
+            if(nh != null && key.compareTo(nh.getKey()) >= 0){
+                this.pos = i - 1;
+                return nh;
+            }
+        }
+
+        return null;
+    }
+
+
+    public gotoEqMoreThanKey(key : AbstractBtreeKey) : NodeHandle | null {
+        let maxLoop = this.innerCount;
+
+        for(let i = 0; i != maxLoop; ++i){
+            this.pos++;
+            let nh = this.innerNodes.get(i);
+            if(nh != null && key.compareTo(nh.getKey()) <= 0){
+                return nh;
+            }
+        }
+
+        return null;
+    }
+
+    public gotoEqKey(key : AbstractBtreeKey) : NodeHandle | null{
+        let maxLoop = this.innerCount;
+
+        for(let i = 0; i != maxLoop; ++i){
+            this.pos++;
+            let nh = this.innerNodes.get(i);
+            if(nh != null && key.compareTo(nh.getKey()) == 0){
+                return nh;
+            }
+        }
+
+        return null;
+    }
 }
