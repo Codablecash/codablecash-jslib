@@ -5,6 +5,7 @@ import { NodeCache } from "../btree_cache/NodeCache";
 import { BtreeKeyFactory } from "../btreekey/BtreeKeyFactory";
 import { InfinityKey } from "../btreekey/InfinityKey";
 import { IBlockFileStore } from "../filestore_block/IBlockFileStore";
+import { IBlockObject } from "../filestore_block/IBlockObject";
 import { VariableBlockFileStore } from "../filestore_variable_block/VariableBlockFileStore";
 import { DiskCacheManager } from "../random_access_file/DiskCacheManager";
 import { AbstractBtreeDataFactory } from "./AbstractBtreeDataFactory";
@@ -198,5 +199,114 @@ export class BtreeStorage {
 
         // assert(nodeType == AbstractTreeNode.DATA);
         return DataNode.fromBinary(buff, factory);
+    }
+
+    public remove(fpos : number) {
+        if(this.store != null && this.cache != null){
+            // clear cache
+            let ref = this.cache.get(fpos);
+            if(ref != null){
+                // delete cache object
+                this.cache.remove(ref);
+            }
+
+            let handle = this.store.get(fpos);
+
+            handle.removeBlocks();
+        }
+    }
+
+    public storeData(data : IBlockObject, fpos? : number) : number {
+        if(fpos != undefined){
+            return this.__storeData(data, fpos);
+        }
+
+        if(this.store != null){
+            let size = data.binarySize();
+            let handle = this.store.alloc(size);
+
+            let buff = ByteBuffer.allocateWithEndian(size, true);
+
+            data.toBinary(buff);
+            // __ASSERT_POS(buff);
+
+            // const char* ptr = (const char*)buff.array();
+            let ptr = buff.toUint8Array();
+            handle.write(ptr, size);
+
+            return handle.getFpos();
+        }
+
+        throw new NullPointerException("BtreeStorage.storeData()");
+    }
+
+    public __storeData(data : IBlockObject, fpos : number) : number {
+        if(this.store != null){
+            let handle = this.store.get(fpos);
+
+            let size = data.binarySize();
+            let buff = ByteBuffer.allocateWithEndian(size, true);
+
+            data.toBinary(buff);
+            // __ASSERT_POS(buff);
+
+            // const char* ptr = (const char*)buff.array();
+            let ptr = buff.toUint8Array();
+            handle.write(ptr, size);
+
+            return handle.getFpos();
+        }
+        throw new NullPointerException("BtreeStorage.__storeData()");
+    }
+
+    public updateNode(node : AbstractTreeNode) : void {
+        if(this.store != null){
+            let size = node.binarySize();
+
+            let fpos = node.getFpos();
+            let handle = this.store.get(fpos);
+
+            let buff = ByteBuffer.allocateWithEndian(size, true);
+
+            node.toBinary(buff);
+            //_ASSERT_POS(buff);
+
+            // const char* ptr = (const char*)buff.array();
+            let ptr = buff.toUint8Array();
+            handle.write(ptr, size);
+        }
+    }
+
+    public removeData(dataFpos : number) : void {
+        if(this.store != null){
+            let handle = this.store.get(dataFpos);
+            handle.removeBlocks();
+        }
+    }
+
+    public storeNode(node : AbstractTreeNode) : number {
+        if(this.store != null){
+            let size = node.binarySize();
+            let handle = this.store.alloc(size);
+
+            let buff = ByteBuffer.allocateWithEndian(size, true);
+
+            let fpos = handle.getFpos();
+            node.setFpos(fpos);
+            node.toBinary(buff);
+
+            // const char* ptr = (const char*)buff.array();
+            let ptr = buff.toUint8Array();
+            handle.write(ptr, size);
+
+            //assert(fpos == handle.getFpos());
+
+            return handle.getFpos();
+        }
+        throw new NullPointerException("BtreeStorage.storeNode()");
+    }
+        
+    public getDataFactory() : AbstractBtreeDataFactory {
+        return this.dfactory;
     }
 }

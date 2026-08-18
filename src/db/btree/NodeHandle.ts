@@ -24,6 +24,10 @@ export class NodeHandle {
         return AbstractTreeNode.toTreeNode(this.ref.getNode()).setIsRoot(isroot);
     }
 
+    public isLeaf() : boolean {
+        return AbstractTreeNode.toTreeNode(this.ref.getNode()).isLeaf();
+    }
+
     public isData() : boolean {
         return this.ref.getNode().isData();
     }

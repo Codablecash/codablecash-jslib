@@ -1,9 +1,12 @@
 import { CFile } from "../base_io/CFile";
 import { BtreeKeyFactory } from "../btreekey/BtreeKeyFactory";
+import { IBlockObject } from "../filestore_block/IBlockObject";
 import { DiskCacheManager } from "../random_access_file/DiskCacheManager";
 import { AbstractBtreeDataFactory } from "./AbstractBtreeDataFactory";
+import { AbstractBtreeKey } from "./AbstractBtreeKey";
 import { BtreeConfig } from "./BtreeConfig";
 import { BtreeStorage } from "./BtreeStorage";
+import { NodeCursor } from "./NodeCursor";
 
 export class BtreeOpenConfig {
     public numDataBuffer : number;
@@ -90,6 +93,15 @@ export class Btree {
 
     public close() : void {
         this.store?.close();
+    }
+
+    public putData(key : AbstractBtreeKey, data : IBlockObject) {
+        if(this.store != null && this.config != null){
+            let rootNode = this.store.loadRoot();
+
+            let cursor = new NodeCursor(rootNode, this.store, this.config.nodeNumber);
+            cursor.insert(key, data);
+        }
     }
     
 }
