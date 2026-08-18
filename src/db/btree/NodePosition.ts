@@ -27,8 +27,15 @@ export class NodePosition {
         return this.innerCount == 0;
     }
 
+    public getInnerCount() : number {
+        return this.innerCount;
+    };
+
     public getKey() : AbstractBtreeKey {
         return this.node.getKey();
+    }
+    public setKey(key : AbstractBtreeKey) : void {
+        this.node.setKey(key);
     }
 
     public getFpos() : number {

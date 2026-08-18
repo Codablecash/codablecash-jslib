@@ -454,10 +454,65 @@ export class NodeCursor {
         return this.store.loadData(datafpos);
     }
 
+    public getNext() : IBlockObject | null {
+        let current = this.top();
 
-    
-    public find(key : AbstractBtreeKey) : IBlockObject {
-        /*if(this.store != null){
+        // get data from current node;
+        let cnh = current.getNodeHandle();
+        if(!cnh.isData() && cnh.isRoot()){
+            return null;
+        }
+
+        //checkIsDataNode(cnh, __FILE__, __LINE__);
+        //uint64_t dfpos = current.nextData();
+
+        //if(dfpos != 0){
+        //	return this.store.loadData(dfpos);
+        //}
+
+        // pop data node
+        this.pop();
+
+        current = this.top();
+        while(!current.isLeaf() || !current.hasNext()){
+            let nextfpos = current.nextNode();
+
+            if(nextfpos == 0){
+                if(current.isRoot()){
+                    return null;
+                }
+                this.pop();
+                current = this.top();
+            }
+            else{
+                let nh = this.store.loadNode(nextfpos);
+                current = new NodePosition(nh);
+                this.push(current);
+
+                current.loadInnerNodes(this.store);
+            }
+        }
+
+        // current is leaf having next data
+        let nextfpos = current.nextNode();
+        let nh = this.store.loadNode(nextfpos);
+        current = new NodePosition(nh);
+        this.push(current);
+
+        //checkIsDataNode(current.getNodeHandle(), __FILE__, __LINE__);
+
+        let datafpos = current.nextData();
+
+        return this.store.loadData(datafpos);
+    }
+
+    public getCurrentKey() : AbstractBtreeKey {
+        let current = this.top();
+        return current.getKey();
+    }
+
+    public find(key : AbstractBtreeKey) : IBlockObject | null{
+        if(this.store != null){
             let leafNode = this.gotoLeaf(key);
 
             let nh = leafNode.gotoEqKey(key);
@@ -470,7 +525,128 @@ export class NodeCursor {
             let dataFpos = dataNode.getDataFpos();
 
             return this.store.loadData(dataFpos);
-        }*/
+        }
         throw new NullPointerException("NodeCursor.find()");
     }
+
+    public remove(key : AbstractBtreeKey) : boolean {
+        let leafNode = this.gotoLeaf(key);
+        // assert(leafNode.isLeaf());
+
+        let removed = leafNode.removeChildNode(key, this.store);
+        if(!removed){
+            return false;
+        }
+
+        this.internalRemoveFromBottomToUpper();
+        this.internalRemoveRoot();
+        this.store.sync(false);
+
+        // __ASSERT_TREE
+
+        return true;
+    }
+
+    /**
+     * root node has an only 1 child
+     */
+    private internalRemoveRoot() : void {
+        let current = this.pop();
+        while(!current.isRoot()){
+            current = this.pop();
+        }
+
+        this.push(current);
+
+        while(current.getInnerCount() == 1 && !current.isLeaf()){
+            let nh = current.getInnerNodes().get(0); // next root
+
+            if(nh != null){ // guard
+                // update new root
+                let newPos = new NodePosition(nh.clone());
+                newPos.loadInnerNodes(this.store);
+
+                newPos.setRoot(true);
+
+                let nextfpos = newPos.getFpos();
+                this.store.setRootFpos(nextfpos);
+
+    //    #ifdef __DEBUG__
+    //            const AbstractBtreeKey* key = newPos.getKey();
+    //            assert(key.isInfinity());
+    //    #endif
+
+                // remove last root
+                let fpos = current.getFpos();
+                this.store.remove(fpos);
+
+                this.pop();
+                this.push(newPos);
+                current = this.top();
+            }
+        }
+    }
+
+    private internalRemoveFromBottomToUpper() : void {
+        let current = this.top(); // start from leaf
+        // assert(current.isLeaf());
+
+        if(!current.isEmpty()){
+            return;
+        }
+
+        while(!current.isRoot() && current.isEmpty()){
+            let key = current.getKey().clone();
+            let fpos = current.getFpos();
+
+            this.pop();
+            //delete current;
+
+            let upperNode = this.top();
+
+            upperNode.removeChildNode(key, this.store);
+
+            // if current is greatest in the sibling
+            if(key.compareTo(upperNode.getKey()) == 0){
+                let pos = upperNode.getInnerCount() - 1;
+
+                if(pos >= 0){
+                    let fpos = upperNode.getChildFpos(pos);
+
+                    let nh = this.store.loadNode(fpos);
+                    let chNode = new NodePosition(nh);
+                    chNode.loadInnerNodes(this.store);
+                    this.push(chNode);
+
+                    this.setKeyForSelfAndDescendants(chNode, key);
+
+                    this.pop();
+                }
+
+            }
+
+            current = upperNode;
+        }
+    }
+
+    private setKeyForSelfAndDescendants(current : NodePosition, key : AbstractBtreeKey) : void {
+        current.setKey(key);
+        current.save(this.store);
+
+        if(!current.isLeaf()){
+            let pos = current.getInnerCount() - 1;
+            //assert(pos >= 0);
+
+            let fpos = current.getChildFpos(pos);
+
+            let nh = this.store.loadNode(fpos);
+            let chNode = new NodePosition(nh);
+            chNode.loadInnerNodes(this.store);
+            this.push(chNode);
+
+            this.setKeyForSelfAndDescendants(chNode, key);
+
+            this.pop();
+        }
+    }    
 }

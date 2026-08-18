@@ -105,7 +105,7 @@ export class Btree {
         }
     }
 
-    public findByKey(key : AbstractBtreeKey) : IBlockObject {
+    public findByKey(key : AbstractBtreeKey) : IBlockObject | null {
         if(this.store != null && this.config != null){
             let rootNode = this.store.loadRoot();
             let cursor = new NodeCursor(rootNode, this.store, this.config.nodeNumber);
