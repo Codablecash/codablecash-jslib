@@ -420,6 +420,41 @@ export class NodeCursor {
 
         return current;
     }
+
+    public gotoFirst() : IBlockObject | null {
+        let current = this.top();
+
+        // check data nodes
+        current.loadInnerNodes(this.store);
+
+        while(!current.isLeaf()){
+        //	uint64_t nextFpos = current.getInnerNodes().get(0).getFpos();
+            let nextFpos = current.nextNode();
+            let nh = this.store.loadNode(nextFpos);
+
+            current = new NodePosition(nh);
+            this.push(current);
+
+            current.loadInnerNodes(this.store);
+        }
+
+        let nextFpos = current.nextNode();
+        if(nextFpos == 0){
+            return null;
+        }
+
+        let nh = this.store.loadNode(nextFpos);
+        current = new NodePosition(nh);
+        this.push(current);
+
+        // checkIsDataNode(current.getNodeHandle(), __FILE__, __LINE__);
+
+        let datafpos = current.nextData();
+
+        return this.store.loadData(datafpos);
+    }
+
+
     
     public find(key : AbstractBtreeKey) : IBlockObject {
         /*if(this.store != null){
