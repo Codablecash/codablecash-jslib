@@ -107,6 +107,41 @@ export class NodePosition {
         this.clearCache();
     }
 
+    public getNextChildPrevious(key : AbstractBtreeKey) : number {
+        let ret = 0;
+        let maxLoop = this.innerCount;
+        for(let i = maxLoop - 1; i >= 0; --i){
+            let nh = this.innerNodes.get(i);
+
+            if(nh != null && key.compareTo(nh.getKey()) == 0){
+                ret = nh.getFpos();
+                this.pos = i - 1;
+                break;
+            }
+            else if(nh != null && key.compareTo(nh.getKey()) > 0){
+                nh = this.innerNodes.get(i + 1);
+
+                if(nh != null){ // guard
+                    ret = nh.getFpos();
+                    this.pos = i;
+                    break;
+                }
+
+            }
+        }
+
+        if(ret == 0){
+            let nh = this.innerNodes.get(0);
+
+            if(nh != null){ // guard
+                ret = nh.getFpos();
+                this.pos = -1;
+            }
+        }
+
+        return ret;
+    }
+
     public getNextChild(key : AbstractBtreeKey) : number {
         let ret = 0;
         let maxLoop = this.innerCount;
