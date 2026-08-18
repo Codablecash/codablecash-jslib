@@ -328,7 +328,59 @@ export class NodeCursor {
         return this.store.loadData(datafpos);
     }
 
+    public getPrevious() : IBlockObject | null {
+        let current = this.top();
 
+        // get data from current node;
+        let cnh = current.getNodeHandle();
+        if(!cnh.isData() && cnh.isRoot()){
+            return null;
+        }
+
+        // checkIsDataNode(cnh, __FILE__, __LINE__);
+        //uint64_t dfpos = current.nextData();
+
+        //if(dfpos != 0){
+        //	return this.store.loadData(dfpos);
+        //}
+
+        // pop data node
+        this.pop();
+
+        current = this.top();
+        while(!current.isLeaf() || !current.hasPrevious()){
+            let nextfpos = current.previousNode();
+
+            if(nextfpos == 0){
+                if(current.isRoot()){
+                    return null;
+                }
+                this.pop();
+                current = this.top();
+            }
+            else{
+                let nh = this.store.loadNode(nextfpos);
+                current = new NodePosition(nh);
+                this.push(current);
+
+                current.loadInnerNodes(this.store);
+                current.setLastPos();
+            }
+        }
+
+        // current is leaf having next data
+        let nextfpos = current.previousNode();
+        let nh = this.store.loadNode(nextfpos);
+        current = new NodePosition(nh);
+        this.push(current);
+
+        // checkIsDataNode(current.getNodeHandle(), __FILE__, __LINE__);
+
+        let datafpos = current.previousData();
+
+        return this.store.loadData(datafpos);
+    }
+    
     public find(key : AbstractBtreeKey) : IBlockObject {
         /*if(this.store != null){
             let leafNode = this.gotoLeaf(key);
