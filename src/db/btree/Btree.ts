@@ -1,3 +1,4 @@
+import { NullPointerException } from "../base/NullPointerException";
 import { CFile } from "../base_io/CFile";
 import { BtreeKeyFactory } from "../btreekey/BtreeKeyFactory";
 import { IBlockObject } from "../filestore_block/IBlockObject";
@@ -102,6 +103,16 @@ export class Btree {
             let cursor = new NodeCursor(rootNode, this.store, this.config.nodeNumber);
             cursor.insert(key, data);
         }
+    }
+
+    public findByKey(key : AbstractBtreeKey) : IBlockObject {
+        if(this.store != null && this.config != null){
+            let rootNode = this.store.loadRoot();
+            let cursor = new NodeCursor(rootNode, this.store, this.config.nodeNumber);
+
+            return cursor.find(key);
+        }
+        throw new NullPointerException("Btree.findByKey()");
     }
     
 }

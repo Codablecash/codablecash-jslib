@@ -190,6 +190,18 @@ export class BtreeStorage {
         throw new NullPointerException("BtreeStorage.loadNode()");
     }
 
+    public loadData(fpos : number) : IBlockObject {
+        if(this.store != null){
+            let handle = this.store.get(fpos);
+
+            let buff = handle.getBuffer();
+            buff.position(0);
+
+            return this.dfactory.makeDataFromBinary(buff);
+        }
+        throw new NullPointerException("BtreeStorage.loadData()");
+    }
+
     public static makeNodeFromBinary(buff : ByteBuffer, factory : BtreeKeyFactory) : AbstractTreeNode {
         var nodeType = buff.get();
 
