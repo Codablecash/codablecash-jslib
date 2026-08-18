@@ -2,9 +2,9 @@ import { ByteBuffer } from "../base_io/ByteBuffer";
 import { IBlockObject } from "../filestore_block/IBlockObject";
 
 export class BtreeConfig implements IBlockObject {
-    private defaultSize : number;
-    private blockSize : number;
-    private nodeNumber : number;
+    public defaultSize : number;
+    public blockSize : number;
+    public nodeNumber : number;
 
     constructor() {
         this.defaultSize = 1024;
@@ -20,6 +20,15 @@ export class BtreeConfig implements IBlockObject {
         out.putLong(this.blockSize);
         out.putLong(this.nodeNumber);
     }
+    public static fromBinary(input : ByteBuffer) {
+        let inst = new BtreeConfig();
+
+        inst.defaultSize = Number(input.getLong());
+        inst.blockSize = Number(input.getLong());
+        inst.nodeNumber = Number(input.getLong());
+
+        return inst;        
+    }
 
     public copyData(): IBlockObject {
         let inst =  new BtreeConfig();
@@ -30,6 +39,4 @@ export class BtreeConfig implements IBlockObject {
 
         return inst;
     }
-
-
 }

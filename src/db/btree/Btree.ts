@@ -28,10 +28,13 @@ export class Btree {
     }
 
     public exists() : boolean {
-        return false;
+        let newStore = new BtreeStorage(this.folder, this.name, this.factory, this.dfactory);
+        return newStore.exists();
     }
 
     public create(config : BtreeConfig) {
-        
+        let newStore = new BtreeStorage(this.folder, this.name, this.factory, this.dfactory);
+
+        newStore.create(this.cacheManager, config);  
     }
 }
