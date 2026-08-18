@@ -97,6 +97,38 @@ export class TreeNode extends AbstractTreeNode {
         return node;
     }
 
+    public getInnerNodeFpos(): RawArrayPrimitive<number> {
+        return this.children;
+    }
 
+    public updateInnerNodeFpos(newlist : RawArrayPrimitive<number>) {
+        let maxLoop = this.children.size();
+        for(let i = 0; i != maxLoop; ++i){
+            this.children.set(i, 0);
+        }
+
+        maxLoop = newlist.size();
+        for(let i = 0; i != maxLoop; ++i){
+            let f = newlist.get(i);
+            this.children.set(i, f);
+        }
+    }
+
+    public copyDate() {
+        let inst = new TreeNode(false);
+
+        inst.fpos = this.fpos;
+
+        inst.root = this.root;
+        inst.leaf = this.leaf;
+
+        inst.children = new RawArrayPrimitive<number>(this.children.size());
+
+        let maxLoop = this.children.size();
+        for(let i = 0; i != maxLoop; ++i){
+            let v = this.children.get(i);
+            inst.children.addElement(v);
+        }
+    }
 }
 
