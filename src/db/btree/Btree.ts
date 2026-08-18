@@ -6,6 +6,8 @@ import { DiskCacheManager } from "../random_access_file/DiskCacheManager";
 import { AbstractBtreeDataFactory } from "./AbstractBtreeDataFactory";
 import { AbstractBtreeKey } from "./AbstractBtreeKey";
 import { BtreeConfig } from "./BtreeConfig";
+import { BtreeReverseScanner } from "./BtreeReverseScanner";
+import { BtreeScanner } from "./BtreeScanner";
 import { BtreeStorage } from "./BtreeStorage";
 import { NodeCursor } from "./NodeCursor";
 
@@ -103,6 +105,26 @@ export class Btree {
             let cursor = new NodeCursor(rootNode, this.store, this.config.nodeNumber);
             cursor.insert(key, data);
         }
+    }
+
+    public getScanner() : BtreeScanner {
+        if(this.store != null && this.config != null){
+            let rootNode = this.store.loadRoot();
+            let cursor = new NodeCursor(rootNode, this.store, this.config.nodeNumber);
+
+            return new BtreeScanner(cursor);
+        }
+        throw new NullPointerException("Btree.getScanner()");
+    }
+
+    public getReverseScanner() : BtreeReverseScanner {
+        if(this.store != null && this.config != null){
+            let rootNode = this.store.loadRoot();
+            let cursor = new NodeCursor(rootNode, this.store, this.config.nodeNumber);
+
+            return new BtreeReverseScanner(cursor);
+        }
+        throw new NullPointerException("Btree.getReverseScanner()");
     }
 
     public findByKey(key : AbstractBtreeKey) : IBlockObject | null {
