@@ -69,6 +69,10 @@ export class RawArrayPrimitive<T> {
 		this.root[index] = value;
     }
 
+    public get(i : number) : T {
+        return this.root[i];
+    }
+
     public size() : number {
         return this.numArray;
     }
