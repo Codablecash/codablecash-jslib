@@ -1,3 +1,4 @@
+import { NullPointerException } from "../base/NullPointerException";
 import { ByteBuffer } from "../base_io/ByteBuffer";
 import { CFile } from "../base_io/CFile";
 import { NodeCache } from "../btree_cache/NodeCache";
@@ -34,13 +35,8 @@ export class BtreeStorage {
         this.rootFpos = 0;
     }
 
-    public close(){
-        if(this.store != null){
-            this.store.close();
-        }
-        if(this.cache != null){
-            this.cache.clear();
-        }
+    public setRootFpos(rootFpos : number) {
+        this.rootFpos = rootFpos;
     }
 
     public exists() {
@@ -118,6 +114,41 @@ export class BtreeStorage {
         header.setRootFpos(rootFpos);
 
         return header;
+    }
+
+    public open(numDataBuffer : number, numNodeBuffer : number, cacheManager : DiskCacheManager) {
+        let folderstr = this.folder.getAbsolutePath();
+
+        this.store = new VariableBlockFileStore(folderstr, this.name, cacheManager);
+        this.store.open(false);
+
+        this.cache = new NodeCache(numDataBuffer, numNodeBuffer);
+    }
+
+    public close(){
+        if(this.store != null){
+            this.store.close();
+        }
+        if(this.cache != null){
+            this.cache.clear();
+        }
+    }
+
+    public loadHeader() : BtreeHeaderBlock {
+        if(this.store != null) {
+            // load 0 fpos
+            let handle = this.store.get(0);
+
+            let buff = handle.getBuffer();
+            if(buff != null){
+                buff.position(0);
+
+                let header = BtreeHeaderBlock.fromBinary(buff);
+                return header;
+            }
+        }
+
+        throw new NullPointerException("BtreeStorage.loadHeader()");
     }
 
 }

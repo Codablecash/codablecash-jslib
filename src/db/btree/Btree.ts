@@ -5,6 +5,15 @@ import { AbstractBtreeDataFactory } from "./AbstractBtreeDataFactory";
 import { BtreeConfig } from "./BtreeConfig";
 import { BtreeStorage } from "./BtreeStorage";
 
+export class BtreeOpenConfig {
+    public numDataBuffer : number;
+    public numNodeBuffer : number;
+
+    constructor(){
+        this.numDataBuffer = 256;
+        this.numNodeBuffer = 512;
+    }
+}
 
 export class Btree {
     private folder : CFile;
@@ -64,5 +73,18 @@ export class Btree {
 
         headerFile.move(newHeaderFile);
         bodyFile.move(newBodyFile);
+    }
+
+    public open(config : BtreeOpenConfig) {
+        this.store = new BtreeStorage(this.folder, this.name, this.factory, this.dfactory);
+
+        this.store.open(config.numDataBuffer, config.numNodeBuffer, this.cacheManager);
+
+        {
+            let header = this.store.loadHeader();
+
+            this.store.setRootFpos(header.getRootFpos());
+            this.config = header.getConfig();
+        }
     }
 }
