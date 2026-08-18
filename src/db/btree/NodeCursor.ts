@@ -380,6 +380,46 @@ export class NodeCursor {
 
         return this.store.loadData(datafpos);
     }
+
+    public gotoKeyPrevious(key : AbstractBtreeKey) : IBlockObject | null {
+        this.gotoLeafPrevious(key);
+
+        let current = this.top();
+
+        let nh = current.gotoEqLessThanKey(key);
+        if(nh == null){
+            return null;
+        }
+
+        let nodePos = new NodePosition(nh.clone());
+        this.push(nodePos);
+
+        let dataFpos = nodePos.previousData();
+        let obj = this.store.loadData(dataFpos);
+
+        return obj;
+    }
+
+    public gotoLeafPrevious(key : AbstractBtreeKey) : NodePosition {
+        let current = this.top();
+
+        // check data nodes
+        current.loadInnerNodes(this.store);
+        current.setLastPos();
+
+        while(!current.isLeaf()){
+            let nextFpos = current.getNextChildPrevious(key);
+            let nh = this.store.loadNode(nextFpos);
+
+            current = new NodePosition(nh);
+            this.push(current);
+
+            current.loadInnerNodes(this.store);
+            current.setLastPos();
+        }
+
+        return current;
+    }
     
     public find(key : AbstractBtreeKey) : IBlockObject {
         /*if(this.store != null){
