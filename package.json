@@ -1,6 +1,6 @@
 {
   "name": "@iizuka/codablecashlib",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Codablecash Javascript Library.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -8,6 +8,7 @@
     "build": "tsc",
     "prepare": "npm run build",
     "test": "jest",
+    "testbtree" : "jest --testPathPatterns=test_btree_base*.test",
     "testvbf" : "jest --testPathPatterns=variable_block_filestore.test",
     "testraf" : "jest --testPathPatterns=random_access_file.test",
     "testosf" : "jest --testPathPatterns=os_file.test",
