@@ -16,7 +16,10 @@ export class BtreeScanner {
         this.key = null;
     }
 
-    public begin() : void {
+    public begin(key? : AbstractBtreeKey) : void {
+        if(key != undefined){
+            this.key = key != null ? key.clone() : null;
+        }
     }
 
     public hasNext() : boolean {
