@@ -99,8 +99,8 @@ describe('TestBTreeGroup', () => {
         btree.close();
     })
 
-    it('ScanEmpty', () => {
-        let projectFolder = new CFile("out/btree/ScanEmpty");
+    it('add01', () => {
+        let projectFolder = new CFile("out/btree/add01");
         projectFolder.deleteDir();
         projectFolder.mkdirs();
         let baseDir = projectFolder.get("store");
@@ -158,6 +158,71 @@ describe('TestBTreeGroup', () => {
                 expect(v == a).toBe(true);
                 expect(kv == a).toBe(true);
             }
+        }
+
+        {
+            let lkey = new ULongKey(7);
+
+            let scanner = btree.getScanner();
+
+            scanner.begin(lkey);
+            let i = 3;
+            while(scanner.hasNext()){
+                let obj = scanner.next();
+                let k = scanner.nextKey();
+
+                let tmp = <TempValue>(obj);
+                let v = tmp.getValue();
+
+                let lk = <ULongKey>(k);
+                let kv = Number(lk.getValue());
+
+                let a = answers.get(i++);
+                expect(v == a).toBe(true);
+                expect(kv == a).toBe(true);
+            }
+        }
+        {
+            let lkey = new ULongKey(6);
+
+            let scanner = btree.getScanner();
+
+            scanner.begin(lkey);
+            let i = 2;
+            while(scanner.hasNext()){
+                let obj = scanner.next();
+                let k = scanner.nextKey();
+
+                let tmp = <TempValue>(obj);
+                let v = tmp.getValue();
+
+                let lk = <ULongKey>(k);
+                let kv = Number(lk.getValue());
+
+                let a = answers.get(i++);
+                expect(v == a).toBe(true);
+                expect(kv == a).toBe(true);
+            }
+        }
+        {
+            let lkey = new ULongKey(1000);
+
+            let scanner = btree.getScanner();
+
+            scanner.begin(lkey);
+            expect(scanner.hasNext() == false).toBe(true);
+        }
+
+        {
+            let lkey = new ULongKey(6);
+            let obj = btree.findByKey(lkey);
+            let tmp = <TempValue>(obj);
+            let v = tmp.getValue();
+            expect(v == 6).toBe(true);
+
+            let lkey2 = new ULongKey(7);
+            obj = btree.findByKey(lkey2);
+            expect(obj == null).toBe(true);
         }
 
         btree.close();
