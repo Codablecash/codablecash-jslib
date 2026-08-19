@@ -64,15 +64,17 @@ export class MuSig {
         for(let i = 0; i != maxLoop; ++i){
             let Xi = this.XiList.get(i);
 
-            let hashBuilder = new MuSigHashBuilder();
-            hashBuilder.addBigInteger(L);
-            hashBuilder.add(Xi);
-            hashBuilder.buildHash();
+            if(Xi != null){
+                let hashBuilder = new MuSigHashBuilder();
+                hashBuilder.addBigInteger(L);
+                hashBuilder.add(Xi);
+                hashBuilder.buildHash();
 
-            let hash = hashBuilder.getResultAsBigInteger().mod(Secp256k1Point.n);
-            let value = Xi.multiple(hash);
+                let hash = hashBuilder.getResultAsBigInteger().mod(Secp256k1Point.n);
+                let value = Xi.multiple(hash);
 
-            result = result.add(value);
+                result = result.add(value);
+            }
         }
 
         return result;
@@ -87,7 +89,11 @@ export class MuSig {
         const maxLoop = this.XiList.size();
         for(let i = 0; i != maxLoop; ++i){
             let Xi = this.XiList.get(i);
-            hashBuilder.add(Xi);
+
+            if(Xi != null){
+                hashBuilder.add(Xi);
+            }
+            
         }
         hashBuilder.buildHash();
 

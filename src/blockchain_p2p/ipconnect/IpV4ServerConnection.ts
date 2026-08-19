@@ -25,8 +25,6 @@ export class IpV4ServerConnection implements IServerSocket {
 
                     this.dataListner.onData(clientSoclet, buff);
                 }
-               
-                // socket.write(`Echo: ${data.toString()}`);
             });
 
             socket.on('end', () => {
@@ -47,7 +45,7 @@ export class IpV4ServerConnection implements IServerSocket {
         this.port = port;
     }
     
-    public async listen() : Promise<void> {
+    public listen() : Promise<void> {
         return new Promise<void>((resolve) => {
             this.server.listen(this.port, this.host, () => {
                 console.log("TCP Server: Server listening on " + this.host + ":" + this.port);
@@ -56,7 +54,7 @@ export class IpV4ServerConnection implements IServerSocket {
         });
     }
 
-    public async close() : Promise<void> {
+    public close() : Promise<void> {
         return new Promise<void>((resolve, reject) => {
             this.server.close((err?: Error) => {
                 if (err) {

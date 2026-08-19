@@ -1,3 +1,4 @@
+import { ByteBuffer } from "../../db/base_io/ByteBuffer";
 import { IpClientConnection } from "./IpClientConnection";
 import { IServerSocket } from "./IServerSocket";
 import { ISeverSocketDataListner } from "./IServerSocketDataListner";
@@ -18,7 +19,11 @@ export class IpV6ServerConnection implements IServerSocket {
             socket.on('data', (data: Buffer) => {
                 if(this.dataListner != null){
                     const clientSoclet = new IpClientConnection(socket);
+                    const buff = new ByteBuffer(data.length);
+                    buff.putBuffer(data);
+                    buff.position(0);
 
+                    this.dataListner.onData(clientSoclet, buff);
                 }
             });
 

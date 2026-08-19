@@ -1,0 +1,401 @@
+import { CFile } from "../../../db/base_io/CFile";
+import { IBlockHandle } from "../../../db/filestore_block/IBlockHandle";
+import { VariableBlockFileStore } from "../../../db/filestore_variable_block/VariableBlockFileStore";
+import { DiskCacheManager } from "../../../db/random_access_file/DiskCacheManager";
+
+
+function makeTestData(start : number, length : number) {
+	let ptr = new Uint8Array(length);
+
+	for(let i = 0; i != length; ++i){
+		let ch = start % 128;
+		start++;
+
+		ptr[i] = ch;
+	}
+	return ptr;
+}
+
+function checkTestData(start : number, data : Uint8Array, length: number) {
+	for(let i = 0; i != length; ++i){
+		let ch = start % 128;
+		start++;
+
+		if(data[i] != ch){
+			return false;
+		}
+	}
+	return true;
+}
+
+describe('TestVariableBlockFileStoreGroup', () => {
+
+    it('case01', async () => {
+		let projectFolder = new CFile("out/random_access_file/case01");
+		projectFolder.deleteDir();
+		projectFolder.mkdirs();
+
+		let baseDirStr = projectFolder.getAbsolutePath();
+
+		let cacheManager = new DiskCacheManager();
+		let name = "file01";
+
+		let store = new VariableBlockFileStore(baseDirStr, name, cacheManager);
+
+		store.createStore(true, 256, 32);
+    })
+
+	it('case02', () => {
+		let projectFolder = new CFile("out/random_access_file/case02");
+		projectFolder.deleteDir();
+		projectFolder.mkdirs();
+
+		let baseDirStr = projectFolder.getAbsolutePath();
+
+		let cacheManager = new DiskCacheManager();
+		let name = "file01";
+
+		{
+			let store = new VariableBlockFileStore(baseDirStr, name, cacheManager);
+			store.createStore(true, 256, 32);
+		}
+
+		{
+			let store = new VariableBlockFileStore(baseDirStr, name, cacheManager);
+			store.open(false);
+
+			store.close();
+		}
+	})
+
+	it('alloc01', () => {
+		let projectFolder = new CFile("out/random_access_file/alloc01");
+		projectFolder.deleteDir();
+		projectFolder.mkdirs();
+
+		let baseDirStr = projectFolder.getAbsolutePath();
+
+		let cacheManager = new DiskCacheManager();
+		let name = "file01";
+	
+		{
+			let store = new VariableBlockFileStore(baseDirStr, name, cacheManager);
+			store.createStore(true, 256, 32);
+		}
+
+		let fpos;
+		{
+			let store = new VariableBlockFileStore(baseDirStr, name, cacheManager);
+			store.open(false);
+
+			let data = makeTestData(3, 10);
+
+			let handle = store.alloc(10);
+			handle.write(data, 10);
+
+			fpos = handle.getFpos();
+
+			store.close();
+		}
+
+		{
+			let store = new VariableBlockFileStore(baseDirStr, name, cacheManager);
+			store.open(false);
+			
+			let handle = store.get(fpos);
+			let buff = handle.getBuffer();
+
+			let ar = buff?.toUint8Array();
+
+			let res : boolean = false;
+			if(ar != null){
+				res = checkTestData(3, ar, 10);
+			}
+			expect(res).toBe(true);
+
+			store.close();
+		}
+	})
+	/**
+	 * Allocate with extending file
+	 */
+	it('alloc02', () => {
+		let projectFolder = new CFile("out/random_access_file/alloc02");
+		projectFolder.deleteDir();
+		projectFolder.mkdirs();
+
+		let baseDirStr = projectFolder.getAbsolutePath();
+
+		let cacheManager = new DiskCacheManager();
+		let name = "file01";
+	
+		{
+			let store = new VariableBlockFileStore(baseDirStr, name, cacheManager);
+			store.createStore(true, 256, 32);
+		}
+
+		let fpos;
+		{
+			let store = new VariableBlockFileStore(baseDirStr, name, cacheManager);
+			store.open(false);
+
+
+			let handle = store.alloc(300);
+			let size = handle.size();
+			expect(size).toBe(300);
+
+			let data = makeTestData(3,300);
+			handle.write(data, 300);
+
+			fpos = handle.getFpos();
+
+			store.close();
+		}
+
+		{
+			let store = new VariableBlockFileStore(baseDirStr, name, cacheManager);
+			store.open(false);
+			
+			let handle = store.get(fpos);
+			let buff = handle.getBuffer();
+
+			let ar = buff?.toUint8Array();
+
+			let res : boolean = false;
+			if(ar != null){
+				res = checkTestData(3, ar, 300);
+			}
+			expect(res).toBe(true);
+
+			store.close();
+		}
+	})
+
+	/**
+	 * large data than allocated
+	 **/
+	it('alloc03', () => {
+		let projectFolder = new CFile("out/random_access_file/alloc03");
+		projectFolder.deleteDir();
+		projectFolder.mkdirs();
+
+		let baseDirStr = projectFolder.getAbsolutePath();
+
+		let cacheManager = new DiskCacheManager();
+		let name = "file01";
+		{
+			let store = new VariableBlockFileStore(baseDirStr, name, cacheManager);
+			store.createStore(true, 256, 32);
+		}
+
+		let fpos;
+		{
+			let store = new VariableBlockFileStore(baseDirStr, name, cacheManager);
+			store.open(false);
+
+
+			let handle = store.alloc(10);
+
+			let data = makeTestData(3, 100);
+			handle.write(data, 100);
+
+			fpos = handle.getFpos();
+
+			store.close();
+		}
+
+		{
+			let store = new VariableBlockFileStore(baseDirStr, name, cacheManager);
+			store.open(false);
+			
+			let handle = store.get(fpos);
+			let buff = handle.getBuffer();
+
+			let ar = buff?.toUint8Array();
+
+			let res : boolean = false;
+			if(ar != null){
+				res = checkTestData(3, ar, 100);
+			}
+			expect(res).toBe(true);
+
+			store.close();
+		}
+	})
+
+	/**
+	 * fragment is 2
+	 */
+	it('alloc04', () => {
+		let projectFolder = new CFile("out/random_access_file/alloc04");
+		projectFolder.deleteDir();
+		projectFolder.mkdirs();
+
+		let baseDirStr = projectFolder.getAbsolutePath();
+
+		let cacheManager = new DiskCacheManager();
+		let name = "file01";
+		{
+			let store = new VariableBlockFileStore(baseDirStr, name, cacheManager);
+			store.createStore(true, 256, 32);
+		}
+
+		let fpos01, fpos02;
+		{
+			let store = new VariableBlockFileStore(baseDirStr, name, cacheManager);
+			store.open(false);
+
+			{
+				let handle = store.alloc(10);
+
+				let data = makeTestData(3, 10);
+				handle.write(data, 10);
+				fpos01 = handle.getFpos();				
+			}
+
+			{
+				let handle = store.alloc(10);
+
+				let data = makeTestData(3, 10);
+				handle.write(data, 10);
+				fpos02 = handle.getFpos();		
+			}
+
+			{
+				let handle = store.get(fpos01);
+				handle.removeBlocks();
+			}
+
+			{
+				let handle = store.alloc(100);
+
+				let data = makeTestData(3, 100);
+				handle.write(data, 100);
+				fpos01 = handle.getFpos();		
+			}
+
+			store.close();
+		}
+
+		{
+			let store = new VariableBlockFileStore(baseDirStr, name, cacheManager);
+			store.open(false);
+			
+			{
+				let handle = store.get(fpos01);
+				let buff = handle.getBuffer();
+
+				let ar = buff?.toUint8Array();
+
+				let res : boolean = false;
+				if(ar != null){
+					res = checkTestData(3, ar, 100);
+				}
+				expect(res).toBe(true);
+			}
+
+			{
+				let handle = store.get(fpos02);
+				let buff = handle.getBuffer();
+
+				let ar = buff?.toUint8Array();
+
+				let res : boolean = false;
+				if(ar != null){
+					res = checkTestData(3, ar, 10);
+				}
+				expect(res).toBe(true);
+			}
+
+			store.close();
+		}
+	})
+
+	/**
+	 * fragment is 2 with realloc & extend
+	 */
+	it('alloc05', () => {
+		let projectFolder = new CFile("out/random_access_file/alloc05");
+		projectFolder.deleteDir();
+		projectFolder.mkdirs();
+
+		let baseDirStr = projectFolder.getAbsolutePath();
+
+		let cacheManager = new DiskCacheManager();
+		let name = "file01";
+		{
+			let store = new VariableBlockFileStore(baseDirStr, name, cacheManager);
+			store.createStore(true, 256, 32);
+		}
+
+		let fpos01, fpos02;
+		{
+			let store = new VariableBlockFileStore(baseDirStr, name, cacheManager);
+			store.open(false);
+
+			{
+				let handle = store.alloc(10);
+
+				let data = makeTestData(3, 10);
+				handle.write(data, 10);
+				fpos01 = handle.getFpos();				
+			}
+
+			{
+				let handle = store.alloc(10);
+
+				let data = makeTestData(3, 10);
+				handle.write(data, 10);
+				fpos02 = handle.getFpos();		
+			}
+
+			{
+				let handle = store.get(fpos01);
+				handle.removeBlocks();
+			}
+
+			{
+				let handle = store.alloc(10);
+
+				let data = makeTestData(3, 1000);
+				handle.write(data, 1000);
+				fpos01 = handle.getFpos();		
+			}
+
+			store.close();
+		}
+
+		{
+			let store = new VariableBlockFileStore(baseDirStr, name, cacheManager);
+			store.open(false);
+			
+			{
+				let handle = store.get(fpos01);
+				let buff = handle.getBuffer();
+
+				let ar = buff?.toUint8Array();
+
+				let res : boolean = false;
+				if(ar != null){
+					res = checkTestData(3, ar, 1000);
+				}
+				expect(res).toBe(true);
+			}
+
+			{
+				let handle = store.get(fpos02);
+				let buff = handle.getBuffer();
+
+				let ar = buff?.toUint8Array();
+
+				let res : boolean = false;
+				if(ar != null){
+					res = checkTestData(3, ar, 10);
+				}
+				expect(res).toBe(true);
+			}
+
+			store.close();
+		}
+	})
+})

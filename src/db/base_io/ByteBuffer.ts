@@ -1,6 +1,7 @@
 import { toBigIntBE, toBufferBE } from "bigint-buffer";
 import { BufferOverflowException } from "./BufferOverflowException";
 import { BigInteger } from "../numeric/BigInteger";
+import bigInt from "big-integer";
 
 const { Buffer } = require('node:buffer');
 
@@ -98,21 +99,27 @@ export class ByteBuffer {
             throw new BufferOverflowException("getShort()");
         }
 
-        return this.data.readInt16BE(this.pos++);
+        let res = this.data.readInt16BE(this.pos);
+        this.pos += 2;
+        return res;
     }
     public getInt() : number {
        if(this.remaining() < 4){
             throw new BufferOverflowException("getInt()");
         }
 
-        return this.data.readInt32BE(this.pos++);
+        let res = this.data.readInt32BE(this.pos);
+        this.pos += 4;
+        return res;
     }
     public getLong() : bigint {
        if(this.remaining() < 4){
             throw new BufferOverflowException("getInt()");
         }
 
-        return this.data.readBigInt64BE(this.pos++);
+        let res = this.data.readBigInt64BE(this.pos);
+        this.pos += 8;
+        return res;
     }
     public toBigInteger() : BigInteger {
         let val = toBigIntBE(this.data);
@@ -152,7 +159,7 @@ export class ByteBuffer {
         }
 
         this.data.writeInt16BE(data, this.pos);
-        this.pos++;
+        this.pos += 2;
         return this;
     }
     public putInt(data : number) : ByteBuffer {
@@ -160,17 +167,40 @@ export class ByteBuffer {
             throw new BufferOverflowException("put(data : number)");
         }
 
-        this.data.writeInt32BE(data, this.pos++);
+        this.data.writeInt32BE(data, this.pos);
+        this.pos += 4;
         return this;
     }
-    public putLong(data : bigint) : ByteBuffer {
+    public putLong(data : bigint | number) : ByteBuffer {
         if(this.remaining() < 8){
             throw new BufferOverflowException("putLong(data : number)");
         }
 
-        this.data.writeBigInt64BE(data, this.pos++);
+        let value : bigint;
+        if(typeof data === "number"){
+            value = BigInt(data);
+        }else{
+            value = data;
+        }
+
+        this.data.writeBigInt64BE(value, this.pos);
+        this.pos += 8;
         return this;
     }
+    public putUint8Array(src : Uint8Array, len : number) {
+        if (len > this.remaining()) {
+            throw new BufferOverflowException("put(src : Uint8Array, off : number, len : number)");
+        }
+
+        // Mem::memcpy(data->getRoot() + this->pos, src, len);
+        let buff = src.slice(0, len);
+        this.data.set(buff, this.pos);
+
+        this.pos += len;
+
+        return this;
+    }
+
     public remaining() : number {
         return this.lim - this.pos;
     }

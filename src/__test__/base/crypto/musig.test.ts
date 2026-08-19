@@ -28,16 +28,20 @@ describe('Musig test', () => {
         const maxLoop = list.size();
         for(let i = 0; i != maxLoop; ++i){
             let signer = list.get(i);
-            let Xi = signer.getxG();
+            expect(signer == null).toBe(false);
 
-            sig.addXi(Xi);
+            if(signer != null){
+                let Xi = signer.getxG();
 
-            // compressed test
-            let point = Secp256k1CompressedPoint.compress(Xi);
-            let Xi2 = point.decompress();
+                sig.addXi(Xi);
 
-            let bl = Xi.equals(Xi2);
-            expect(bl).toBe(true);
+                // compressed test
+                let point = Secp256k1CompressedPoint.compress(Xi);
+                let Xi2 = point.decompress();
+
+                let bl = Xi.equals(Xi2);
+                expect(bl).toBe(true);
+            }
         }
 
         let bl = sig.verify(data, length);
