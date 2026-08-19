@@ -7,6 +7,17 @@ import { DataNode } from "./DataNode";
 
 export abstract class AbstractBtreeDataFactory {
     public abstract makeDataFromBinary(input : ByteBuffer) : IBlockObject;
-    public abstract registerData(key : AbstractBtreeKey, data: IBlockObject, dataNode : DataNode, store: BtreeStorage) : void;
-    public abstract beforeRemove(dataNode : DataNode, store : BtreeStorage, key: AbstractBtreeKey) : boolean;
+    public registerData(key : AbstractBtreeKey, data: IBlockObject, dataNode : DataNode, store: BtreeStorage) : void {
+        let dataFpos = dataNode.getDataFpos();
+        if(dataFpos != 0){
+            store.removeData(dataFpos);
+        }
+
+        dataFpos = store.storeData(data);
+        dataNode.setDataFpos(dataFpos);
+    }
+    public beforeRemove(dataNode : DataNode, store : BtreeStorage, key: AbstractBtreeKey) : boolean {
+        return true;
+    }
+    public abstract copy() : AbstractBtreeDataFactory;
 }
