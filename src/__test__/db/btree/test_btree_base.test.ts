@@ -6,7 +6,17 @@ import { InfinityKey } from "../../../db/btreekey/InfinityKey"
 import { NullKey } from "../../../db/btreekey/NullKey";
 import { ULongKey } from "../../../db/btreekey/ULongKey";
 import { DiskCacheManager } from "../../../db/random_access_file/DiskCacheManager";
-import { TmpValueFactory } from "./TempValue";
+
+
+import { TempValue, TmpValueFactory } from "./TempValue";
+
+
+function ddKeyValue(key : number, value: number, btree : Btree){
+	let lkey = new ULongKey(key);
+	let tvalue = new TempValue(value);
+
+	btree.putData(lkey, tvalue);
+}
 
 describe('TestBTreeGroup', () => {
     it('infinityKey', () => {
@@ -53,6 +63,38 @@ describe('TestBTreeGroup', () => {
 
         let opconf = new BtreeOpenConfig();
         btree.open(opconf);
+        btree.close();
+    })
+
+    it('ScanEmpty', () => {
+        let projectFolder = new CFile("out/btree/ScanEmpty");
+        projectFolder.deleteDir();
+        projectFolder.mkdirs();
+        let baseDir = projectFolder.get("store");
+        let baseDirStr = baseDir.getAbsolutePath();
+
+        let cacheManager = new DiskCacheManager();
+        let name = "file01";
+
+        let factory = new BtreeKeyFactory();
+        let dfactory = new TmpValueFactory();
+
+        let btree = new Btree(baseDir, name, cacheManager, factory, dfactory);
+        let  config = new BtreeConfig();
+        btree.create(config);
+
+        let opconf = new BtreeOpenConfig();
+        btree.open(opconf);
+        {
+            let scanner = btree.getScanner();
+
+            scanner.begin();
+
+            while(scanner.hasNext()){
+                let k = scanner.nextKey();
+                let obj = scanner.next();
+            }
+        }
         btree.close();
     })
 })
