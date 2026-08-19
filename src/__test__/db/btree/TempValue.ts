@@ -13,10 +13,11 @@ export class TempValue implements IBlockObject {
     }
 
     public binarySize(): number {
-        throw new Error("Method not implemented.");
+        return 4 + 8;
     }
     public toBinary(out: ByteBuffer): void {
-        throw new Error("Method not implemented.");
+        out.putInt(TmpValueFactory.TMPVALUE);
+        out.putLong(this.value);
     }
     public copyData(): IBlockObject {
         return new TempValue(this.value);

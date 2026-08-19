@@ -19,7 +19,10 @@ export class TreeNode extends AbstractTreeNode {
         if(numChildren != undefined && key != undefined && leaf != undefined){
             this.root = isroot;
             this.leaf = leaf;
-            this.children = new RawArrayPrimitive<number>(); 
+            this.children = new RawArrayPrimitive<number>(numChildren);
+            for(let i = 0; i != numChildren; ++i){
+                this.children.addElement(0);
+            }
             return;
         }       
 

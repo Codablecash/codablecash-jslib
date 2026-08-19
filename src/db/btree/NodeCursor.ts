@@ -233,7 +233,7 @@ export class NodeCursor {
         }
 
         let total = allList.size();
-        let list1Size = total / 2;
+        let list1Size = Math.trunc(total / 2);
 
         let i = 0;
         for(; i != list1Size; ++i){
