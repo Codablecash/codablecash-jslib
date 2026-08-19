@@ -137,4 +137,13 @@ export class Btree {
         throw new NullPointerException("Btree.findByKey()");
     }
     
+    public remove(key : AbstractBtreeKey) : boolean {
+        if(this.store != null && this.config){
+            let rootNode = this.store.loadRoot();
+            let cursor = new NodeCursor(rootNode, this.store, this.config.nodeNumber);
+
+            return cursor.remove(key);
+        }
+        throw new NullPointerException("Btree.remove()");
+    }
 }

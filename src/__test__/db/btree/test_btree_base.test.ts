@@ -307,4 +307,98 @@ describe('TestBTreeGroup', () => {
 
         btree.close();
     })
+
+    it('remove01', () => {
+        let projectFolder = new CFile("out/btree/remove01");
+        projectFolder.deleteDir();
+        projectFolder.mkdirs();
+        let baseDir = projectFolder.get("store");
+        let baseDirStr = baseDir.getAbsolutePath();
+
+        let cacheManager = new DiskCacheManager();
+        let name = "file01";
+
+        let factory = new BtreeKeyFactory();
+        let dfactory = new TmpValueFactory();
+
+        let btree = new Btree(baseDir, name, cacheManager, factory, dfactory);
+        let  config = new BtreeConfig();
+        config.nodeNumber = 3;
+        btree.create(config);
+
+        let opconf = new BtreeOpenConfig();
+        btree.open(opconf);
+
+        let answers = new RawArrayPrimitive<number>(32);
+        {
+            addKeyValue(10, 10, btree);
+            addKeyValue(6, 6, btree);
+            addKeyValue(3, 3, btree);
+            addKeyValue(2, 2, btree);
+            addKeyValue(100, 100, btree);
+            addKeyValue(50, 50, btree);
+            addKeyValue(7, 7, btree);
+            addKeyValue(8, 8, btree);
+            addKeyValue(9, 9, btree);
+            addKeyValue(11, 11, btree);
+            addKeyValue(12, 12, btree);
+            addKeyValue(13, 13, btree);
+            addKeyValue(14, 14, btree);
+
+            answers.addElement(2);
+            answers.addElement(3);
+            answers.addElement(6);
+            //answers.addElement(7);
+            //answers.addElement(8);
+            //answers.addElement(9);
+            //answers.addElement(10);
+            answers.addElement(11);
+            answers.addElement(12);
+            answers.addElement(13);
+            answers.addElement(14);
+            answers.addElement(50);
+            answers.addElement(100);
+        }
+
+		{
+			let lkey = new ULongKey(7);
+			btree.remove(lkey);
+		}
+		{
+			let lkey = new ULongKey(7000);
+			btree.remove(lkey);
+		}
+		{
+			let lkey8 = new ULongKey(8);
+			btree.remove(lkey8);
+			let lkey9 = new ULongKey(9);
+			btree.remove(lkey9);
+			let lkey10 = new ULongKey(10);
+			btree.remove(lkey10);
+		}
+
+        {
+            let scanner = btree.getScanner();
+
+            scanner.begin();
+            let i = 0;
+            while(scanner.hasNext()){
+                let k = scanner.nextKey();
+                let obj = scanner.next();
+
+
+                let tmp = <TempValue>(obj);
+                let v = tmp.getValue();
+
+                let lk = <ULongKey>(k);
+                let kv = Number(lk.getValue());
+
+                let a = answers.get(i++);
+                expect(v == a).toBe(true);
+                expect(kv == a).toBe(true);
+            }
+        }
+
+        btree.close();
+    })
 })
