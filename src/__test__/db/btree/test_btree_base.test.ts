@@ -401,4 +401,73 @@ describe('TestBTreeGroup', () => {
 
         btree.close();
     })
+
+    function removeValue(value : number, btree : Btree){
+	    let lkey = new ULongKey(value);
+	    btree.remove(lkey);
+    }
+
+    it('remove01', () => {
+        let projectFolder = new CFile("out/btree/remove01");
+        projectFolder.deleteDir();
+        projectFolder.mkdirs();
+        let baseDir = projectFolder.get("store");
+        let baseDirStr = baseDir.getAbsolutePath();
+
+        let cacheManager = new DiskCacheManager();
+        let name = "file01";
+
+        let factory = new BtreeKeyFactory();
+        let dfactory = new TmpValueFactory();
+
+        let btree = new Btree(baseDir, name, cacheManager, factory, dfactory);
+        let  config = new BtreeConfig();
+        config.nodeNumber = 2;
+        btree.create(config);
+
+        let opconf = new BtreeOpenConfig();
+        btree.open(opconf);
+
+        let answers = new RawArrayPrimitive<Number>(32);
+        {
+            addKeyValue(1, 1, btree);
+            addKeyValue(2, 2, btree);
+            addKeyValue(3, 3, btree);
+            addKeyValue(4, 4, btree);
+            addKeyValue(5, 5, btree);
+            addKeyValue(6, 6, btree);
+
+            removeValue(1, btree);
+            removeValue(2, btree);
+            removeValue(3, btree);
+
+            answers.addElement(4);
+            answers.addElement(5);
+            answers.addElement(6);
+        }
+
+        {
+            let scanner = btree.getScanner();
+
+            scanner.begin();
+            let i = 0;
+            while(scanner.hasNext()){
+                let k = scanner.nextKey();
+                let obj = scanner.next();
+
+
+                let tmp = <TempValue>(obj);
+                let v = tmp.getValue();
+
+                let lk = <ULongKey>(k);
+                let kv = Number(lk.getValue());
+
+                let a = answers.get(i++);
+                expect(v == a).toBe(true);
+                expect(kv == a).toBe(true);
+            }
+        }
+
+        btree.close();
+    })
 })
