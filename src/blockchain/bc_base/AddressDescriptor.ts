@@ -33,8 +33,36 @@ export class AddressDescriptor {
 
     }
 
-    private importCstring(str : Uint8Array){
+    private importCstring(cstr : Uint8Array){
+        let length = cstr.length;
+        this.prefix = cstr.slice(0, AddressDescriptor.PREFIX_LENGTH);
+        this.zone = cstr.slice(AddressDescriptor.PREFIX_LENGTH, AddressDescriptor.PREFIX_LENGTH + AddressDescriptor.ZONE_LENGTH);
+/*
+	int length = Mem::strlen(cstr);
 
+	Mem::memcpy(this.prefix, cstr, AddressDescriptor::PREFIX_LENGTH);
+	Mem::memcpy(this.zone, cstr + AddressDescriptor::PREFIX_LENGTH, AddressDescriptor::ZONE_LENGTH);
+
+	int bodylength = length - AddressDescriptor::PREFIX_LENGTH - AddressDescriptor::ZONE_LENGTH
+			- AddressDescriptor::CHECKDIGIT_LENGTH;
+	char* bodycstr = new char[bodylength + 1];
+	Mem::memset(bodycstr, 0, bodylength + 1);
+	StackArrayRelease<const char> __st_bodycstr(bodycstr);
+
+	Mem::memcpy(bodycstr, cstr + AddressDescriptor::PREFIX_LENGTH + AddressDescriptor::ZONE_LENGTH, bodylength);
+
+	UnicodeString str(bodycstr);
+	this.body = Base58::decode(&str);
+
+	// check checkdigits
+	char __checkDigit[2];
+	Mem::memcpy(__checkDigit, cstr + AddressDescriptor::PREFIX_LENGTH + AddressDescriptor::ZONE_LENGTH + bodylength, AddressDescriptor::CHECKDIGIT_LENGTH);
+
+	makeCheckDigit();
+
+	int cmp = Mem::memcmp(this.checkDigit, __checkDigit, AddressDescriptor::CHECKDIGIT_LENGTH);
+	ExceptionThrower<AddressCheckDigitException>::throwExceptionIfCondition(cmp != 0, L"Check digit error.", __FILE__, __LINE__);
+*/
         this.makeCheckDigit();
     }
 
