@@ -192,7 +192,7 @@ export class ByteBuffer {
             throw new BufferOverflowException("put(src : Uint8Array, off : number, len : number)");
         }
 
-        // Mem::memcpy(data->getRoot() + this->pos, src, len);
+        // Mem::memcpy(data.getRoot() + this.pos, src, len);
         let buff = src.slice(0, len);
         this.data.set(buff, this.pos);
 
@@ -204,5 +204,18 @@ export class ByteBuffer {
     public remaining() : number {
         return this.lim - this.pos;
     }
-  
+
+    public binaryEquals(buff : ByteBuffer) : boolean {
+        let diff = this.data.compare(buff.data);
+
+        let bl = (diff == 0) && this.cap == buff.cap;
+
+        return bl;
+    }
+
+    public binaryCmp(buff: ByteBuffer) : number {
+        let diff = this.data.compare(buff.data);
+
+        return diff;
+    }
 }
