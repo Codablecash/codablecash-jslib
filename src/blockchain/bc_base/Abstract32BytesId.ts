@@ -2,6 +2,8 @@ import { ByteBuffer } from "../../db/base_io/ByteBuffer";
 import { BigInteger } from "../../db/numeric/BigInteger";
 
 export class Abstract32BytesId {
+    public static Q : BigInteger = new BigInteger("ff66c4652cbb54e13e4cc75898014aef72332e147343a95031cf416ca9f77ce7", 16);
+    public static G : BigInteger = new BigInteger("e000000000000000000000000000000000000000000000000000000000000002", 16);
 
     public id : ByteBuffer; // 32 bytes
 
@@ -59,4 +61,22 @@ export class Abstract32BytesId {
         return hash;
     }
 
+    public makeRandom16Bytes() : ByteBuffer {
+        let size = 0;
+        let p = new BigInteger("0");
+        do{
+            let sbint = BigInteger.getRandomBigInt(256);
+
+            let seed = new BigInteger(sbint);
+
+            let s = seed.mod(Abstract32BytesId.Q);
+            p = Abstract32BytesId.G.modPow(s, Abstract32BytesId.Q);
+            size = p.binarySize();
+        } while(size != 32);
+
+        let buff = p.toBinary();
+        buff.position(0);
+
+        return buff;
+    }
 }

@@ -11,11 +11,16 @@ export class BigInteger {
 
     private value : bigInt.BigInteger;
 
-    constructor(val : string);
+    constructor(val : string, base? : number);
     constructor(val : bigint);
     constructor(val : bigInt.BigInteger);
-    constructor(val : any){
-         this.value = bigInt(val);
+    constructor(val : any, base? : number){
+        if((typeof val == "string" && base != undefined)){
+            this.value = bigInt(val, base);
+            return;
+        }
+
+        this.value = bigInt(val);
     }
 
     public copy(){
