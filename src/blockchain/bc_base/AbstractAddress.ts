@@ -29,7 +29,7 @@ export abstract class AbstractAddress implements IBlockObject{
         Mem::memset(zonech, 0, 4);
         ::sprintf(zonech, "%03d", (uint8_t)this->zone);
         */
-        let zonestr = this.zone.toString(10).padStart(3);
+        let zonestr = this.zone.toString(10).padStart(3, "0");
         let zonech = Buffer.from(zonestr, "utf8");
 
         let body = this.getBodyPart();
