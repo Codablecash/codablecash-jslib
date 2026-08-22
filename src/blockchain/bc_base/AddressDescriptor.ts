@@ -104,7 +104,7 @@ export class AddressDescriptor {
 
         let checkdigit = total % 99;
 
-        let checkdigitstr = checkdigit.toString(10).padStart(2);
+        let checkdigitstr = checkdigit.toString(10).padStart(2, "0");
         this.checkDigit = Buffer.from(checkdigitstr, "utf8");
     }
 }
