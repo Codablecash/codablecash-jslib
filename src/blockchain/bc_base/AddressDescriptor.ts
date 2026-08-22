@@ -1,4 +1,6 @@
 import { ByteBuffer } from "../../db/base_io/ByteBuffer";
+import { AddressCheckDigitException } from "./AddressCheckDigitException";
+import { Base58 } from "./Base58";
 
 export class AddressDescriptor {
     public static PREFIX_LENGTH : number = 2;
@@ -44,9 +46,23 @@ export class AddressDescriptor {
 
         start += AddressDescriptor.ZONE_LENGTH;
 	    let bodylength = length - AddressDescriptor.PREFIX_LENGTH - AddressDescriptor.ZONE_LENGTH - AddressDescriptor.CHECKDIGIT_LENGTH;
-        let bodycstr = cstr.slice(start, start + bodylength);
+        let bodycstr : Uint8Array = cstr.slice(start, start + bodylength);
 
-        
+        let str = new TextDecoder().decode(bodycstr);
+
+        let decodedBody = Base58.decode(str);
+        if(decodedBody != null){
+            this.body = decodedBody;
+        }
+
+        // check checkdigits
+        this.makeCheckDigit();
+
+        start += bodylength;
+        let __checkDigit = cstr.slice(start, start + AddressDescriptor.CHECKDIGIT_LENGTH);
+        if(__checkDigit != this.checkDigit){
+            throw new AddressCheckDigitException("Wrong address descriptor");
+        }
 /*
 	int length = Mem::strlen(cstr);
 
@@ -73,7 +89,6 @@ export class AddressDescriptor {
 	int cmp = Mem::memcmp(this.checkDigit, __checkDigit, AddressDescriptor::CHECKDIGIT_LENGTH);
 	ExceptionThrower<AddressCheckDigitException>::throwExceptionIfCondition(cmp != 0, L"Check digit error.", __FILE__, __LINE__);
 */
-        this.makeCheckDigit();
     }
 
     public makeCheckDigit() {
