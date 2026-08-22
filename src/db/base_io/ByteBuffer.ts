@@ -140,6 +140,15 @@ export class ByteBuffer {
         this.pos++;
         return this;
     }
+    public puti(index : number, b : number) : ByteBuffer {
+        if(index + 1 > this.lim){
+            throw new BufferOverflowException("put(int index, uint8_t b)");
+        }
+
+        this.data[index] = b;
+        return this;
+    }
+
     public putBuffer(data : Buffer) : ByteBuffer {
         let dataLength = data.byteLength;
         if(this.remaining() < dataLength){

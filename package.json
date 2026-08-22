@@ -8,6 +8,7 @@
     "build": "tsc",
     "prepare": "npm run build",
     "test": "jest --runInBand",
+    "testbase64": "jest --testPathPatterns=test_base64.test",
     "test256": "jest --testPathPatterns=test.sha256.test",
     "testbase58": "jest --testPathPatterns=test_base58*.test",
     "testbtree": "jest --testPathPatterns=test_btree_base*.test",

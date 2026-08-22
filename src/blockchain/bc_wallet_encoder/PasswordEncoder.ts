@@ -12,10 +12,11 @@ export class PasswordEncoder implements IWalletDataEncoder {
 
         {
             let p : Uint8Array = Buffer.from(this.password, "utf8");
-            let length = this.password.length;
 
             this.keybuff = Sha256.sha256(p, true);
             this.keybuff.position(0);
         }
     }
+
+    
 }
