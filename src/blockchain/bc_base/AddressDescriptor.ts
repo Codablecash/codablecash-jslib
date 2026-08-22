@@ -35,8 +35,18 @@ export class AddressDescriptor {
 
     private importCstring(cstr : Uint8Array){
         let length = cstr.length;
-        this.prefix = cstr.slice(0, AddressDescriptor.PREFIX_LENGTH);
-        this.zone = cstr.slice(AddressDescriptor.PREFIX_LENGTH, AddressDescriptor.PREFIX_LENGTH + AddressDescriptor.ZONE_LENGTH);
+
+        let start = 0;
+        this.prefix = cstr.slice(start, AddressDescriptor.PREFIX_LENGTH);
+        
+        start += AddressDescriptor.PREFIX_LENGTH;
+        this.zone = cstr.slice(start, start + AddressDescriptor.ZONE_LENGTH);
+
+        start += AddressDescriptor.ZONE_LENGTH;
+	    let bodylength = length - AddressDescriptor.PREFIX_LENGTH - AddressDescriptor.ZONE_LENGTH - AddressDescriptor.CHECKDIGIT_LENGTH;
+        let bodycstr = cstr.slice(start, start + bodylength);
+
+        
 /*
 	int length = Mem::strlen(cstr);
 
@@ -81,14 +91,5 @@ export class AddressDescriptor {
 
         let checkdigitstr = checkdigit.toString(10).padStart(2);
         this.checkDigit = Buffer.from(checkdigitstr, "utf8");
-
-        /*
-        int checkdigit = total % 99;
-        char tmp[3];
-        Mem::memset(tmp, 0, 3);
-
-        ::sprintf(tmp, "%02d", checkdigit);
-
-        Mem::memcpy(this.checkDigit, tmp, 2);*/
     }
 }

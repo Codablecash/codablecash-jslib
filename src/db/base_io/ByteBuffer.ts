@@ -153,6 +153,19 @@ export class ByteBuffer {
         return this;
     }
 
+    public putArray(src : Uint8Array, off : number, len : number) {
+        if (len > this.remaining()) {
+            throw new BufferOverflowException("putArray()");
+        }
+
+        // Mem::memcpy(data->getRoot() + this->pos, src + off, len);
+        let slice = src.slice(off, off + len);
+        this.data.set(slice, this.pos);
+        this.pos += len;
+
+        return this;
+    }
+
     public putShort(data : number) : ByteBuffer {
         if(this.remaining() < 1){
             throw new BufferOverflowException("put(data : number)");

@@ -8,12 +8,11 @@
     "build": "tsc",
     "prepare": "npm run build",
     "test": "jest --runInBand",
-    "testbtree" : "jest --testPathPatterns=test_btree_base*.test",
-    "testvbf" : "jest --testPathPatterns=variable_block_filestore.test",
-    "testraf" : "jest --testPathPatterns=random_access_file.test",
-    "testosf" : "jest --testPathPatterns=os_file.test",
-    "testblong" : "jest --testPathPatterns=bytebuffer_long.test"
-    
+    "testbtree": "jest --testPathPatterns=test_btree_base*.test",
+    "testvbf": "jest --testPathPatterns=variable_block_filestore.test",
+    "testraf": "jest --testPathPatterns=random_access_file.test",
+    "testosf": "jest --testPathPatterns=os_file.test",
+    "testblong": "jest --testPathPatterns=bytebuffer_long.test"
   },
   "author": "Tomohiro Iizuka",
   "license": "MIT",
@@ -23,6 +22,7 @@
     "async-lock": "^1.4.1",
     "big-integer": "^1.6.52",
     "bigint-buffer": "^1.1.5",
+    "bs58": "^6.0.0",
     "fast-sha256": "^1.3.0",
     "rwlock": "^5.0.0",
     "typescript": "^5.9.3"
