@@ -47,6 +47,10 @@ export class Base64 {
         return buf;
     }
 
+    public static decodeString(str : string){
+        let sArr = Buffer.from(str, "utf8");
+        return Base64.decode(sArr, sArr.length);
+    }
     /**
      * 
      * @param sArr Buffer.from([string], utf8)
