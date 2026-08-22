@@ -32,14 +32,14 @@ export class Aes256Cbc {
         });
 
         let strres = encrypted.toString();
-        let binres = Base64.decodeString(strres).toUint8Array();
+        let binres = Buffer.from(strres, "utf8");
 
         let result = new Aes256CbcResult(binres.length, binres);
         return result;
     }
 
     public decrypt(data : Uint8Array, length : number) : string {
-        let str = Base64.encode(data, data.length);
+        let str = new TextDecoder("utf8").decode(data);
         let wkey = CryptoJS.lib.WordArray.create(this.key256);
         let wiv = CryptoJS.lib.WordArray.create(this.iv);
 

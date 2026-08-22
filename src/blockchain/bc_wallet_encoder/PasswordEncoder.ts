@@ -2,6 +2,7 @@ import { Aes256Cbc, Aes256CbcResult } from "../../base/crypto/Aes256Cbc";
 import { Sha256 } from "../../base/crypto/Sha256";
 import { ByteBuffer } from "../../db/base_io/ByteBuffer";
 import { Base64 } from "../bc_base/Base64";
+import { HdWalletSeed } from "../bc_wallet/HdWalletSeed";
 import { IWalletDataEncoder } from "./IWalletDataEncoder";
 
 
@@ -20,7 +21,27 @@ export class PasswordEncoder implements IWalletDataEncoder {
         }
     }
 
-    public encode(data : Uint8Array, size : number) {
+    public encode(seed : HdWalletSeed) : HdWalletSeed {
+        let size = seed.size();
+        let data = seed.toArray();
+
+        let result = this.__encode(data, size);
+
+        return new HdWalletSeed(result.data, result.length);
+    }
+
+    public decode(encodedSeed : HdWalletSeed) : HdWalletSeed {
+        let ar = encodedSeed.toArray();
+
+
+        let buff = this.__decode(ar);
+
+        let dec = Base64.decode(buff.toUint8Array(), buff.limit());
+
+        return new HdWalletSeed(dec.toUint8Array(), dec.limit());
+    }
+
+    public __encode(data : Uint8Array, size : number) {
         let str = Base64.encode(data, size);
 
         let aes = new Aes256Cbc();
@@ -29,5 +50,15 @@ export class PasswordEncoder implements IWalletDataEncoder {
 
         return result;
     }
-    
+
+    public __decode(data : Uint8Array) : ByteBuffer {
+        let aes = new Aes256Cbc();
+        aes.setKey(this.keybuff.toUint8Array());
+
+        let resstr = aes.decrypt(data, data.length);
+
+        let b = Buffer.from(resstr, "utf8");
+        return ByteBuffer.wrapWithEndian(b, b.length, true);
+    }
+
 }
