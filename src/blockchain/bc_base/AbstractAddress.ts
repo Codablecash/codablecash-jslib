@@ -3,7 +3,11 @@ import { IBlockObject } from "../../db/filestore_block/IBlockObject";
 import { AddressDescriptor } from "./AddressDescriptor";
 
 export abstract class AbstractAddress implements IBlockObject{
-    private zone : number;
+	public static readonly ADDRESS_TYPE_BALANCE = 1;
+	public static readonly ADDRESS_TYPE_SMARTCONTRACT_MODULE = 2;
+	public static readonly ADDRESS_TYPE_SMARTCONTRACT_INSTANCE = 3;
+
+    protected zone : number;
 
     constructor(zone : number) {
         this.zone = zone;

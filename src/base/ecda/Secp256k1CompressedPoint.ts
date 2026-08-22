@@ -56,14 +56,23 @@ export class Secp256k1CompressedPoint implements IBlockObject {
     }
 
     public toBinary(out: ByteBuffer): void {
-        out.put(this .prefix);
+        out.put(this.prefix);
 
         let buffx = this.x.toBinary();
-        buffx .position(0);
+        buffx.position(0);
 
         let buffxp = BigInteger.padBuffer(buffx, 32);
         buffxp.position(0);
         out.putByteBuffer(buffxp);
+    }
+
+    public static fromBinary(input : ByteBuffer) {
+        let prefix = input.get();
+    
+        let buff = input.getByteBuffer(32);
+        let xptr = BigInteger.fromBinary(buff);
+
+        return new Secp256k1CompressedPoint(xptr, prefix);
     }
 }
 

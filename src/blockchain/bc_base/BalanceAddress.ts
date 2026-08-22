@@ -1,5 +1,6 @@
 import { ScPublicKey } from "../../base/ecda/ScPublicKey";
 import { Secp256k1CompressedPoint } from "../../base/ecda/Secp256k1CompressedPoint";
+import { NullPointerException } from "../../db/base/NullPointerException";
 import { ByteBuffer } from "../../db/base_io/ByteBuffer";
 import { IBlockObject } from "../../db/filestore_block/IBlockObject";
 import { AbstractAddress } from "./AbstractAddress";
@@ -7,12 +8,16 @@ import { AbstractAddress } from "./AbstractAddress";
 export class BalanceAddress extends AbstractAddress {
     public static readonly PREFIX = "cb";
 
+    private pubkey : Secp256k1CompressedPoint | null;
+
     constructor(zone? : number, pubkey? : Secp256k1CompressedPoint){
         if(zone != undefined && pubkey != undefined){
             super(zone);
+            this.pubkey = <Secp256k1CompressedPoint>pubkey.copyData();
         }
         else {
             super(0);
+            this.pubkey = null;
         }
     }
     
@@ -24,20 +29,37 @@ export class BalanceAddress extends AbstractAddress {
     }
 
     public getType(): number {
-        throw new Error("Method not implemented.");
+        return AbstractAddress.ADDRESS_TYPE_BALANCE;
     }
     public binarySize(): number {
-        throw new Error("Method not implemented.");
+        if(this.pubkey != null){
+            let total = 1; // sizeof(uint8_t);
+            total += 2; // sizeof(this.zone);
+            total += this.pubkey.binarySize();
+
+            return total;
+        }
+        throw new NullPointerException("BalanceAddress.binarySize()");
     }
+
     public toBinary(out: ByteBuffer): void {
-        throw new Error("Method not implemented.");
+        if(this.pubkey != null){
+            out.put(this.getType());
+            out.putShort(this.zone);
+            this.pubkey.toBinary(out);
+        }
+        throw new NullPointerException("BalanceAddress.toBinary()");
     }
     public fromBinary(input: ByteBuffer): void {
-        throw new Error("Method not implemented.");
+        this.zone = input.getShort();
+        this.pubkey = Secp256k1CompressedPoint.fromBinary(input);
     }
 
     public copyData(): IBlockObject {
-        throw new Error("Method not implemented.");
+        if(this.pubkey != null){
+            return new BalanceAddress(this.zone, <Secp256k1CompressedPoint>(this.pubkey.copyData()));
+        }
+        throw new NullPointerException("BalanceAddress.copyData()");
     }
 
     public getPrefix(): string {
