@@ -3,7 +3,7 @@ import { ByteBuffer } from "../../db/base_io/ByteBuffer";
 
 
 export class Sha256 {
-    public static sha256(binary : Uint8Array, endian : boolean) {
+    public static sha256(binary : Uint8Array, endian : boolean) : ByteBuffer {
            let arr = CryptoJS.lib.WordArray.create(binary);
 
         let result = CryptoJS.SHA256(arr);

@@ -1,3 +1,5 @@
+import { RipeMd160 } from "../../base/crypto/RipeMd160";
+import { Sha256 } from "../../base/crypto/Sha256";
 import { ScPublicKey } from "../../base/ecda/ScPublicKey";
 import { Secp256k1CompressedPoint } from "../../base/ecda/Secp256k1CompressedPoint";
 import { NullPointerException } from "../../db/base/NullPointerException";
@@ -66,7 +68,20 @@ export class BalanceAddress extends AbstractAddress {
         return BalanceAddress.PREFIX;
     }
     public getBodyPart(): ByteBuffer {
-        throw new Error("Method not implemented.");
+        if(this.pubkey != null){
+            let size = this.pubkey.binarySize();
+            let buff = ByteBuffer.allocateWithEndian(size, true);
+            this.pubkey.toBinary(buff);
+
+            // sha256
+            let sha = Sha256.sha256(buff.toUint8Array(), true);
+
+            // RIPEMD-160
+            let ripe = RipeMd160.encode(sha);
+
+            return ripe;
+        }
+        throw new NullPointerException("BalanceAddress.getBodyPart()");
     }
     
 }
