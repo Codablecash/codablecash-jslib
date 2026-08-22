@@ -54,6 +54,9 @@ export class ByteBuffer {
     public position(i : number) : void {
         this.pos = i;
     }
+    public getPosition() {
+        return this.pos;
+    }
 
     public limit() : number {
         return this.lim;
