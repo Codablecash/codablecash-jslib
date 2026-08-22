@@ -18,7 +18,7 @@ export class Base58 {
         return indexes;
     }
 
-    encode(input : Uint8Array, inputLength : number) {
+    public static encode(input : Uint8Array, inputLength : number) {
         if (inputLength == 0) {
             return "";
         }
@@ -59,7 +59,7 @@ export class Base58 {
         let maxLoop = encodedLength - outputStart;
         for(let i = 0; i != maxLoop; ++i){
             let ch : number = encoded[outputStart + i];
-            str += ch;
+            str += String.fromCharCode(ch);
         }
 
         return str;

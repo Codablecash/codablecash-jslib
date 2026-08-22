@@ -8,6 +8,7 @@
     "build": "tsc",
     "prepare": "npm run build",
     "test": "jest --runInBand",
+    "testbase58": "jest --testPathPatterns=test_base58*.test",
     "testbtree": "jest --testPathPatterns=test_btree_base*.test",
     "testvbf": "jest --testPathPatterns=variable_block_filestore.test",
     "testraf": "jest --testPathPatterns=random_access_file.test",
