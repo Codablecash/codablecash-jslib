@@ -29,4 +29,5 @@ export class PasswordEncoder implements IWalletDataEncoder {
 
         return result;
     }
+    
 }

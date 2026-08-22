@@ -1,4 +1,5 @@
 import { Base64 } from "../../blockchain/bc_base/Base64";
+import * as CryptoJS from 'crypto-js';
 
 export class Aes256Cbc {
     public static readonly DEFAULT_IV : Uint8Array = new Uint8Array([0x86, 0xaf, 0xc4, 0x38, 0x68, 0xfe, 0xa6, 0xab, 0xd4, 0x0f, 0xbf, 0x6d, 0x5e, 0xd5, 0x09, 0x05]);
@@ -37,6 +38,20 @@ export class Aes256Cbc {
         return result;
     }
 
+    public decrypt(data : Uint8Array, length : number) : string {
+        let str = Base64.encode(data, data.length);
+        let wkey = CryptoJS.lib.WordArray.create(this.key256);
+        let wiv = CryptoJS.lib.WordArray.create(this.iv);
+
+        const wordArray = CryptoJS.AES.decrypt(str, wkey, {
+            iv: wiv,
+            mode: CryptoJS.mode.CBC,
+            padding: CryptoJS.pad.Pkcs7
+        });
+
+        var resultstr = wordArray.toString(CryptoJS.enc.Utf8);
+        return resultstr;
+    }
 }
 
 export class Aes256CbcResult {
