@@ -13,6 +13,10 @@ export abstract class AbstractUtxo implements IBlockObject {
         this.nonce = new Uint8Array(32);
     }
 
+    public abstract getType() : number;
+    public abstract fromBinary(input : ByteBuffer) : void;
+    public abstract build() : void;
+
     public abstract binarySize(): number;
     public abstract toBinary(out: ByteBuffer): void;
     public abstract copyData(): IBlockObject;
@@ -34,5 +38,12 @@ export abstract class AbstractUtxo implements IBlockObject {
         sha.position(0);
 
         this.nonce = sha.toUint8Array();
+    }
+
+    public getId() : UtxoId {
+        if(this.utxoId != null){
+            return this.utxoId;
+        }
+        throw new NullPointerException("AbstractUtxo.getId()");
     }
 }
