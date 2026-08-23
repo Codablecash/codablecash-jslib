@@ -2,6 +2,8 @@ import { Sha256 } from "../../base/crypto/Sha256";
 import { NullPointerException } from "../../db/base/NullPointerException";
 import { ByteBuffer } from "../../db/base_io/ByteBuffer";
 import { IBlockObject } from "../../db/filestore_block/IBlockObject";
+import { AddressDescriptor } from "../bc_base/AddressDescriptor";
+import { BalanceUnit } from "../bc_base/BalanceUnit";
 import { UtxoId } from "./UtxoId";
 
 export abstract class AbstractUtxo implements IBlockObject {
@@ -20,6 +22,13 @@ export abstract class AbstractUtxo implements IBlockObject {
     public abstract binarySize(): number;
     public abstract toBinary(out: ByteBuffer): void;
     public abstract copyData(): IBlockObject;
+
+    public abstract getAddress() : AddressDescriptor;
+    public abstract getAmount() : BalanceUnit;
+
+    public isRemote() : boolean {
+        return false;
+    }
 
     public equals(other : AbstractUtxo) : boolean {
         if(this.utxoId != null && other.utxoId != null){
