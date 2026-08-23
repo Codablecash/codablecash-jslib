@@ -79,12 +79,12 @@ export class ByteBuffer {
             throw new BufferOverflowException("getByteBuffer()");
         }
 
-        let buff = Buffer.allocate(length);
+        let buff = Buffer.alloc(length);
 
         this.data.copy(buff, 0, this.pos, this.pos + length);
         this.pos += length;
 
-        let ret = new ByteBuffer(length);
+        let ret = ByteBuffer.allocateWithEndian(length, true);
         ret.putBuffer(buff);
         ret.position(0);
 

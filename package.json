@@ -8,6 +8,7 @@
     "build": "tsc",
     "prepare": "npm run build",
     "test": "jest --runInBand",
+    "testaddrdata": "jest --testPathPatterns=test_address_data.test",
     "testenc": "jest --testPathPatterns=test_wallet_encoder.test",
     "testaes": "jest --testPathPatterns=test_aes.test",
     "testbase64": "jest --testPathPatterns=test_base64.test",
@@ -23,7 +24,6 @@
   "license": "MIT",
   "dependencies": {
     "@babel/core": "^7.29.6",
-    "@noble/hashes": "^2.3.0",
     "@types/async-lock": "^1.4.2",
     "async-lock": "^1.4.1",
     "big-integer": "^1.6.52",

@@ -23,7 +23,7 @@ export class BalanceAddress extends AbstractAddress {
         }
     }
     
-    public createAddress(zone : number, publicKey : ScPublicKey) {
+    public static createAddress(zone : number, publicKey : ScPublicKey) {
         let pubkey = Secp256k1CompressedPoint.compress(publicKey);
         let address = new BalanceAddress(zone, <Secp256k1CompressedPoint>(pubkey.copyData()));
 
@@ -49,6 +49,7 @@ export class BalanceAddress extends AbstractAddress {
             out.put(this.getType());
             out.putShort(this.zone);
             this.pubkey.toBinary(out);
+            return;
         }
         throw new NullPointerException("BalanceAddress.toBinary()");
     }
@@ -77,9 +78,11 @@ export class BalanceAddress extends AbstractAddress {
             let sha = Sha256.sha256(buff.toUint8Array(), true);
 
             // RIPEMD-160
-            let ripe = RipeMd160.encode(sha);
+            let ripe : string = RipeMd160.encode(sha);
 
-            return ripe;
+            let ripebuffer = Buffer.from(ripe, "utf8");
+
+            return ByteBuffer.wrapWithEndian(ripebuffer, ripebuffer.length, true);
         }
         throw new NullPointerException("BalanceAddress.getBodyPart()");
     }

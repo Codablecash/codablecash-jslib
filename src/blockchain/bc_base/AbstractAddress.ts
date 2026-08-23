@@ -1,6 +1,7 @@
 import { ByteBuffer } from "../../db/base_io/ByteBuffer";
 import { IBlockObject } from "../../db/filestore_block/IBlockObject";
 import { AddressDescriptor } from "./AddressDescriptor";
+import { BalanceAddress } from "./BalanceAddress";
 
 export abstract class AbstractAddress implements IBlockObject{
 	public static readonly ADDRESS_TYPE_BALANCE = 1;
@@ -14,6 +15,31 @@ export abstract class AbstractAddress implements IBlockObject{
     }
 
     public abstract getType() : number;
+
+    public static createFromBinary(input : ByteBuffer) {
+        let ret : AbstractAddress | null = null;
+
+        let type = input.get();
+        switch(type){
+        case AbstractAddress.ADDRESS_TYPE_BALANCE:
+            ret = new BalanceAddress();
+            break;
+        case AbstractAddress.ADDRESS_TYPE_SMARTCONTRACT_MODULE:
+            //ret = new SmartcontractModuleAddress();
+            break;
+        case AbstractAddress.ADDRESS_TYPE_SMARTCONTRACT_INSTANCE:
+            //ret = new SmartcontractInstanceAddress();
+            break;
+        default:
+            return null;
+        }
+
+        if(ret != null){ // guard
+            ret.fromBinary(input);
+        }
+        
+        return ret;
+    }
 
     public abstract binarySize(): number;
     public abstract toBinary(out: ByteBuffer): void;
