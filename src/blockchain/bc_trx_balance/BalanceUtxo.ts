@@ -106,6 +106,6 @@ export class BalanceUtxo extends AbstractUtxo {
             throw new FeeShortageException("at discountFee()");
         }
 
-        this.amount.sub(feeRemain);
+        this.amount.subSelf(feeRemain);
     }
 }
