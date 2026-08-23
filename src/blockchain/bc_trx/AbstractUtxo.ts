@@ -7,6 +7,11 @@ import { BalanceUnit } from "../bc_base/BalanceUnit";
 import { UtxoId } from "./UtxoId";
 
 export abstract class AbstractUtxo implements IBlockObject {
+    public static TRX_UTXO_BALANCE = 1;
+    public static TRX_UTXO_TICKET = 2;
+    public static TRX_UTXO_VOTED_TICKET = 3;
+    public static TRX_UTXO_REMOTE_BALANCE = 4;
+
     private utxoId : UtxoId | null;
     private nonce : Uint8Array;
 
