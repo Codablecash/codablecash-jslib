@@ -9,9 +9,9 @@ import { UtxoId } from "../bc_trx/UtxoId";
 import { FeeShortageException } from "./FeeShortageException";
 
 
-class BalanceUtxo extends AbstractUtxo {
-	private addressDesc : AddressDescriptor | null;
-	private amount : BalanceUnit;
+export class BalanceUtxo extends AbstractUtxo {
+	protected addressDesc : AddressDescriptor | null;
+	protected amount : BalanceUnit;
 
     constructor(amount : BalanceUnit){
         super();
