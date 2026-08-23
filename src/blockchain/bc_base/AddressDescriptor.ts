@@ -1,8 +1,9 @@
 import { ByteBuffer } from "../../db/base_io/ByteBuffer";
+import { IBlockObject } from "../../db/filestore_block/IBlockObject";
 import { AddressCheckDigitException } from "./AddressCheckDigitException";
 import { Base58 } from "./Base58";
 
-export class AddressDescriptor {
+export class AddressDescriptor implements IBlockObject {
     public static PREFIX_LENGTH : number = 2;
     public static ZONE_LENGTH : number = 3;
     public static CHECKDIGIT_LENGTH : number = 2;
@@ -33,6 +34,40 @@ export class AddressDescriptor {
             this.importCstring(prefix);
         }
 
+    }
+
+    public binarySize(): number {
+        let total = 1 * 5;
+
+        total += 1;
+        total += this.body.limit();
+
+        return total;
+    }
+    public toBinary(out: ByteBuffer): void {
+        out.putArray(this.prefix, 0, AddressDescriptor.PREFIX_LENGTH);
+        out.putArray(this.zone, 0, AddressDescriptor.ZONE_LENGTH);
+
+        this.body.position(0);
+        let size = this.body.limit();
+        out.put(size);
+
+        out.putByteBuffer(this.body);
+    }
+    public static createFromBinary(input : ByteBuffer) : AddressDescriptor {
+        let prefix = input.getByteBuffer(AddressDescriptor.PREFIX_LENGTH);
+        let zone = input.getByteBuffer(AddressDescriptor.ZONE_LENGTH);
+
+        let length = input.get();
+  
+        let dest = input.getByteBuffer(length);
+
+        return new AddressDescriptor(prefix.toUint8Array(), zone.toUint8Array(), dest.toUint8Array(), length);
+    }
+
+    public copyData() : IBlockObject {
+        let inst = new AddressDescriptor(this.prefix, this.zone, this.body.toUint8Array(), this.body.limit());
+        return inst;
     }
 
     private importCstring(cstr : Uint8Array){
