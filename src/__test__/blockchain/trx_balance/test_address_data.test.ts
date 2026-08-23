@@ -20,17 +20,20 @@ describe('TestAddressDataGroup', () => {
         buff.position(0);
         let addr = BalanceAddress.createFromBinary(buff);
 
-        // FIXME 
+        if(addr != null){
+            let address2 = <BalanceAddress>addr.copyData();
+
+            let desc = address.toAddressDescriptor();
+            let desc2 = address2.toAddressDescriptor();
+
+            let cmp = desc.compareTo(desc2);
+            expect(cmp == 0).toBe(true);
+        }
+        
         
         /**
          * 
-         * 	BalanceAddress* address2 = dynamic_cast<BalanceAddress*>(addr->copyData()); __STP(address2);
-
-	AddressDescriptor* desc = address->toAddressDescriptor(); __STP(desc);
-	AddressDescriptor* desc2 = address2->toAddressDescriptor(); __STP(desc2);
-
-	CHECK(desc->compareTo(desc2) == 0);
-
+         * 	
 	AddressDescriptorData* data = new AddressDescriptorData(desc); __STP(data);
 	AddressDescriptorData* data2 = dynamic_cast<AddressDescriptorData*>(data->copyData()); __STP(data2);
 

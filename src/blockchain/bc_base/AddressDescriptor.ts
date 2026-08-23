@@ -63,32 +63,30 @@ export class AddressDescriptor {
         if(__checkDigit != this.checkDigit){
             throw new AddressCheckDigitException("Wrong address descriptor");
         }
-/*
-	int length = Mem::strlen(cstr);
+    }
 
-	Mem::memcpy(this.prefix, cstr, AddressDescriptor::PREFIX_LENGTH);
-	Mem::memcpy(this.zone, cstr + AddressDescriptor::PREFIX_LENGTH, AddressDescriptor::ZONE_LENGTH);
+    public toCString() : string {
+        let str = Base58.encode(this.body.toUint8Array(), this.body.limit());
 
-	int bodylength = length - AddressDescriptor::PREFIX_LENGTH - AddressDescriptor::ZONE_LENGTH
-			- AddressDescriptor::CHECKDIGIT_LENGTH;
-	char* bodycstr = new char[bodylength + 1];
-	Mem::memset(bodycstr, 0, bodylength + 1);
-	StackArrayRelease<const char> __st_bodycstr(bodycstr);
+        let bodyCstr = Buffer.from(str, "utf8");
 
-	Mem::memcpy(bodycstr, cstr + AddressDescriptor::PREFIX_LENGTH + AddressDescriptor::ZONE_LENGTH, bodylength);
+        let bodylength = str.length;
+        let capacity = AddressDescriptor.PREFIX_LENGTH + AddressDescriptor.ZONE_LENGTH
+                + bodylength + AddressDescriptor.CHECKDIGIT_LENGTH;
+        let buff = ByteBuffer.allocateWithEndian(capacity, true);
 
-	UnicodeString str(bodycstr);
-	this.body = Base58::decode(&str);
+        buff.putArray(this.prefix, 0, AddressDescriptor.PREFIX_LENGTH);
+        buff.putArray(this.zone, 0, AddressDescriptor.ZONE_LENGTH);
 
-	// check checkdigits
-	char __checkDigit[2];
-	Mem::memcpy(__checkDigit, cstr + AddressDescriptor::PREFIX_LENGTH + AddressDescriptor::ZONE_LENGTH + bodylength, AddressDescriptor::CHECKDIGIT_LENGTH);
+        buff.putArray(bodyCstr, 0, bodylength);
+        buff.putArray(this.checkDigit, 0, AddressDescriptor.CHECKDIGIT_LENGTH);
 
-	makeCheckDigit();
+        buff.position(0);
 
-	int cmp = Mem::memcmp(this.checkDigit, __checkDigit, AddressDescriptor::CHECKDIGIT_LENGTH);
-	ExceptionThrower<AddressCheckDigitException>::throwExceptionIfCondition(cmp != 0, L"Check digit error.", __FILE__, __LINE__);
-*/
+        let retar = buff.toUint8Array();
+        let ret = new TextDecoder().decode(retar);
+
+        return ret;
     }
 
     public makeCheckDigit() {
@@ -106,5 +104,14 @@ export class AddressDescriptor {
 
         let checkdigitstr = checkdigit.toString(10).padStart(2, "0");
         this.checkDigit = Buffer.from(checkdigitstr, "utf8");
+    }
+
+    public compareTo(other : AddressDescriptor) : number {
+        let thiscstr = this.toCString();
+        let othercstr = other.toCString();
+
+        const strcmp = (a: string, b: string): number => (a < b ? -1 : a > b ? 1 : 0);
+
+        return strcmp(thiscstr, othercstr);
     }
 }
