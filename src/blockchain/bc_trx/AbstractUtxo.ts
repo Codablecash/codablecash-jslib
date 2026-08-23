@@ -12,8 +12,8 @@ export abstract class AbstractUtxo implements IBlockObject {
     public static TRX_UTXO_VOTED_TICKET = 3;
     public static TRX_UTXO_REMOTE_BALANCE = 4;
 
-    private utxoId : UtxoId | null;
-    private nonce : Uint8Array;
+    protected utxoId : UtxoId | null;
+    protected nonce : Uint8Array;
 
     constructor() {
         this.utxoId = null;

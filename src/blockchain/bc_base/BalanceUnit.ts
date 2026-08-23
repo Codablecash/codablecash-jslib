@@ -56,4 +56,8 @@ export class BalanceUnit implements IBlockObject {
         return this.amount == other.amount ? 0 : ( this.amount > other.amount ? 1 : -1);
     }
 
+    public sub(val : BalanceUnit) : BalanceUnit {
+        this.amount -= val.amount;
+        return this;
+    }
 }

@@ -1,8 +1,12 @@
+import { Sha256 } from "../../base/crypto/Sha256";
+import { NullPointerException } from "../../db/base/NullPointerException";
 import { ByteBuffer } from "../../db/base_io/ByteBuffer";
 import { IBlockObject } from "../../db/filestore_block/IBlockObject";
 import { AddressDescriptor } from "../bc_base/AddressDescriptor";
 import { BalanceUnit } from "../bc_base/BalanceUnit";
 import { AbstractUtxo } from "../bc_trx/AbstractUtxo";
+import { UtxoId } from "../bc_trx/UtxoId";
+import { FeeShortageException } from "./FeeShortageException";
 
 
 class BalanceUtxo extends AbstractUtxo {
@@ -12,32 +16,96 @@ class BalanceUtxo extends AbstractUtxo {
     constructor(amount : BalanceUnit){
         super();
         this.addressDesc = null;
-        
+        this.amount = <BalanceUnit>amount.copyData();
     }
 
     public getType(): number {
-        throw new Error("Method not implemented.");
-    }
-    public fromBinary(input: ByteBuffer): void {
-        throw new Error("Method not implemented.");
-    }
-    public build(): void {
-        throw new Error("Method not implemented.");
-    }
-    public binarySize(): number {
-        throw new Error("Method not implemented.");
-    }
-    public toBinary(out: ByteBuffer): void {
-        throw new Error("Method not implemented.");
-    }
-    public copyData(): IBlockObject {
-        throw new Error("Method not implemented.");
-    }
-    public getAddress(): AddressDescriptor {
-        throw new Error("Method not implemented.");
-    }
-    public getAmount(): BalanceUnit {
-        throw new Error("Method not implemented.");
+        return AbstractUtxo.TRX_UTXO_BALANCE;
     }
 
+    public setAddress(desc : AddressDescriptor) : void {
+        this.addressDesc = <AddressDescriptor>desc.copyData();
+    }
+
+    public binarySize(): number {
+        if(this.utxoId != null && this.addressDesc != null){
+            let total = 1;
+
+            total += this.utxoId.binarySize();
+
+            total += this.addressDesc.binarySize();
+            total += this.amount.binarySize();
+
+            return total;
+        }
+        throw new NullPointerException("BalanceUtxo.binarySize()");
+    }
+    public toBinary(out: ByteBuffer): void {
+        if(this.utxoId != null && this.addressDesc != null){
+            out.put(this.getType());
+
+            this.utxoId.toBinary(out);
+
+            this.addressDesc.toBinary(out);
+            this.amount.toBinary(out);
+        }
+        throw new NullPointerException("BalanceUtxo.toBinary()");
+    }
+    public fromBinary(input: ByteBuffer): void {
+        this.utxoId = UtxoId.fromBinary(input);
+
+        this.addressDesc = AddressDescriptor.createFromBinary(input);
+
+        let unit = BalanceUnit.fromBinary(input);
+        if(unit != null){
+            this.amount = unit;
+        }else{
+            throw new NullPointerException("BalanceUtxo.fromBinary()");
+        }
+    }
+
+    public copyData(): IBlockObject {
+        if(this.addressDesc != null){
+            let inst = new BalanceUtxo(this.amount);
+            inst.setAddress(this.addressDesc);
+            return inst;
+        }
+        throw new NullPointerException("BalanceUtxo.copyData()");
+    }
+
+    public getAddress(): AddressDescriptor {
+        throw this.addressDesc;
+    }
+    public getAmount(): BalanceUnit {
+        return this.amount;
+    }
+
+    public build() : void {
+        if(this.addressDesc != null){
+            let capacity = this.addressDesc.binarySize();
+            capacity += this.amount.binarySize();
+            capacity += 32; // nonce
+
+            let buff = ByteBuffer.allocateWithEndian(capacity, true);
+
+            this.addressDesc.toBinary(buff);
+            this.amount.toBinary(buff);
+            buff.putArray(this.nonce, 0, 32);
+            buff.position(0);
+
+            let sha = Sha256.sha256(buff.toUint8Array(), true);
+
+            this.utxoId = new UtxoId(sha.toUint8Array(), sha.limit());
+            return;
+        }
+        throw new NullPointerException("BalanceUtxo.build()");
+    }
+
+    public discountFee(feeRemain : BalanceUnit) {
+        if(this.amount.compareTo(feeRemain) < 0){
+            throw new FeeShortageException("at discountFee()");
+        }
+
+        this.amount.sub(feeRemain);
+    }
 }
