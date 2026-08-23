@@ -2,9 +2,9 @@ import { Sha256 } from "../../base/crypto/Sha256";
 import { ByteBuffer } from "../../db/base_io/ByteBuffer";
 
 export class BloomFilter {
-    private byteLength : number;
-    private buffer : Uint8Array;
-    private bitlength : number;
+    protected byteLength : number;
+    protected buffer : Uint8Array;
+    protected bitlength : number;
 
     constructor(byteLength : number) {
         this.byteLength = byteLength;
