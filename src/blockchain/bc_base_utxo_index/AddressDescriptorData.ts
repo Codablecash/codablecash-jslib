@@ -17,7 +17,7 @@ export class AddressDescriptorData implements IBlockObject {
     public toBinary(out: ByteBuffer): void {
         this.desc.toBinary(out);
     }
-    public fromBinary(input : ByteBuffer) {
+    public static fromBinary(input : ByteBuffer) {
         let desc = AddressDescriptor.createFromBinary(input);
         return new AddressDescriptorData(desc);
     }
