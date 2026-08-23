@@ -13,10 +13,15 @@ export class BalanceUtxo extends AbstractUtxo {
 	protected addressDesc : AddressDescriptor | null;
 	protected amount : BalanceUnit;
 
-    constructor(amount : BalanceUnit){
+    constructor(amount? : BalanceUnit){
         super();
         this.addressDesc = null;
-        this.amount = <BalanceUnit>amount.copyData();
+
+        if(amount != undefined){
+            this.amount = <BalanceUnit>amount.copyData();
+        }else{
+            this.amount = new BalanceUnit(0);
+        }
     }
 
     public getType(): number {

@@ -4,6 +4,10 @@ import { ByteBuffer } from "../../db/base_io/ByteBuffer";
 import { IBlockObject } from "../../db/filestore_block/IBlockObject";
 import { AddressDescriptor } from "../bc_base/AddressDescriptor";
 import { BalanceUnit } from "../bc_base/BalanceUnit";
+import { TicketUtxo } from "../bc_finalizer_trx/TicketUtxo";
+import { TicketVotedUtxo } from "../bc_finalizer_trx/TicketVotedUtxo";
+import { BalanceUtxo } from "../bc_trx_balance/BalanceUtxo";
+import { RemoteBalanceUtxo } from "../bc_trx_icc/RemoteBalanceUtxo";
 import { UtxoId } from "./UtxoId";
 
 export abstract class AbstractUtxo implements IBlockObject {
@@ -19,6 +23,32 @@ export abstract class AbstractUtxo implements IBlockObject {
         this.utxoId = null;
         this.nonce = new Uint8Array(32);
     }
+
+public static createFromBinary(input : ByteBuffer) {
+	let ret : AbstractUtxo | null = null;
+
+	let type = input.get();
+	switch(type){
+	case AbstractUtxo.TRX_UTXO_BALANCE:
+		ret = new BalanceUtxo();
+		break;
+	case AbstractUtxo.TRX_UTXO_TICKET:
+		ret = new TicketUtxo();
+		break;
+	case AbstractUtxo.TRX_UTXO_VOTED_TICKET:
+		ret = new TicketVotedUtxo();
+		break;
+	case AbstractUtxo.TRX_UTXO_REMOTE_BALANCE:
+		ret = new RemoteBalanceUtxo();
+		break;
+	default:
+		return null;
+	}
+
+	ret.fromBinary(input);
+
+	return ret;
+}
 
     public abstract getType() : number;
     public abstract fromBinary(input : ByteBuffer) : void;
