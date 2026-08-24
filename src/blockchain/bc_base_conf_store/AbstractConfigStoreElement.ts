@@ -21,7 +21,7 @@ export abstract class AbstractConfigStoreElement {
 
     public static createFromBinary(input : ByteBuffer) : AbstractConfigStoreElement {
         let t = input.get();
-        let ret : AbstractConfigStoreElement = null;
+        let ret : AbstractConfigStoreElement | null = null;
         
         if(t == AbstractConfigStoreElement.TYPE_LONG_VALUE){
             ret = new LongValueConfigStoreValue();
