@@ -8,4 +8,8 @@ export class WalletAccount extends AbstractWalletAccount {
         super(0, 0);
         this.accountBaseDir = accountBaseDir;
     }
+
+	public getAccountBaseDir() : CFile {
+		return this.accountBaseDir;
+	}
 }
