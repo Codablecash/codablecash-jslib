@@ -1,6 +1,7 @@
 import { ByteBuffer } from "../../db/base_io/ByteBuffer";
 import { AbstractBtreeKey } from "../../db/btree/AbstractBtreeKey";
 import { BtreeKeyFactory } from "../../db/btreekey/BtreeKeyFactory";
+import { TransactionIdKey } from "./TransactionIdKey";
 
 export class TransactionIdKeyFactory extends BtreeKeyFactory {
     public static readonly TRANSACTION_ID_KEY = 0x14;
@@ -11,7 +12,7 @@ export class TransactionIdKeyFactory extends BtreeKeyFactory {
             return key;
         }
 
-        return BtreeKeyFactory.fromBinary(keyType, input);
+        return super.fromBinary(keyType, input);
     }
 
     public copy() : BtreeKeyFactory {
