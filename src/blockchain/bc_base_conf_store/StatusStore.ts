@@ -50,6 +50,16 @@ export class StatusStore {
         this.addValue(key, v);
     }
 
+    public addShortValue(key : string, shortInt : number) {
+        this.addShortValue(key, shortInt);
+    }
+
+    public addBinaryValue(key : string, data : Uint8Array, length : number) {
+        let value = new BinaryValueConfigStoreValue();
+        value.init(data, length);
+
+        this.addValue(key, value);
+    }
 
     public addValue(key : string, value : AbstractConfigStoreElement) {
         this.__nlk_addValue(key, value);
