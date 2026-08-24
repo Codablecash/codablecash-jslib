@@ -6,6 +6,7 @@ import { NullPointerException } from "../../db/base/NullPointerException";
 import { ByteBuffer } from "../../db/base_io/ByteBuffer";
 import { IBlockObject } from "../../db/filestore_block/IBlockObject";
 import { AbstractAddress } from "./AbstractAddress";
+import { AddressDescriptor } from "./AddressDescriptor";
 
 export class BalanceAddress extends AbstractAddress {
     public static readonly PREFIX = "cb";
@@ -87,4 +88,17 @@ export class BalanceAddress extends AbstractAddress {
         throw new NullPointerException("BalanceAddress.getBodyPart()");
     }
     
+    public toAddressDescriptor() : AddressDescriptor {
+        let prefix = Buffer.from(this.getPrefix(), "utf8");
+
+        let zonech = this.zone.toString(16).padStart(3, "0");
+        let zonearray = Buffer.from(zonech, "utf8");
+
+        let body = this.getBodyPart();
+        body.position(0);
+        let charstr = body.toUint8Array();
+        let length = body.limit();
+
+        return new AddressDescriptor(prefix, zonearray, charstr, length);
+    }
 }

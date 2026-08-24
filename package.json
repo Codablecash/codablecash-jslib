@@ -8,6 +8,7 @@
     "build": "tsc",
     "prepare": "npm run build",
     "test": "jest --runInBand",
+    "testbloom": "jest --testPathPatterns=test_bloomfilter.test",
     "testaddrdata": "jest --testPathPatterns=test_address_data.test",
     "testenc": "jest --testPathPatterns=test_wallet_encoder.test",
     "testaes": "jest --testPathPatterns=test_aes.test",

@@ -124,6 +124,16 @@ export class ByteBuffer {
         this.pos += 8;
         return res;
     }
+    public getULong() : bigint {
+       if(this.remaining() < 4){
+            throw new BufferOverflowException("getInt()");
+        }
+
+        let res = this.data.readBigUInt64BE(this.pos);
+        this.pos += 8;
+        return res;
+    }
+
     public toBigInteger() : BigInteger {
         let val = toBigIntBE(this.data);
         let ret = new BigInteger(val);

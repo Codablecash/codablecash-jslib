@@ -20,9 +20,9 @@ export class BloomFilter {
 
         let l = BigInt(this.bitlength);
 
-        let _v1 = (bb.getLong());
-        let _v2 = (bb.getLong());
-        let _v3 = (bb.getLong());
+        let _v1 = (bb.getULong());
+        let _v2 = (bb.getULong());
+        let _v3 = (bb.getULong());
 
         let v1 = Number(_v1 % l);
         let v2 = Number(_v2 % l);
@@ -34,7 +34,7 @@ export class BloomFilter {
     }
 
     public setBit(pos : number) : void {
-        let nbytes = pos / 8;
+        let nbytes = Math.trunc(pos / 8);
         let shift = pos % 8;
 
         let v = this.buffer[nbytes] | (1 << shift);
@@ -42,7 +42,7 @@ export class BloomFilter {
     }
 
     public hasBit(pos : number) : boolean {
-        let nbytes = pos / 8;
+        let nbytes = Math.trunc(pos / 8);
         let shift = pos % 8;
 
         let filter = (1 << shift);
@@ -57,9 +57,9 @@ export class BloomFilter {
 
         let l = BigInt(this.bitlength);
 
-        let _v1 = (bb.getLong());
-        let _v2 = (bb.getLong());
-        let _v3 = (bb.getLong());
+        let _v1 = (bb.getULong());
+        let _v2 = (bb.getULong());
+        let _v3 = (bb.getULong());
 
         let v1 = Number(_v1 % l);
         let v2 = Number(_v2 % l);
