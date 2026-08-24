@@ -12,6 +12,10 @@ export class AddressDescriptorUtxoData implements IBlockObject {
         this.list = new ArrayList<AbstractUtxo>();
     }
 
+    public getList() {
+        return this.list;
+    }
+
     public binarySize(): number {
         let total = 2; //sizeof(uint16_t);
 

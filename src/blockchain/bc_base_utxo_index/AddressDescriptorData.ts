@@ -9,6 +9,10 @@ export class AddressDescriptorData implements IBlockObject {
         this.desc = <AddressDescriptor>desc.copyData();
     }
 
+    public getDescriptor() : AddressDescriptor {
+        return this.desc;
+    }
+
     public binarySize(): number {
         let total = this.desc.binarySize();
 

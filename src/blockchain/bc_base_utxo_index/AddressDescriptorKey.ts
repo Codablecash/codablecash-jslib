@@ -22,6 +22,9 @@ export class AddressDescriptorKey extends AbstractBtreeKey {
         }
         throw new NullPointerException("AddressDescriptorKey.getUtxo()");
     }
+    public setUtxo(utxo : AbstractUtxo) : void {
+        this.utxo = utxo;
+    }
 
 	public isInfinity() : boolean {
         return false;
