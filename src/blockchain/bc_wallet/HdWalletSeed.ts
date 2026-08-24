@@ -25,4 +25,11 @@ export class HdWalletSeed extends Abstract32BytesId {
         throw new NullPointerException("Abstract32BytesId.size()"); 
     }
 
+	public getByteBuffer() : ByteBuffer {
+        if(this.id != null){
+            return this.id;
+        }
+		throw new NullPointerException("Abstract32BytesId.getByteBuffer()"); 
+	}
+
 }
