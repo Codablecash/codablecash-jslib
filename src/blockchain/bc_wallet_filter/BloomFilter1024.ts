@@ -54,9 +54,9 @@ export class BloomFilter1024 extends BloomFilter implements IBlockObject {
 
         let l = BigInt(this.bitlength);
 
-        let _v1 = (bb.getLong());
-        let _v2 = (bb.getLong());
-        let _v3 = (bb.getLong());
+        let _v1 = (bb.getULong());
+        let _v2 = (bb.getULong());
+        let _v3 = (bb.getULong());
 
         let v1 = Number(_v1 % l);
         let v2 = Number(_v2 % l);
