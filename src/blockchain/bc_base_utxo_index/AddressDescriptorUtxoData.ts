@@ -88,4 +88,60 @@ export class AddressDescriptorUtxoData implements IBlockObject {
 
         return ret;
     }
+
+    public join(value : AddressDescriptorUtxoData) : void {
+        let newList = value.list;
+
+        let maxLoop = newList.size();
+        for(let i = 0; i != maxLoop; ++i){
+            let v = newList.get(i);
+
+            if(v != null){ // guard
+                if(this.contains(v)){
+                    continue;
+                }
+
+                let element = <AbstractUtxo>(v.copyData());
+                this.list.addElement(element);
+            }
+        }
+    }
+
+    public contains(value : AbstractUtxo) : boolean {
+        let maxLoop = this.list.size();
+        for(let i = 0; i != maxLoop; ++i){
+            let v = this.list.get(i);
+
+            if(v != null && v.equals(value)){
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public remove(value : AbstractUtxo) : void {
+        let index = this.indexof(value);
+
+        if(index >= 0){
+            this.list.remove(index);
+        }
+    }
+
+    public indexof(value : AbstractUtxo) : number {
+        let maxLoop = this.list.size();
+        for(let i = 0; i != maxLoop; ++i){
+            let v = this.list.get(i);
+            if(v != null && v.equals(value)){
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    public isEmpty() : boolean {
+        return this.list.size() == 0;
+    }
+
 }
