@@ -60,4 +60,9 @@ export class BalanceUnit implements IBlockObject {
         this.amount -= val.amount;
         return this;
     }
+
+    public addSelf(val : BalanceUnit) : BalanceUnit {
+        this.amount += val.amount;
+        return this; 
+    }
 }

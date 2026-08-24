@@ -1,3 +1,4 @@
+import { NullPointerException } from "../../db/base/NullPointerException";
 import { ByteBuffer } from "../../db/base_io/ByteBuffer";
 import { AbstractBtreeKey } from "../../db/btree/AbstractBtreeKey";
 import { AddressDescriptor } from "../bc_base/AddressDescriptor";
@@ -13,6 +14,13 @@ export class AddressDescriptorKey extends AbstractBtreeKey {
         super();
         this.desc = <AddressDescriptor>(desc.copyData());
         this.utxo = null;
+    }
+
+    public getUtxo() : AbstractUtxo {
+        if(this.utxo != null){
+            return this.utxo;
+        }
+        throw new NullPointerException("AddressDescriptorKey.getUtxo()");
     }
 
 	public isInfinity() : boolean {
