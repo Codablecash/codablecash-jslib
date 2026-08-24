@@ -1,9 +1,12 @@
+import { NullPointerException } from "../../db/base/NullPointerException";
 import { ByteBuffer } from "../../db/base_io/ByteBuffer";
 import { CFile } from "../../db/base_io/CFile";
 import { DiskCacheManager } from "../../db/random_access_file/DiskCacheManager";
 import { RandomAccessFile } from "../../db/random_access_file/RandomAccessFile";
 import { AbstractConfigStoreElement } from "./AbstractConfigStoreElement";
+import { BinaryValueConfigStoreValue } from "./BinaryValueConfigStoreValue";
 import { LongValueConfigStoreValue } from "./LongValueConfigStoreValue";
+import { ShortValueConfigStoreValue } from "./ShortValueConfigStoreValue";
 
 export class StatusStore {
     private file: CFile;
@@ -58,6 +61,35 @@ export class StatusStore {
         this.open();
         this.write();
         this.close();
+    }
+
+    public getShortValue(key : string) : number {
+        let v = this.getValue(key);
+        let value = <ShortValueConfigStoreValue>(v);
+
+        return value.getValue();
+    }
+
+    public getBinaryValue(key : string) : ByteBuffer {
+        let v = this.getValue(key);
+        let value = <BinaryValueConfigStoreValue>(v);
+
+        return ByteBuffer.wrapWithEndian(value.getData(), value.getLength(), true);
+    }    
+
+    public getLongValue(key : string) : bigint {
+        let v = this.getValue(key);
+        let value = <LongValueConfigStoreValue>(v);
+
+        return value.getValue();
+    }
+
+    public getValue(key : string) : AbstractConfigStoreElement {
+        let v = this.map.get(key);
+        if(v != undefined){
+            return v;
+        }
+        throw new NullPointerException("StatusStore.getValue() key : " + key);
     }
 
     public load() : void {
