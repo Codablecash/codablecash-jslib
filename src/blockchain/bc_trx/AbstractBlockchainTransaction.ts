@@ -47,7 +47,7 @@ export abstract class AbstractBlockchainTransaction implements IBlockObject{
 	public abstract getFee() : BalanceUnit;
 	public abstract getFeeRate() : BalanceUnit;
 
-	public abstract getUtxoSize() : NumberConstructor;
+	public abstract getUtxoSize() : number;
 	public abstract getUtxo(i : number) : AbstractUtxo;
 	public abstract getUtxoReferenceSize(): number;
 	public abstract getUtxoReference(i : number) : AbstractUtxoReference;
