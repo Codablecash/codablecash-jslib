@@ -1,8 +1,9 @@
 import { Secp256k1CompressedPoint } from "../../base/ecda/Secp256k1CompressedPoint";
 import { ByteBuffer } from "../../db/base_io/ByteBuffer";
+import { IBlockObject } from "../../db/filestore_block/IBlockObject";
 import { BigInteger } from "../../db/numeric/BigInteger";
 
-export class BalanceUtxoSign {
+export class BalanceUtxoSign implements IBlockObject {
     private R : Secp256k1CompressedPoint;
 	private s : BigInteger;
 
@@ -29,13 +30,23 @@ export class BalanceUtxoSign {
         out.putByteBuffer(bin32);
     }
 
-public static fromBinary(input : ByteBuffer) : BalanceUtxoSign {
-	let pt = Secp256k1CompressedPoint.fromBinary(input);
-	
-	let buff = input.getByteBuffer(32);
-	let bi = buff.toBigInteger();
+    public static fromBinary(input : ByteBuffer) : BalanceUtxoSign {
+        let pt = Secp256k1CompressedPoint.fromBinary(input);
+        
+        let buff = input.getByteBuffer(32);
+        let bi = buff.toBigInteger();
 
-	return new BalanceUtxoSign(pt, bi);
-}
+        return new BalanceUtxoSign(pt, bi);
+    }
 
+    public copyData() : IBlockObject {
+        return new BalanceUtxoSign(this.R, this.s);
+    }
+
+	public getR() : Secp256k1CompressedPoint {
+		return this.R;
+	}
+	public gets() : BigInteger {
+		return this.s;
+	}
 }
