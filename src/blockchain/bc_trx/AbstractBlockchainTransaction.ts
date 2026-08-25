@@ -56,7 +56,15 @@ export abstract class AbstractBlockchainTransaction implements IBlockObject{
     public abstract toBinary(out: ByteBuffer): void;
     public abstract fromBinary(input: ByteBuffer): void;
 
-    public abstract copyData(): IBlockObject;
+    public copyData(): IBlockObject {
+        let cap = this.binarySize();
+        let buff = ByteBuffer.allocateWithEndian(cap, true);
+
+        this.toBinary(buff);
+        buff.position(0);
+
+        return AbstractBlockchainTransaction.createFromBinary(buff);
+    }
 
 	public getTimestamp() : SystemTimestamp {
 		return this.timestamp;
