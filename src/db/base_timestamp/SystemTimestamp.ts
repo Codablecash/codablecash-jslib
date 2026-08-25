@@ -1,7 +1,5 @@
 import { ByteBuffer } from "../base_io/ByteBuffer";
 
-const microtime = require("microtime");
-
 export class SystemTimestamp {
     protected sec : bigint;
 	protected usec : number;
@@ -12,9 +10,11 @@ export class SystemTimestamp {
             this.usec = usec;
         }
         else{
-            let microtimeNow = microtime.now();
-            this.sec = BigInt(Math.trunc(microtimeNow / 1000000));
-            this.usec = microtimeNow & 1000000;
+            const now = new Date();
+
+            //let microtimeNow = microtime.now();
+            this.sec = BigInt(Math.trunc(now.getTime() / 1000));
+            this.usec = (now.getTime() % 1000)* 1000;
         }        
     }
 
@@ -55,5 +55,13 @@ export class SystemTimestamp {
         return this.sec == 0n && this.usec == 0;
     }
 
-    
+    public getDate() : Date {
+        let mills = Number(this.sec * 1000n) + Math.trunc(this.usec / 1000);
+
+        let d = new Date(mills);
+        //d.setTime(Number(this.sec));
+
+        return d;
+    }
+
 }
