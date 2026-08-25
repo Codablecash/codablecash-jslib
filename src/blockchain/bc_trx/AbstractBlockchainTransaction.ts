@@ -1,6 +1,9 @@
 import { ByteBuffer } from "../../db/base_io/ByteBuffer";
 import { SystemTimestamp } from "../../db/base_timestamp/SystemTimestamp";
 import { IBlockObject } from "../../db/filestore_block/IBlockObject";
+import { BalanceUnit } from "../bc_base/BalanceUnit";
+import { AbstractUtxo } from "./AbstractUtxo";
+import { AbstractUtxoReference } from "./AbstractUtxoReference";
 import { TransactionId } from "./TransactionId";
 import { TransactionVersion } from "./TransactionVersion";
 
@@ -22,20 +25,41 @@ export abstract class AbstractBlockchainTransaction implements IBlockObject{
     protected timestamp : SystemTimestamp;
     protected version : TransactionVersion;
 
+    public static createFromBinary(input : ByteBuffer) : AbstractBlockchainTransaction {
+        throw new Error("not implemented");
+        /*let ret : AbstractBlockchainTransaction;
+        
+        ret.fromBinary();
+        ret.build();
+
+        return ret;*/
+    }
+
     constructor() {
         this.trxId = null;
         this.timestamp = new SystemTimestamp();
         this.version = new TransactionVersion(1, 0 , 0);        
     }
 
-    binarySize(): number {
-        throw new Error("Method not implemented.");
-    }
-    toBinary(out: ByteBuffer): void {
-        throw new Error("Method not implemented.");
-    }
-    copyData(): IBlockObject {
-        throw new Error("Method not implemented.");
-    }
+    public abstract getType() : number;
+    public abstract build() : void;
+
+	public abstract getFee() : BalanceUnit;
+	public abstract getFeeRate() : BalanceUnit;
+
+	public abstract getUtxoSize() : NumberConstructor;
+	public abstract getUtxo(i : number) : AbstractUtxo;
+	public abstract getUtxoReferenceSize(): number;
+	public abstract getUtxoReference(i : number) : AbstractUtxoReference;
+
+    public abstract binarySize(): number;
+    public abstract toBinary(out: ByteBuffer): void;
+    public abstract fromBinary(input: ByteBuffer): void;
+
+    public abstract copyData(): IBlockObject;
+
+	public getTimestamp() : SystemTimestamp {
+		return this.timestamp;
+	}
 
 }

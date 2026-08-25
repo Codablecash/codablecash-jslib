@@ -54,4 +54,6 @@ export class SystemTimestamp {
     public isZero() : boolean {
         return this.sec == 0n && this.usec == 0;
     }
+
+    
 }
