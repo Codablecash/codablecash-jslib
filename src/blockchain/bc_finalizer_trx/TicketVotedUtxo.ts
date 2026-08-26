@@ -116,4 +116,8 @@ export class TicketVotedUtxo extends AbstractUtxo {
     public getAmount(): BalanceUnit {
         return this.amount;
     }
+
+    public setAddress(desc : AddressDescriptor) {
+        this.address = <AddressDescriptor>(desc.copyData());
+    }
 }

@@ -22,6 +22,6 @@ export class BlockHeaderId extends Abstract32BytesId {
             this.id.position(0);
             return new BlockHeaderId(this.id.toUint8Array(), this.id.limit());
         }
-        throw new NullPointerException("");
+        throw new NullPointerException("BlockHeaderId.copyData()");
     }
 }
