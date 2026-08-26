@@ -1,3 +1,4 @@
+import { NullPointerException } from "../../db/base/NullPointerException";
 import { ByteBuffer } from "../../db/base_io/ByteBuffer";
 import { SystemTimestamp } from "../../db/base_timestamp/SystemTimestamp";
 import { IBlockObject } from "../../db/filestore_block/IBlockObject";
@@ -40,6 +41,13 @@ export abstract class AbstractBlockchainTransaction implements IBlockObject{
         this.timestamp = new SystemTimestamp();
         this.version = new TransactionVersion(1, 0 , 0);        
     }
+
+	public getTransactionId() : TransactionId {
+        if(this.trxId != null){
+            return this.trxId;
+        }
+		throw new NullPointerException("AbstractBlockchainTransaction.getTransactionId()");
+	}
 
     public abstract getType() : number;
     public abstract build() : void;

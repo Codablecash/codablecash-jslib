@@ -14,6 +14,10 @@ export class NodeIdentifier implements IBlockObject {
         }
     }
 
+	public getPublicKey() : BigInteger {
+		return this.nodeIdentifier;
+	}
+
     binarySize(): number {
         return 4 + this.nodeIdentifier.binarySize();
     }
