@@ -1,8 +1,9 @@
 import { NullPointerException } from "../../db/base/NullPointerException";
 import { ByteBuffer } from "../../db/base_io/ByteBuffer";
+import { IBlockObject } from "../../db/filestore_block/IBlockObject";
 import { BigInteger } from "../../db/numeric/BigInteger";
 
-export class Abstract32BytesId {
+export abstract class Abstract32BytesId implements IBlockObject {
     public static Q : BigInteger = new BigInteger("ff66c4652cbb54e13e4cc75898014aef72332e147343a95031cf416ca9f77ce7", 16);
     public static G : BigInteger = new BigInteger("e000000000000000000000000000000000000000000000000000000000000002", 16);
 
@@ -16,6 +17,8 @@ export class Abstract32BytesId {
             this.id = null;
         }
     }
+    
+    public abstract copyData(): IBlockObject;
 
     public size() : number {
         if(this.id != null){ // guarad
