@@ -15,6 +15,10 @@ export class InputUtxoCollection {
         this.list = new ArrayList<BalanceUtxoReference>();
     }
 
+    public getList() : ArrayList<BalanceUtxoReference> {
+        return this.list;
+    }
+
     public addReference(ref : BalanceUtxoReference) : void {
         let r  = <BalanceUtxoReference>(ref.copyData());
         this.list.addElement(r);

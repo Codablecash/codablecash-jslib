@@ -17,6 +17,12 @@ export class BalanceUtxoReference extends AbstractUtxoReference {
     public getType(): number {
         return AbstractUtxoReference.UTXO_REF_TYPE_BALANCE;
     }
+    public getXi() : Secp256k1CompressedPoint {
+        if(this.Xi != null){
+            return this.Xi;
+        }
+        throw new NullPointerException("BalanceUtxoReference.getXi()");
+    }
 
     public binarySize(): number {
         if(this.Xi != null && this.utxoId != null && this.bloomHash != null){
