@@ -36,6 +36,10 @@ export class ByteBuffer {
          return inst;
     }
 
+    public clone() : ByteBuffer {
+        return ByteBuffer.wrapWithEndian(this.data, this.cap, true);
+    }
+
     public toUint8Array() : Uint8Array {
         let ar = new Uint8Array(this.cap);
 

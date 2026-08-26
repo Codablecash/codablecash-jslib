@@ -23,6 +23,14 @@ export class ArrayList<T> {
         this.numArray++;
     }
 
+	public addAll(list : ArrayList<T>){
+		let maxLoop = list.size();
+		for(let i = 0; i != maxLoop; ++i){
+			let ptr = list.get(i);
+			this.addElement(ptr);
+		}
+	}
+
     public setElement(ptr : T | null, index : number) : void {
         this.root[index] = ptr;
     }

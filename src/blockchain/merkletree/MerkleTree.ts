@@ -1,8 +1,15 @@
 import { Sha256 } from "../../base/crypto/Sha256";
 import { ArrayList } from "../../db/base/ArrayList";
+import { NullPointerException } from "../../db/base/NullPointerException";
 import { ByteBuffer } from "../../db/base_io/ByteBuffer";
 import { IBlockObject } from "../../db/filestore_block/IBlockObject";
 import { AbstractBlockchainTransaction } from "../bc_trx/AbstractBlockchainTransaction";
+import { AbstractMerkleElement } from "./AbstractMerkleElement";
+import { BlankMerkleElement } from "./BlankMerkleElement";
+import { MarkleElementFifo } from "./MarkleElementFifo";
+import { MerkleCertificate } from "./MerkleCertificate";
+import { MerkleCertificateElement } from "./MerkleCertificateElement";
+import { MerkleElement } from "./MerkleElement";
 
 
 function implementsIBlockObject(arg: any): arg is IBlockObject {
@@ -11,9 +18,11 @@ function implementsIBlockObject(arg: any): arg is IBlockObject {
 }
 
 export class MerkleTree {
+    private root : AbstractMerkleElement | null;
     private list : ArrayList<ByteBuffer>;
 
     constructor(){
+        this.root = null;
         this.list = new ArrayList<ByteBuffer>();
     }
 
@@ -77,6 +86,106 @@ export class MerkleTree {
 
         hash.position(0);
         this.addByteBuffer(hash);
+    }
+
+    public pack() : void {
+        let fifo = new MarkleElementFifo();
+
+        let maxLoop = this.list.size();
+        for(let i = 0; i != maxLoop; ++i){
+            let buff = this.list.get(i);
+
+            if(buff != null){ // guard
+                let element = new MerkleElement();
+                element.setHash(buff);
+
+                fifo.addElement(element);
+            }
+        }
+
+        while(fifo.size() != 1){
+            let lastFifo = fifo;
+
+            fifo = this.packFifo(lastFifo);
+        }
+
+        this.root = fifo.out();
+    }
+
+    public packFifo(fifo : MarkleElementFifo) : MarkleElementFifo {
+        let newFifo = new MarkleElementFifo();
+
+        while(!fifo.isEmpty()){
+            let newElement = new MerkleElement();
+            newFifo.addElement(newElement);
+
+            let ele = fifo.out();
+            newElement.addChild(ele);
+
+            if(!fifo.isEmpty()){
+                ele = fifo.out();
+                newElement.addChild(ele);
+            }else{
+                // blank node
+                newElement.addChild(new BlankMerkleElement());
+            }
+
+            newElement.calcHash();
+        }
+
+        return newFifo;
+    }
+
+    public makeCertificate(arg0 : ByteBuffer | Uint8Array, arg1? : number) : MerkleCertificate | null {
+        if(arg0 instanceof Uint8Array && arg1 != undefined){
+            return this.__makeCertificateArray(arg0, arg1);
+        }
+        return this.__makeCertificate(<ByteBuffer>arg0);
+    }
+
+    private __makeCertificate(b : ByteBuffer) : MerkleCertificate | null {
+        if(this.root != null){
+            let cert = new MerkleCertificate();
+
+            let rootHash = this.root.getHash();
+            cert.setMerkleRoot(rootHash);
+
+            let element = this.root.find(b);
+            if(element == null){
+                return null;
+            }
+            else if(element.isRoot()){
+                let hash = element.getHash();
+                let me = new MerkleCertificateElement(hash, true);
+                cert.addHash(me);
+
+                return cert;
+            }
+            else {
+                let hash = element.getHash();
+                let me = new MerkleCertificateElement(hash, element.isLeft());
+                cert.addHash(me);
+            }
+
+            while(!element.isRoot()){
+                element = element.getAnotherPair();
+                let hash = element.getHash();
+
+                let me = new MerkleCertificateElement(hash, element.isLeft());
+                cert.addHash(me);
+
+                element = element.getParent();
+            }
+
+            return cert;
+        }
+        throw new NullPointerException("MerkleTree.__makeCertificate()");
+    }
+
+    private __makeCertificateArray(hash : Uint8Array, size : number) : MerkleCertificate | null {
+        let buff = ByteBuffer.wrapWithEndian(hash, size, true);
+
+        return this.__makeCertificate(buff);
     }
 
 }
