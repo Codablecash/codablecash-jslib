@@ -3,6 +3,15 @@ import { ByteBuffer } from "../../db/base_io/ByteBuffer";
 import { SystemTimestamp } from "../../db/base_timestamp/SystemTimestamp";
 import { IBlockObject } from "../../db/filestore_block/IBlockObject";
 import { BalanceUnit } from "../bc_base/BalanceUnit";
+import { CoinbaseTransaction } from "../bc_block_body/CoinbaseTransaction";
+import { StakeBaseTransaction } from "../bc_block_body/StakeBaseTransaction";
+import { RegisterTicketTransaction } from "../bc_finalizer_trx/RegisterTicketTransaction";
+import { RegisterVotePoolTransaction } from "../bc_finalizer_trx/RegisterVotePoolTransaction";
+import { RevokeMissedTicket } from "../bc_finalizer_trx/RevokeMissedTicket";
+import { RevokeMissVotedTicket } from "../bc_finalizer_trx/RevokeMissVotedTicket";
+import { VoteBlockTransaction } from "../bc_finalizer_trx/VoteBlockTransaction";
+import { BalanceTransferTransaction } from "../bc_trx_balance/BalanceTransferTransaction";
+import { GenesisTransaction } from "../bc_trx_genesis/GenesisTransaction";
 import { AbstractUtxo } from "./AbstractUtxo";
 import { AbstractUtxoReference } from "./AbstractUtxoReference";
 import { TransactionId } from "./TransactionId";
@@ -27,13 +36,46 @@ export abstract class AbstractBlockchainTransaction implements IBlockObject{
     protected version : TransactionVersion;
 
     public static createFromBinary(input : ByteBuffer) : AbstractBlockchainTransaction {
-        throw new Error("not implemented");
-        /*let ret : AbstractBlockchainTransaction;
+        let ret : AbstractBlockchainTransaction;
+
+        let type = input.get();
+
+        switch(type){
+        case AbstractBlockchainTransaction.TRX_TYPE_GENESIS:
+            ret = new GenesisTransaction();
+            break;
+        case AbstractBlockchainTransaction.TRX_TYPE_BANANCE_TRANSFER:
+            ret = new BalanceTransferTransaction();
+            break;
+        case AbstractBlockchainTransaction.TRX_TYPE_REGISTER_VOTE_POOL:
+            ret = new RegisterVotePoolTransaction();
+            break;
+        case AbstractBlockchainTransaction.TRX_TYPE_REGISTER_TICKET:
+            ret = new RegisterTicketTransaction();
+            break;
+        case AbstractBlockchainTransaction.TRX_TYPE_VOTE_BLOCK:
+            ret = new VoteBlockTransaction();
+            break;
+        case AbstractBlockchainTransaction.TRX_TYPE_REVOKE_MISSED_TICKET:
+            ret = new RevokeMissedTicket();
+            break;
+        case AbstractBlockchainTransaction.TRX_TYPE_REVOKE_MISS_VOTED_TICKET:
+            ret = new RevokeMissVotedTicket();
+            break;
+        case AbstractBlockchainTransaction.TRX_TYPE_COIN_BASE:
+            ret = new CoinbaseTransaction();
+            break;
+        case AbstractBlockchainTransaction.TRX_TYPE_STAKE_BASE:
+            ret = new StakeBaseTransaction();
+            break;
+        default:
+            throw new NullPointerException("AbstractBlockchainTransaction.createFromBinary()");
+        }
         
-        ret.fromBinary();
+        ret.fromBinary(input);
         ret.build();
 
-        return ret;*/
+        return ret;
     }
 
     constructor() {
