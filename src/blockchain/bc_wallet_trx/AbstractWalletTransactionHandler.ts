@@ -5,7 +5,7 @@ import { WalletAccount } from "../bc_wallet/WalletAccount";
 import { WalletAccountTrxRepository } from "../bc_wallet_trx_repo/WalletAccountTrxRepository";
 
 export abstract class AbstractWalletTransactionHandler {
-    private account : WalletAccount;
+    protected account : WalletAccount;
 
     constructor(account : WalletAccount) {
         this.account = account;
@@ -43,7 +43,7 @@ export abstract class AbstractWalletTransactionHandler {
 
             let addressDesc = utxo.getAddress();
 
-            if(this.account.hasAddress(addressDesc)){
+            if(!utxo.isRemote() && this.account.hasAddress(addressDesc)){
                 trxRepo.importUtxo(utxo);
                 imported = true;
             }
