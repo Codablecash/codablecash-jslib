@@ -18,6 +18,10 @@ export class BlockHeaderHeightIndexKey extends AbstractBtreeKey {
         }
     }
 
+    public getFpos() {
+        return this.fpos;
+    }
+
     public isInfinity() : boolean { return false; }
 	public isNull() : boolean { return false; }
 
