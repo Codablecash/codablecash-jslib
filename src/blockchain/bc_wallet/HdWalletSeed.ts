@@ -1,6 +1,8 @@
+import { Sha256 } from "../../base/crypto/Sha256";
 import { NullPointerException } from "../../db/base/NullPointerException";
 import { ByteBuffer } from "../../db/base_io/ByteBuffer";
 import { Abstract32BytesId } from "../bc_base/Abstract32BytesId";
+import { IWalletDataEncoder } from "../bc_wallet_encoder/IWalletDataEncoder";
 
 export class HdWalletSeed extends Abstract32BytesId {
     constructor(binary? : Uint8Array, length? : number){
@@ -17,19 +19,42 @@ export class HdWalletSeed extends Abstract32BytesId {
         return walletSeed;       
     }
 
+    public encodedSeed(encoder : IWalletDataEncoder) : HdWalletSeed {
+        return encoder.encode(this);
+    }
+
     public copyData() {
         if(this.id != null){
             let data = this.id.toUint8Array();
             return new HdWalletSeed(data, data.length);
         }
-        throw new NullPointerException("Abstract32BytesId.size()"); 
+        throw new NullPointerException("HdWalletSeed.size()"); 
     }
 
 	public getByteBuffer() : ByteBuffer {
         if(this.id != null){
             return this.id;
         }
-		throw new NullPointerException("Abstract32BytesId.getByteBuffer()"); 
+		throw new NullPointerException("HdWalletSeed.getByteBuffer()"); 
 	}
 
+    public indexedSeed(accountIndex : number) : HdWalletSeed {
+        if(this.id != null){
+            let cap = this.id.limit() + 8; //sizeof(uint64_t);
+            let buff = ByteBuffer.allocateWithEndian(cap, true);
+
+            buff.putLong(accountIndex);
+
+            this.id.position(0);
+            buff.putByteBuffer(this.id);
+
+            let id = Sha256.sha256(buff.toUint8Array(), true);
+
+            let walletSeed = new HdWalletSeed();
+            walletSeed.id = id;
+
+            return walletSeed;
+        }
+        throw new NullPointerException("HdWalletSeed.getByteBuffer()"); 
+    }
 }
