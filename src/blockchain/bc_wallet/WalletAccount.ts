@@ -15,7 +15,7 @@ import { ChangeAddressStore } from "./ChangeAddressStore";
 import { HdWalletSeed } from "./HdWalletSeed";
 import { ReceivingAddressStore } from "./ReceivingAddressStore";
 
-export class WalletAccount extends AbstractWalletAccount{
+export class WalletAccount extends AbstractWalletAccount {
 	public static STORE_NAME = "WalletAccount";
 	public static KEY_ENCRYPTED_SEED = "encryptedSeed";
 

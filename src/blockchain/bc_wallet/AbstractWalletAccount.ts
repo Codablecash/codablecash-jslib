@@ -7,4 +7,8 @@ export class AbstractWalletAccount {
         this.zone = zone;
         this.accountIndex = accountIndex;
     }
+
+	public getZone() : number {
+		return this.zone;
+	}
 }

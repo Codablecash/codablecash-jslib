@@ -1,7 +1,9 @@
 import { ArrayList } from "../../db/base/ArrayList";
+import { NullPointerException } from "../../db/base/NullPointerException";
 import { CFile } from "../../db/base_io/CFile";
 import { StatusStore } from "../bc_base_conf_store/StatusStore";
 import { IWalletDataEncoder } from "../bc_wallet_encoder/IWalletDataEncoder";
+import { BloomFilter1024 } from "../bc_wallet_filter/BloomFilter1024";
 import { HdWalletSeed } from "./HdWalletSeed";
 import { WalletAccount } from "./WalletAccount";
 
@@ -80,5 +82,49 @@ export class HdWallet {
 		}
 
 		this.defaultZone = this.store.getShortValue(HdWallet.KEY_DEFAULT_ZONE);
+	}
+
+	public getRootSeed(encoder : IWalletDataEncoder) : HdWalletSeed {
+		if(this.encodedSeed != null){
+			let rootSeed = encoder.decode(this.encodedSeed);
+
+			return rootSeed;
+		}
+		throw new NullPointerException("HdWallet.getRootSeed()");
+	}
+
+	public getBloomFilters(encoder : IWalletDataEncoder) : ArrayList<BloomFilter1024> {
+		let list = new ArrayList<BloomFilter1024>();
+
+		let maxLoop = this.accounts.size();
+		for(let i = 0; i != maxLoop; ++i){
+			let account = this.accounts.get(i);
+
+			if(account != null){ // guard
+				let f = account.getBloomFilter(encoder);
+				list.addElement(<BloomFilter1024>(f.copyData()));
+			}
+		}
+
+		return list;
+	}
+
+	public getZoneAccount(zone : number) : WalletAccount | null {
+		let retaccount = null;
+
+		let maxLoop = this.accounts.size();
+		for(let i = 0; i != maxLoop; ++i){
+			let account = this.accounts.get(i);
+
+			if(account != null){
+				let z = account.getZone();
+				if(z == zone){
+					retaccount = account;
+				}
+			}
+
+		}
+
+		return retaccount;
 	}
 }
