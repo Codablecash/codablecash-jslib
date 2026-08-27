@@ -1,8 +1,12 @@
+import { ArrayList } from "../../db/base/ArrayList";
 import { NullPointerException } from "../../db/base/NullPointerException";
 import { CFile } from "../../db/base_io/CFile";
+import { BtreeScanner } from "../../db/btree/BtreeScanner";
 import { AddressDescriptor } from "../bc_base/AddressDescriptor";
 import { BalanceUnit } from "../bc_base/BalanceUnit";
 import { StatusStore } from "../bc_base_conf_store/StatusStore";
+import { TransactionData } from "../bc_base_trx_index/TransactionData";
+import { AbstractBlockchainTransaction } from "../bc_trx/AbstractBlockchainTransaction";
 import { IWalletDataEncoder } from "../bc_wallet_encoder/IWalletDataEncoder";
 import { BloomFilter1024 } from "../bc_wallet_filter/BloomFilter1024";
 import { WalletAccountTrxRepository } from "../bc_wallet_trx_repo/WalletAccountTrxRepository";
@@ -163,5 +167,51 @@ export class WalletAccount extends AbstractWalletAccount{
 
         this.trxRepo = new WalletAccountTrxRepository(this);
         this.trxRepo.open();
+    }
+
+    public getTransactions() : ArrayList<AbstractBlockchainTransaction> {
+        if(this.trxRepo != null){
+            let list = new ArrayList<AbstractBlockchainTransaction>();
+
+            let scanner = this.trxRepo.getScanner();
+            while(scanner.hasNext()){
+                let obj = scanner.next();
+                let data = <TransactionData>(obj);
+
+                list.addElement(<AbstractBlockchainTransaction>(data.getTrx().copyData()));
+            }
+
+            return list;
+        }
+        throw new NullPointerException("WalletAccount.getTransactions()");
+    }
+
+    public getBloomFilter(encoder : IWalletDataEncoder) : BloomFilter1024 {
+        if(this.bloomFilter == null){
+            this.createBloomFilter(encoder);
+        }
+
+        if(this.bloomFilter != null){
+            return this.bloomFilter;
+        }
+        throw new NullPointerException("WalletAccount.getBloomFilter()");
+    }
+
+    public createBloomFilter(encoder : IWalletDataEncoder) : void {
+        if(this.receivingAddresses != null && this.changeAddresses != null){
+            this.bloomFilter = new BloomFilter1024();
+
+            this.receivingAddresses.exportAddress2Filter(this.bloomFilter);
+            this.changeAddresses.exportAddress2Filter(this.bloomFilter, encoder);
+            return;
+        }
+        throw new NullPointerException("WalletAccount.createBloomFilter()");
+    }
+
+    public checkAddress(desc : AddressDescriptor) : boolean {
+        if(this.receivingAddresses != null && this.changeAddresses != null){
+            return this.receivingAddresses.hasAddress(desc) || this.changeAddresses.hasAddress(desc);
+        }
+        throw new NullPointerException("WalletAccount.checkAddress()");
     }
 }
