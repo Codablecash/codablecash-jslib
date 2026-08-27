@@ -7,9 +7,11 @@ import { BalanceUnit } from "../bc_base/BalanceUnit";
 import { StatusStore } from "../bc_base_conf_store/StatusStore";
 import { TransactionData } from "../bc_base_trx_index/TransactionData";
 import { AbstractBlockchainTransaction } from "../bc_trx/AbstractBlockchainTransaction";
+import { TransactionId } from "../bc_trx/TransactionId";
 import { IWalletDataEncoder } from "../bc_wallet_encoder/IWalletDataEncoder";
 import { BloomFilter1024 } from "../bc_wallet_filter/BloomFilter1024";
 import { WalletAccountTrxRepository } from "../bc_wallet_trx_repo/WalletAccountTrxRepository";
+import { AbstractAddressStore } from "./AbstractAddressStore";
 import { AbstractWalletAccount } from "./AbstractWalletAccount";
 import { ChangeAddressStore } from "./ChangeAddressStore";
 import { HdWalletSeed } from "./HdWalletSeed";
@@ -52,6 +54,14 @@ export class WalletAccount extends AbstractWalletAccount {
     public setEncryptedSeed(encrypted : HdWalletSeed) : void {
         this.encryptedSeed = encrypted;
     }
+
+	public getWalletAccountTrxRepository() : WalletAccountTrxRepository {
+        if(this.trxRepo != null){
+            return this.trxRepo;
+        }
+		throw new NullPointerException("WalletAccount.getWalletAccountTrxRepository()");
+	}
+
 
     public static newAccount(baseDir : CFile, rootSeed : HdWalletSeed, accountIndex : number, zone : number
             , encoder : IWalletDataEncoder, maxAddress : number) : WalletAccount {
@@ -124,11 +134,57 @@ export class WalletAccount extends AbstractWalletAccount {
         this.changeAddresses.init(encoder);
     }
 
+    public importTransaction(trx : AbstractBlockchainTransaction) : void{
+        let type = trx.getType();
+
+        switch(type){
+        default:
+            throw new NullPointerException("WalletAccount.importTransaction()");
+        }
+    }
+
     public getReceivingAddressDescriptor(i : number) : AddressDescriptor {
         if(this.receivingAddresses != null){
             return this.receivingAddresses.getAddressDescriptor(i);
         }
         throw new NullPointerException("WalletAccount.getReceivingAddressDescriptor()");
+    }
+
+    public findTransaction(trxId : TransactionId) : AbstractBlockchainTransaction | null {
+        if(this.trxRepo != null){
+            return this.trxRepo.findTransaction(trxId);
+        }
+        throw new NullPointerException("WalletAccount.findTransaction()");
+    }
+
+    public removeTransaction(trxId : TransactionId){
+        if(this.trxRepo != null){
+            this.trxRepo.removeTransaction(trxId);
+        }
+        throw new NullPointerException("WalletAccount.removeTransaction()");
+    }
+
+    public hasAddress(addressDesc : AddressDescriptor) {
+        if(this.receivingAddresses != null && this.changeAddresses != null){
+            return this.findAddressDiscriptor(this.receivingAddresses, addressDesc) >= 0
+                    || this.findAddressDiscriptor(this.changeAddresses, addressDesc) >= 0;
+        }
+        throw new NullPointerException("WalletAccount.hasAddress()");
+    }
+
+    public findAddressDiscriptor(store : AbstractAddressStore, addressDesc : AddressDescriptor) {
+        let ret = -1;
+
+        let maxLoop = store.size();
+        for(let i = 0; i != maxLoop; ++i){
+            let desc = store.getAddressDescriptor(i);
+            if(desc.compareTo(addressDesc) == 0){
+                ret = i;
+                break;
+            }
+        }
+
+        return ret;
     }
 
     public getTotalAmount() : BalanceUnit {

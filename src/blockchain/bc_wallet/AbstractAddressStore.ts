@@ -33,6 +33,10 @@ export class AbstractAddressStore {
         this.store = new StatusStore(baseDir, storeName);
     }
 
+	public size() : number {
+		return this.list.size();
+	}
+
     public setEncryptedSeed(encrypted : HdWalletSeed) : void {
         this.encryptedSeed = encrypted;
     }

@@ -104,12 +104,9 @@ export class WalletAccountTrxRepository implements IUtxoFinder {
         throw new NullPointerException("WalletAccountTrxRepository.getBalanceUtxo()");
     }
 
-    public getUtxo(utxoId : UtxoId) : AbstractUtxo {
+    public getUtxo(utxoId : UtxoId) : AbstractUtxo | null {
         if(this.utxoRepo != null){
-            let u = this.utxoRepo.getUtxo(utxoId);
-            if(u != null){
-                return u;
-            } 
+            return this.utxoRepo.getUtxo(utxoId);
         }
         throw new NullPointerException("WalletAccountTrxRepository.getUtxo()");
     }
