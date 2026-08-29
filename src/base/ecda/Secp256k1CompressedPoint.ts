@@ -1,7 +1,9 @@
+import { ByteBuffer } from "../../db/base_io/ByteBuffer";
+import { IBlockObject } from "../../db/filestore_block/IBlockObject";
 import { BigInteger } from "../../db/numeric/BigInteger";
 import { Secp256k1Point } from "./Secp256k1Point";
 
-export class Secp256k1CompressedPoint {
+export class Secp256k1CompressedPoint implements IBlockObject {
     public static readonly COMPRESS_Y_EVEN : number = 2;
     public static readonly COMPRESS_Y_ODD : number = 3;
 
@@ -40,6 +42,37 @@ export class Secp256k1CompressedPoint {
         }
 
         return new Secp256k1Point(this.x, y);
+    }
+
+    public copyData() : IBlockObject {
+        return new Secp256k1CompressedPoint(this.x, this.prefix);
+    }
+
+    public binarySize(): number {
+        let total = 1; // sizeof(this .prefix);
+        total += 32; //this .x.binarySize();
+
+        return total;
+    }
+
+    public toBinary(out: ByteBuffer): void {
+        out.put(this.prefix);
+
+        let buffx = this.x.toBinary();
+        buffx.position(0);
+
+        let buffxp = BigInteger.padBuffer(buffx, 32);
+        buffxp.position(0);
+        out.putByteBuffer(buffxp);
+    }
+
+    public static fromBinary(input : ByteBuffer) {
+        let prefix = input.get();
+    
+        let buff = input.getByteBuffer(32);
+        let xptr = BigInteger.fromBinary(buff);
+
+        return new Secp256k1CompressedPoint(xptr, prefix);
     }
 }
 

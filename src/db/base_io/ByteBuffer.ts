@@ -36,6 +36,10 @@ export class ByteBuffer {
          return inst;
     }
 
+    public clone() : ByteBuffer {
+        return ByteBuffer.wrapWithEndian(this.data, this.cap, true);
+    }
+
     public toUint8Array() : Uint8Array {
         let ar = new Uint8Array(this.cap);
 
@@ -53,6 +57,9 @@ export class ByteBuffer {
 
     public position(i : number) : void {
         this.pos = i;
+    }
+    public getPosition() {
+        return this.pos;
     }
 
     public limit() : number {
@@ -76,12 +83,12 @@ export class ByteBuffer {
             throw new BufferOverflowException("getByteBuffer()");
         }
 
-        let buff = Buffer.allocate(length);
+        let buff = Buffer.alloc(length);
 
         this.data.copy(buff, 0, this.pos, this.pos + length);
         this.pos += length;
 
-        let ret = new ByteBuffer(length);
+        let ret = ByteBuffer.allocateWithEndian(length, true);
         ret.putBuffer(buff);
         ret.position(0);
 
@@ -121,6 +128,16 @@ export class ByteBuffer {
         this.pos += 8;
         return res;
     }
+    public getULong() : bigint {
+       if(this.remaining() < 4){
+            throw new BufferOverflowException("getInt()");
+        }
+
+        let res = this.data.readBigUInt64BE(this.pos);
+        this.pos += 8;
+        return res;
+    }
+
     public toBigInteger() : BigInteger {
         let val = toBigIntBE(this.data);
         let ret = new BigInteger(val);
@@ -137,6 +154,15 @@ export class ByteBuffer {
         this.pos++;
         return this;
     }
+    public puti(index : number, b : number) : ByteBuffer {
+        if(index + 1 > this.lim){
+            throw new BufferOverflowException("put(int index, uint8_t b)");
+        }
+
+        this.data[index] = b;
+        return this;
+    }
+
     public putBuffer(data : Buffer) : ByteBuffer {
         let dataLength = data.byteLength;
         if(this.remaining() < dataLength){
@@ -150,6 +176,19 @@ export class ByteBuffer {
     }
     public putByteBuffer(data : ByteBuffer) : ByteBuffer {
         this.putBuffer(data.data);
+        return this;
+    }
+
+    public putArray(src : Uint8Array, off : number, len : number) {
+        if (len > this.remaining()) {
+            throw new BufferOverflowException("putArray()");
+        }
+
+        // Mem::memcpy(data->getRoot() + this->pos, src + off, len);
+        let slice = src.slice(off, off + len);
+        this.data.set(slice, this.pos);
+        this.pos += len;
+
         return this;
     }
 
@@ -192,7 +231,7 @@ export class ByteBuffer {
             throw new BufferOverflowException("put(src : Uint8Array, off : number, len : number)");
         }
 
-        // Mem::memcpy(data->getRoot() + this->pos, src, len);
+        // Mem::memcpy(data.getRoot() + this.pos, src, len);
         let buff = src.slice(0, len);
         this.data.set(buff, this.pos);
 
@@ -204,5 +243,18 @@ export class ByteBuffer {
     public remaining() : number {
         return this.lim - this.pos;
     }
-  
+
+    public binaryEquals(buff : ByteBuffer) : boolean {
+        let diff = this.data.compare(buff.data);
+
+        let bl = (diff == 0) && this.cap == buff.cap;
+
+        return bl;
+    }
+
+    public binaryCmp(buff: ByteBuffer) : number {
+        let diff = this.data.compare(buff.data);
+
+        return diff;
+    }
 }

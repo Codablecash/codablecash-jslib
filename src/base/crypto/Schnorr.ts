@@ -14,8 +14,14 @@ export class SchnorrConsts {
 export class Schnorr {
     public static readonly keyLength = 256;
 
-    public static generateKey(seed : BigInteger) : SchnorrKeyPair {
-        let s  = seed.mod(SchnorrConsts.Q_1);
+    public static generateKey(seed? : BigInteger) : SchnorrKeyPair {
+        let s : BigInteger;
+        if(seed == undefined){
+            s = BigInteger.ramdom();
+        }
+        else{
+            s  = seed.mod(SchnorrConsts.Q_1);
+        }
 
         let p = SchnorrConsts.G.modPow(s, SchnorrConsts.Q);
 
