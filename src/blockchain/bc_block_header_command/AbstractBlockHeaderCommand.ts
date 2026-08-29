@@ -21,6 +21,7 @@ export abstract class AbstractBlockHeaderCommand implements IBlockObject {
     
     public abstract binarySize(): number;
     public abstract toBinary(out: ByteBuffer): void;
+    public abstract fromBinary(input : ByteBuffer) : void;
     public abstract copyData(): IBlockObject;
 
     public static createFromBinary(input : ByteBuffer) : AbstractBlockHeaderCommand {

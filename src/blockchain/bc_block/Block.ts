@@ -1,3 +1,4 @@
+import { ByteBuffer } from "../../db/base_io/ByteBuffer";
 import { BlockBody } from "../bc_block_body/BlockBody";
 import { BlockHeader } from "./BlockHeader";
 
@@ -21,5 +22,30 @@ export class Block {
         }
 
         throw new Error("Wrong argument/ Block.constructor()");
+    }
+
+    public clone() : Block {
+        let inst = new Block(this.header, this.body);
+
+        return inst;
+    }
+
+    public binarySize() : number {
+        let total = this.header.binarySize();
+        total += this.body.binarySize();
+
+        return total;
+    }
+
+    public toBinary(buff : ByteBuffer) : void {
+        this.header.toBinary(buff);
+        this.body.toBinary(buff);
+    }
+
+    public static createFromBinary(buff : ByteBuffer) : Block {
+        let header = BlockHeader.createFromBinary(buff);
+        let body = BlockBody.fromBinary(buff);
+
+        return new Block(header, body);
     }
 }
