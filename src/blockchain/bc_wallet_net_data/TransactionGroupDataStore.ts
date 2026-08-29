@@ -1,10 +1,17 @@
+import { NullPointerException } from "../../db/base/NullPointerException";
 import { CFile } from "../../db/base_io/CFile";
-import { Btree } from "../../db/btree/Btree";
+import { Btree, BtreeOpenConfig } from "../../db/btree/Btree";
+import { BtreeConfig } from "../../db/btree/BtreeConfig";
 import { DiskCacheManager } from "../../db/random_access_file/DiskCacheManager";
+import { BlockHeaderId } from "../bc_block/BlockHeaderId";
+import { BlockHeaderIdKey } from "../bc_blockstore_header/BlockHeaderIdKey";
+import { BlockHeaderIdKeyFactory } from "../bc_blockstore_header/BlockHeaderIdKeyFactory";
+import { HeaderTransactionGroup } from "./HeaderTransactionGroup";
+import { HeaderTransactionGroupDataFactory } from "./HeaderTransactionGroupDataFactory";
 
 
 export class TransactionGroupDataStore {
-    public static FILE_NAME = "unfinalized_data";
+    public static readonly FILE_NAME = "unfinalized_data";
 
     private baseDir : CFile;
 	private cacheManager : DiskCacheManager;
@@ -16,54 +23,69 @@ export class TransactionGroupDataStore {
         this.headerGroupStore = null;        
     }
 
-    // TODO
-/*
-void open() {
-	UnicodeString fileName(FILE_NAME);
+    public initBlank() : void {
+        let fileName = TransactionGroupDataStore.FILE_NAME;
 
-	BlockHeaderIdKeyFactory* keyFactory = new BlockHeaderIdKeyFactory(); __STP(keyFactory);
-	HeaderTransactionGroupDataFactory* dataFactory = new HeaderTransactionGroupDataFactory(); __STP(dataFactory);
+        let keyFactory = new BlockHeaderIdKeyFactory();
+        let dataFactory = new HeaderTransactionGroupDataFactory();
 
-	this.headerGroupStore = new Btree(this.baseDir, &fileName, this.cacheManager, keyFactory, dataFactory);
+        let btree = new Btree(this.baseDir, fileName, this.cacheManager, keyFactory, dataFactory);
 
-	BtreeOpenConfig opconf;
-	opconf.numDataBuffer = 256;
-	opconf.numNodeBuffer = 512;
-	this.headerGroupStore.open(&opconf);
+        let config = new BtreeConfig();
+        config.nodeNumber = 8;
+        config.defaultSize = 1024;
+        config.blockSize = 32;
+        btree.create(config);
+    }
 
-}
+    public open() : void {
+        let fileName = TransactionGroupDataStore.FILE_NAME;
 
-void close() noexcept {
-	if(this.headerGroupStore != nullptr){
-		this.headerGroupStore.close();
-		delete this.headerGroupStore, this.headerGroupStore = nullptr;
-	}
-}
+        let keyFactory = new BlockHeaderIdKeyFactory();
+        let dataFactory = new HeaderTransactionGroupDataFactory();
 
-void add(const BlockHeaderId *headerId, const HeaderTransactionGroup *group) {
-	BlockHeaderIdKey key(headerId);
+        this.headerGroupStore = new Btree(this.baseDir, fileName, this.cacheManager, keyFactory, dataFactory);
 
-	this.headerGroupStore.putData(&key, group);
-}
+        let opconf = new BtreeOpenConfig();
+        opconf.numDataBuffer = 256;
+        opconf.numNodeBuffer = 512;
+        this.headerGroupStore.open(opconf);
+    }
 
-HeaderTransactionGroup* getHeaderTransactionGroup(const BlockHeaderId *headerId) const {
-	BlockHeaderIdKey key(headerId);
+    public close() : void {
+        if(this.headerGroupStore != null){
+            this.headerGroupStore.close();
+            this.headerGroupStore = null;
+        }
+    }
 
-	IBlockObject* object = this.headerGroupStore.findByKey(&key);
-	HeaderTransactionGroup* trxGroup = dynamic_cast<HeaderTransactionGroup*>(object);
+    public add(headerId : BlockHeaderId, group : HeaderTransactionGroup) : void {
+        if(this.headerGroupStore != null){
+            let key = new BlockHeaderIdKey(headerId);
 
-	assert(trxGroup != nullptr);
+            this.headerGroupStore.putData(key, group);
+        }
+    }
 
-	return trxGroup;
-}
+    public getHeaderTransactionGroup(headerId : BlockHeaderId) : HeaderTransactionGroup {
+        if(this.headerGroupStore != null){
+            let key = new BlockHeaderIdKey(headerId);
 
-bool removeHeaderTransactionGroup(const BlockHeaderId *headerId) {
-	BlockHeaderIdKey key(headerId);
+            let object = this.headerGroupStore.findByKey(key);
+            let trxGroup = <HeaderTransactionGroup>(object);
 
-	bool ret = this.headerGroupStore.remove(&key);
-	return ret;
-}
+            return trxGroup;
+        }
+        throw new NullPointerException("TransactionGroupDataStore.getHeaderTransactionGroup()");
+    }
 
+    public removeHeaderTransactionGroup(headerId : BlockHeaderId) : boolean {
+        if(this.headerGroupStore != null){
+            let key = new BlockHeaderIdKey(headerId);
 
-*/
+            let ret = this.headerGroupStore.remove(key);
+            return ret;
+        }
+        throw new NullPointerException("TransactionGroupDataStore.removeHeaderTransactionGroup()");
+    }
 }
