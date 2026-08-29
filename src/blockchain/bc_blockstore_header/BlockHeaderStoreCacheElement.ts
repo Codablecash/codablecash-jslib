@@ -36,6 +36,10 @@ export class BlockHeaderStoreCacheElement implements IComparable {
         return this.index - o.index;
     }
 
+	public getIndex() : number {
+		return this.index;
+	}
+
     public init() : void {
         this.store = new BlockHeaderStore(this.index, this.baseDir, this.cacheManager);
         this.heightIndex = new BlockHeaderHeightIndex(this.index, this.baseDir, this.cacheManager);

@@ -167,7 +167,19 @@ export class RawLinkedList<T extends IComparable> {
         return -1;
     }
 
-    public moveElementToTop(element : RawLinkedListElement<T>) : void {
+    public moveElementToTop(arg0 : RawLinkedListElement<T> | number) {
+        if(typeof arg0 == "number"){
+            let el = this.getElement(arg0);
+            if(el != null){
+                this.moveElementToTop(el);
+            }
+            
+            return;
+        }
+        this.__moveElementToTop(arg0);
+    }
+
+    public __moveElementToTop(element : RawLinkedListElement<T>) : void {
 		if(element === this.root){
 			return;
 		}
