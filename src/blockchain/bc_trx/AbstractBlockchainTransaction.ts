@@ -2,6 +2,7 @@ import { NullPointerException } from "../../db/base/NullPointerException";
 import { ByteBuffer } from "../../db/base_io/ByteBuffer";
 import { SystemTimestamp } from "../../db/base_timestamp/SystemTimestamp";
 import { IBlockObject } from "../../db/filestore_block/IBlockObject";
+import { NopSmartcontractTransaction } from "../../smartcontract_modular/transaction/NopSmartcontractTransaction";
 import { BalanceUnit } from "../bc_base/BalanceUnit";
 import { CoinbaseTransaction } from "../bc_block_body/CoinbaseTransaction";
 import { StakeBaseTransaction } from "../bc_block_body/StakeBaseTransaction";
@@ -10,6 +11,7 @@ import { RegisterVotePoolTransaction } from "../bc_finalizer_trx/RegisterVotePoo
 import { RevokeMissedTicket } from "../bc_finalizer_trx/RevokeMissedTicket";
 import { RevokeMissVotedTicket } from "../bc_finalizer_trx/RevokeMissVotedTicket";
 import { VoteBlockTransaction } from "../bc_finalizer_trx/VoteBlockTransaction";
+import { NotifyZoneExtendRequestedTransaction } from "../bc_status_cache_extend_shard/NotifyZoneExtendRequestedTransaction";
 import { BalanceTransferTransaction } from "../bc_trx_balance/BalanceTransferTransaction";
 import { GenesisTransaction } from "../bc_trx_genesis/GenesisTransaction";
 import { MerkleTree } from "../merkletree/MerkleTree";
@@ -74,7 +76,15 @@ export abstract class AbstractBlockchainTransaction implements IBlockObject{
         case AbstractBlockchainTransaction.TRX_TYPE_STAKE_BASE:
             ret = new StakeBaseTransaction();
             break;
-            // TODO other transactions
+        case AbstractBlockchainTransaction.TRX_TYPE_SMARTCONTRACT_NOP:
+            ret = new NopSmartcontractTransaction();
+            break;
+        //case AbstractBlockchainTransaction.TRX_TYPE_ICC_NOP:
+        //    ret = new NopInterChainCommunicationTransaction();
+        //    break;
+        case AbstractBlockchainTransaction.TRX_TYPE_ICC_ZONE_EXTEND_REQUESTED:
+            ret = new NotifyZoneExtendRequestedTransaction();
+            break;
         default:
             throw new NullPointerException("AbstractBlockchainTransaction.createFromBinary()");
         }
