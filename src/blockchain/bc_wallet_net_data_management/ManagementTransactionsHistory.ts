@@ -29,25 +29,18 @@ export class ManagementTransactionsHistory {
         return this.list.size();
     }
 
-    public getTransaction(i : number | TransactionId) : AbstractBlockchainTransaction {
+    public getTransaction(i : number | TransactionId) : AbstractBlockchainTransaction | null{
         if(i instanceof TransactionId){
             return this.__getTransaction(i);
         }
 
-        let n = this.list.get(i);
-        if(n != null){
-            return n;
-        }
-        throw new NullPointerException("ManagementTransactionsHistory.getTransaction()");
+        return this.list.get(i);
     }
 
-    public __getTransaction(trxId : TransactionId)  : AbstractBlockchainTransaction {
+    public __getTransaction(trxId : TransactionId)  : AbstractBlockchainTransaction | null {
         let trx = this.map.get(trxId.toString());
 
-        if(trx != undefined){
-            return trx;
-        }
-        throw new NullPointerException("ManagementTransactionsHistory.getTransaction()");
+        return trx != undefined ? trx : null;
     }
 
     public importOtherManagementTransactionsHistory(other : ManagementTransactionsHistory) : void {
@@ -55,7 +48,9 @@ export class ManagementTransactionsHistory {
         for(let i = 0; i != maxLoop; ++i){
             let trx = other.getTransaction(i);
 
-            this.addTransaction(trx);
+            if(trx != null){ // guard
+                this.addTransaction(trx);
+            }
         }
     }
 

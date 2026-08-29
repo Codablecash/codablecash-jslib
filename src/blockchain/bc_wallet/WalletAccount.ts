@@ -7,6 +7,7 @@ import { BalanceUnit } from "../bc_base/BalanceUnit";
 import { StatusStore } from "../bc_base_conf_store/StatusStore";
 import { TransactionData } from "../bc_base_trx_index/TransactionData";
 import { AbstractBlockchainTransaction } from "../bc_trx/AbstractBlockchainTransaction";
+import { IAddressChecker } from "../bc_trx/IAddressChecker";
 import { TransactionId } from "../bc_trx/TransactionId";
 import { IWalletDataEncoder } from "../bc_wallet_encoder/IWalletDataEncoder";
 import { BloomFilter1024 } from "../bc_wallet_filter/BloomFilter1024";
@@ -17,7 +18,7 @@ import { ChangeAddressStore } from "./ChangeAddressStore";
 import { HdWalletSeed } from "./HdWalletSeed";
 import { ReceivingAddressStore } from "./ReceivingAddressStore";
 
-export class WalletAccount extends AbstractWalletAccount {
+export class WalletAccount extends AbstractWalletAccount implements IAddressChecker {
 	public static STORE_NAME = "WalletAccount";
 	public static KEY_ENCRYPTED_SEED = "encryptedSeed";
 
