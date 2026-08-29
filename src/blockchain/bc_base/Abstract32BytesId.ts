@@ -17,6 +17,10 @@ export abstract class Abstract32BytesId implements IBlockObject {
             this.id = null;
         }
     }
+
+	public bufferIsNull() : boolean {
+		return this.id == null;
+	}
     
     public abstract copyData(): IBlockObject;
 

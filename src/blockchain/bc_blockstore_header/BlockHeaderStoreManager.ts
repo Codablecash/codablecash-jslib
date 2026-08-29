@@ -1,7 +1,9 @@
 import { ArrayList } from "../../db/base/ArrayList";
 import { CFile } from "../../db/base_io/CFile";
 import { BlockHeader } from "../bc_block/BlockHeader";
+import { BlockHeaderId } from "../bc_block/BlockHeaderId";
 import { BlockHeaderStoreCache } from "./BlockHeaderStoreCache";
+import { IHeaderRemovalNotifier } from "./IHeaderRemovalNotifier";
 
 
 export class BlockHeaderStoreManager {
@@ -34,83 +36,73 @@ export class BlockHeaderStoreManager {
         let cache = this.cache.getHeaderStoreCacheElement(height, false);
         return cache != null ? cache.getHeadersAtHeight(height) : null;
     }
-/*
-    bool BlockHeaderStoreManager::isEmpty() const noexcept {
-        BlockHeaderStoreCacheElement* cache = this.cache.getHeaderStoreCacheElement(1, false);
-        return cache == nullptr;
+
+    public isEmpty() : boolean {
+        let cache = this.cache.getHeaderStoreCacheElement(1, false);
+        return cache == null;
     }
 
-    ArrayList<BlockHeader>* BlockHeaderStoreManager::getChildrenOf(const BlockHeaderId *headerId, uint64_t height) {
-        StackReadLock __lock(this.rwLock, __FILE__, __LINE__);
-
-        BlockHeaderStoreCacheElement* cache = this.cache.getHeaderStoreCacheElement(height, false);
-        return cache != nullptr ? cache.getChildrenOf(headerId, height) : new ArrayList<BlockHeader>();
+    public getChildrenOf(headerId : BlockHeaderId, height : number) : ArrayList<BlockHeader> {
+        let cache = this.cache.getHeaderStoreCacheElement(height, false);
+        return cache != null ? cache.getChildrenOf(headerId, height) : new ArrayList<BlockHeader>();
     }
 
-
-    void BlockHeaderStoreManager::removeHeader(const BlockHeaderId *hash, uint64_t height) {
-        StackWriteLock __lock(this.rwLock, __FILE__, __LINE__);
-
-        BlockHeaderStoreCacheElement* cache = this.cache.getHeaderStoreCacheElement(height, false);
-        if(cache == nullptr){
+    public removeHeader(hash : BlockHeaderId, height : number) {
+        let cache = this.cache.getHeaderStoreCacheElement(height, false);
+        if(cache == null){
             return;
         }
 
         cache.removeBlock(hash, height);
     }
 
-    BlockHeader* BlockHeaderStoreManager::getHeader(const BlockHeaderId *headerId, uint64_t height) {
-        StackReadLock __lock(this.rwLock, __FILE__, __LINE__);
-
-        return __getHeader(headerId, height);
+    public getHeader(headerId : BlockHeaderId, height : number) : BlockHeader | null {
+        return this.__getHeader(headerId, height);
     }
 
-    BlockHeader* BlockHeaderStoreManager::__getHeader(const BlockHeaderId* headerId, uint64_t height) {
+    public __getHeader(headerId : BlockHeaderId, height : number) : BlockHeader | null {
         if(height < 1 || headerId.bufferIsNull()){
-            return nullptr;
+            return null;
         }
 
-        ArrayList<BlockHeader>* list = __getBlocksAtHeight(height); __STP(list);
-        if(list == nullptr){
-            return nullptr;
+        let list = this.__getBlocksAtHeight(height);
+        if(list == null){
+            return null;
         }
-        list.setDeleteOnExit();
 
-        BlockHeader* ret = nullptr;
+        let ret = null;
 
-        int maxLoop = list.size();
-        for(int i = 0; i != maxLoop; ++i){
-            BlockHeader* header = list.get(i);
-            const BlockHeaderId* id = header.getId();
-            if(id.equals(headerId)){
-                ret = list.remove(i);
-                break;
+        let maxLoop = list.size();
+        for(let i = 0; i != maxLoop; ++i){
+            let header = list.get(i);
+
+            if(header != null){
+                let id = header.getId();
+                if(id.equals(headerId)){
+                    ret = list.remove(i);
+                    break;
+                }
             }
         }
 
         return ret;
     }
 
-    BlockHeader* BlockHeaderStoreManager::getNBlocksBefore(const BlockHeaderId *headerId, uint64_t height, int beforeNBlocks) {
-        BlockHeader* currentHeader = __getHeader(headerId, height);
+    public getNBlocksBefore(headerId : BlockHeaderId, height : number, beforeNBlocks : number) : BlockHeader | null{
+        let currentHeader = this.__getHeader(headerId, height);
 
         // ExceptionThrower<BlockHeaderNotFoundException>::throwExceptionIfCondition(currentHeader == nullptr, L"The currentHeader does not found.", __FILE__, __LINE__);
 
-        uint64_t currentHeight = height;
-        for(int i = 0; i != beforeNBlocks; ++i){
-            __STP(currentHeader);
-            currentHeader = __getHeader(currentHeader.getLastHeaderId(), currentHeader.getHeight() - 1);
+        let currentHeight = height;
+        for(let i = 0; currentHeader != null && i != beforeNBlocks; ++i){
+            currentHeader = this.__getHeader(currentHeader.getLastHeaderId(), currentHeader.getHeight() - 1);
         }
 
         return currentHeader;
     }
 
-    void BlockHeaderStoreManager::finalize(uint64_t height,	const BlockHeaderId *headerId, IHeaderRemovalNotifier* notifier) {
-        StackWriteLock __lock(this.rwLock, __FILE__, __LINE__);
-
-        BlockHeaderStoreCacheElement* cache = this.cache.getHeaderStoreCacheElement(height, false);
+    public finalize(height : number, headerId : BlockHeaderId, notifier : IHeaderRemovalNotifier) {
+        let cache = this.cache.getHeaderStoreCacheElement(height, false);
         cache.finalize(height, headerId, notifier);
     }
-*/
-    // TODO implement
 }
