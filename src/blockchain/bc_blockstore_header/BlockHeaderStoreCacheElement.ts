@@ -21,7 +21,7 @@ export class BlockHeaderStoreCacheElement implements IComparable {
         this.heightIndex = null;
     }
 
-    compareTo(other: IComparable | null): number {
+    public compareTo(other: IComparable | null): number {
         if(other == null){
             return 1;
         }
@@ -30,6 +30,7 @@ export class BlockHeaderStoreCacheElement implements IComparable {
         return this.index - o.index;
     }
 
+    // TODO implements
 
 
 }

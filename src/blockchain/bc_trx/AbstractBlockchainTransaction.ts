@@ -12,6 +12,7 @@ import { RevokeMissVotedTicket } from "../bc_finalizer_trx/RevokeMissVotedTicket
 import { VoteBlockTransaction } from "../bc_finalizer_trx/VoteBlockTransaction";
 import { BalanceTransferTransaction } from "../bc_trx_balance/BalanceTransferTransaction";
 import { GenesisTransaction } from "../bc_trx_genesis/GenesisTransaction";
+import { MerkleTree } from "../merkletree/MerkleTree";
 import { AbstractUtxo } from "./AbstractUtxo";
 import { AbstractUtxoReference } from "./AbstractUtxoReference";
 import { TransactionId } from "./TransactionId";
@@ -20,16 +21,21 @@ import { TransactionVersion } from "./TransactionVersion";
 
 export abstract class AbstractBlockchainTransaction implements IBlockObject{
     public static readonly TRX_TYPE_GENESIS = 1;
-    public static readonly TRX_TYPE_BANANCE_TRANSFER = 1;
+    public static readonly TRX_TYPE_BANANCE_TRANSFER = 2;
 
-    public static readonly TRX_TYPE_REGISTER_VOTE_POOL = 1;
-    public static readonly TRX_TYPE_REGISTER_TICKET = 1;
-    public static readonly TRX_TYPE_VOTE_BLOCK = 1;
-    public static readonly TRX_TYPE_REVOKE_MISSED_TICKET = 1;
-    public static readonly TRX_TYPE_REVOKE_MISS_VOTED_TICKET = 1;
+    public static readonly TRX_TYPE_REGISTER_VOTE_POOL = 3;
+    public static readonly TRX_TYPE_REGISTER_TICKET = 4;
+    public static readonly TRX_TYPE_VOTE_BLOCK = 5;
+    public static readonly TRX_TYPE_REVOKE_MISSED_TICKET = 6;
+    public static readonly TRX_TYPE_REVOKE_MISS_VOTED_TICKET = 7;
 
-    public static readonly TRX_TYPE_COIN_BASE = 1;
-    public static readonly TRX_TYPE_STAKE_BASE = 1;
+    public static readonly TRX_TYPE_COIN_BASE = 8;
+    public static readonly TRX_TYPE_STAKE_BASE = 9;
+
+    public static readonly TRX_TYPE_SMARTCONTRACT_NOP = 10;
+
+    public static readonly TRX_TYPE_ICC_NOP = 20;
+    public static readonly TRX_TYPE_ICC_ZONE_EXTEND_REQUESTED = 21;
 
     protected trxId : TransactionId | null;
     protected timestamp : SystemTimestamp;
@@ -68,6 +74,7 @@ export abstract class AbstractBlockchainTransaction implements IBlockObject{
         case AbstractBlockchainTransaction.TRX_TYPE_STAKE_BASE:
             ret = new StakeBaseTransaction();
             break;
+            // TODO other transactions
         default:
             throw new NullPointerException("AbstractBlockchainTransaction.createFromBinary()");
         }
@@ -119,5 +126,9 @@ export abstract class AbstractBlockchainTransaction implements IBlockObject{
 	public getTimestamp() : SystemTimestamp {
 		return this.timestamp;
 	}
+
+    public addInternalMerkleTreeElement(tree : MerkleTree) : void {
+
+    }
 
 }

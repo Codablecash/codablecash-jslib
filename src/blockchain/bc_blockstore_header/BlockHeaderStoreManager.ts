@@ -16,4 +16,6 @@ export class BlockHeaderStoreManager {
         this.cache = new BlockHeaderStoreCache(this.baseDir, sectionLimit);
         this.sectionLimit = sectionLimit;
     }
+
+    // TODO implement
 }

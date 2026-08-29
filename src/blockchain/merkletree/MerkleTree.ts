@@ -26,6 +26,13 @@ export class MerkleTree {
         this.list = new ArrayList<ByteBuffer>();
     }
 
+	public getRoot() : AbstractMerkleElement {
+        if(this.root != null){
+            return this.root;
+        }
+		throw new NullPointerException("MerkleTree.getRoot()");
+	}
+
     public addElement(arg0 : any, arg1? : number) : void {
         if(arg0 instanceof Uint8Array && arg1 != undefined){
             this.addArray(arg0 , arg1);
