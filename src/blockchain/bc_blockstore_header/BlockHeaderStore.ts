@@ -65,7 +65,7 @@ export class BlockHeaderStore {
 
     public storeHeader(header : BlockHeader) : number {
         if(this.store != null){
-            let size = header.binarySize();// TODO  check
+            let size = header.binarySize();
 
             let buff = ByteBuffer.allocateWithEndian(size, true);
             header.toBinary(buff);

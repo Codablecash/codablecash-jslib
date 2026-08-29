@@ -221,4 +221,15 @@ export class BlockHeader implements IBlockObject {
     public setHeaderId(id : BlockHeaderId) : void {
         this.id = id;
     }
+
+    public getId() {
+        return this.id;
+    }
+
+    public getHeight() : number {
+        return this.height;
+    }
+    public getLastHeaderId() : BlockHeaderId {
+		return this.lastid;
+	}
 }
