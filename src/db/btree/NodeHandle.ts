@@ -1,3 +1,4 @@
+import { IComparable } from "../base/IComparable";
 import { RawArrayPrimitive } from "../base/RawArrayPrimitive";
 import { NodecacheRef } from "../btree_cache/NodecacheRef";
 import { AbstractBtreeKey } from "./AbstractBtreeKey";
@@ -5,11 +6,19 @@ import { AbstractTreeNode } from "./AbstractTreeNode";
 import { DataNode } from "./DataNode";
 import { TreeNode } from "./TreeNode";
 
-export class NodeHandle {
+export class NodeHandle implements IComparable {
     private ref : NodecacheRef;
 
     constructor(ref : NodecacheRef) {
         this.ref = ref;
+    }
+    
+    public compareTo(other: IComparable | null): number {
+        let o = <NodeHandle>other;
+        if(o == null){
+            return 1;
+        }
+        return this.ref.compareTo(o.ref);
     }
 
     public clone() {

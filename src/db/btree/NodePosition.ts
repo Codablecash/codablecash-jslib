@@ -1,4 +1,5 @@
 import { ArrayList } from "../base/ArrayList";
+import { IComparable } from "../base/IComparable";
 import { NullPointerException } from "../base/NullPointerException";
 import { RawArrayPrimitive } from "../base/RawArrayPrimitive";
 import { AbstractBtreeKey } from "./AbstractBtreeKey";
@@ -6,7 +7,7 @@ import { BtreeStorage } from "./BtreeStorage";
 import { NodeHandle } from "./NodeHandle";
 import { NodeStructureException } from "./NodeStructureException";
 
-export class NodePosition {
+export class NodePosition implements IComparable{
 	private pos : number;
 	private node : NodeHandle;
 	private innerNodes : ArrayList<NodeHandle>;
@@ -17,6 +18,14 @@ export class NodePosition {
         this.pos = 0;
         this.innerNodes = new ArrayList<NodeHandle>();
         this.innerCount = 0;
+    }
+
+   public compareTo(other: IComparable | null): number {
+        let o = <NodePosition>other;
+        if(o == null){
+            return 1;
+        }
+        return this.pos - o.pos;
     }
 
     public clearCache() {

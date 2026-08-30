@@ -1,8 +1,9 @@
 import { ArrayList } from "../../db/base/ArrayList";
+import { IComparable } from "../../db/base/IComparable";
 import { NullPointerException } from "../../db/base/NullPointerException";
 import { ByteBuffer } from "../../db/base_io/ByteBuffer";
 
-export abstract class AbstractMerkleElement {
+export abstract class AbstractMerkleElement implements IComparable {
 	protected hash : ByteBuffer | null;
 	protected parent : AbstractMerkleElement | null;
 	protected children : ArrayList<AbstractMerkleElement>;
@@ -11,6 +12,19 @@ export abstract class AbstractMerkleElement {
         this.hash = null;
         this.parent = null;
         this.children = new ArrayList<AbstractMerkleElement>();
+    }
+    public compareTo(other: IComparable | null): number {
+        let o = <AbstractMerkleElement>other;
+        if(o == null|| o.hash == null){
+            if(this.hash == null){
+                return 0;
+            }
+            return 1;
+        }
+        if(this.hash == null){
+            return -1;
+        }
+        return this.hash.binaryCmp(o.hash);
     }
 
     public abstract find(hash : ByteBuffer) : AbstractMerkleElement | null;

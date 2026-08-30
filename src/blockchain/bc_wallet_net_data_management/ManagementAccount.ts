@@ -1,4 +1,5 @@
 import { ArrayList } from "../../db/base/ArrayList";
+import { IComparable } from "../../db/base/IComparable";
 import { AbstractBlockchainTransaction } from "../bc_trx/AbstractBlockchainTransaction";
 import { AbstractUtxoReference } from "../bc_trx/AbstractUtxoReference";
 import { IAddressChecker } from "../bc_trx/IAddressChecker";
@@ -9,7 +10,7 @@ import { ManagedUtxoCacheRecord } from "./ManagedUtxoCacheRecord";
 import { ManagementTransactionsHistory } from "./ManagementTransactionsHistory";
 
 
-export class ManagementAccount implements IUtxoRefChecker {
+export class ManagementAccount implements IUtxoRefChecker, IComparable {
 	private trxHistory : ManagementTransactionsHistory;
 	private utxoCache : ManagedUtxoCache;
 
@@ -20,6 +21,13 @@ export class ManagementAccount implements IUtxoRefChecker {
 
         this.trxHistory = new ManagementTransactionsHistory();
         this.utxoCache = new ManagedUtxoCache();
+    }
+    public compareTo(other: IComparable | null): number {
+        let o = <ManagementAccount>other;
+        if(o == null){
+            return 1;
+        }
+        return this.storeType - o.storeType;
     }
 
     public reset() : void {

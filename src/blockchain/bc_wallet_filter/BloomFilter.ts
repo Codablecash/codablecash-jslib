@@ -1,7 +1,8 @@
 import { Sha256 } from "../../base/crypto/Sha256";
+import { IComparable } from "../../db/base/IComparable";
 import { ByteBuffer } from "../../db/base_io/ByteBuffer";
 
-export class BloomFilter {
+export class BloomFilter implements IComparable {
     protected byteLength : number;
     protected buffer : Uint8Array;
     protected bitlength : number;
@@ -13,6 +14,25 @@ export class BloomFilter {
 
         this.bitlength = byteLength * 8;
     }
+
+    public compareTo(other: IComparable | null): number {
+        let o = <BloomFilter>other;
+        if(o == null){
+            return 1;
+        }
+
+        let shlen = this.buffer.length <= o.buffer.length ? this.buffer.length : o.buffer.length;
+
+        for (let i = 0; i < shlen; i++) {
+            let diff = this.buffer[i] - o.buffer[i];
+            if (diff != 0){
+                return diff;
+            }
+        }
+
+        return this.buffer.length <= o.buffer.length ? 1 : -1;
+    }
+
 
     public add(b : Uint8Array, length : number) {
         let bb = Sha256.sha256(b, true);

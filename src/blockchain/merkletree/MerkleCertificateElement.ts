@@ -1,13 +1,22 @@
 import { IBlockObject } from "../../db/filestore_block/IBlockObject";
 import { ByteBuffer } from "../../db/base_io/ByteBuffer";
+import { IComparable } from "../../db/base/IComparable";
 
-export class MerkleCertificateElement implements IBlockObject {
+export class MerkleCertificateElement implements IBlockObject, IComparable {
 	private hash : ByteBuffer;
 	private left : boolean;
 
     constructor(hash : ByteBuffer, left : boolean){
         this.hash = hash.clone();
         this.left = left;
+    }
+    
+    public compareTo(other: IComparable | null): number {
+        let o = <MerkleCertificateElement>other;
+        if(o == null){
+            return 1;
+        }
+        return this.hash.binaryCmp(o.hash);
     }
     
 	public isLeft() : boolean {

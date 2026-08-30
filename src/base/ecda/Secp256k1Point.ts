@@ -1,8 +1,9 @@
+import { IComparable } from "../../db/base/IComparable";
 import { ByteBuffer } from "../../db/base_io/ByteBuffer";
 import { BigInteger } from "../../db/numeric/BigInteger";
 
 
-export class Secp256k1Point {
+export class Secp256k1Point implements IComparable {
     public static readonly p = new BigInteger(0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2Fn);
     public static readonly a = new BigInteger(0n);
     public static readonly b = new BigInteger(7n);
@@ -32,11 +33,26 @@ export class Secp256k1Point {
         ret += this.x.toString();
         ret += ", y : ";
         ret += this.y.toString();
+        return ret;
     }
 
     constructor(x =  Secp256k1Point.gX, y =  Secp256k1Point.gY){
         this.x = new BigInteger(x.getValue());
         this.y = new BigInteger(y.getValue());
+    }
+
+    public compareTo(other: IComparable | null): number {
+        if(other == null){
+            return 1;
+        }
+
+        let o = <Secp256k1Point>other;
+        let diff = this.x.compareTo(o.x);
+
+        if(diff != 0){
+            return diff;
+        }
+        return this.y.compareTo(o.y);
     }
 
     public copy() : Secp256k1Point {

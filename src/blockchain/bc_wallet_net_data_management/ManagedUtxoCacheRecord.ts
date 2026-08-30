@@ -1,10 +1,11 @@
+import { IComparable } from "../../db/base/IComparable";
 import { NullPointerException } from "../../db/base/NullPointerException";
 import { AbstractUtxo } from "../bc_trx/AbstractUtxo";
 import { TransactionId } from "../bc_trx/TransactionId";
 import { UtxoId } from "../bc_trx/UtxoId";
 
 
-export class ManagedUtxoCacheRecord {
+export class ManagedUtxoCacheRecord implements IComparable {
 	public static readonly NONE = 0;
 	public static readonly FINALIZED = 1;
 	public static readonly UNFINALIZED = 2;
@@ -18,6 +19,20 @@ export class ManagedUtxoCacheRecord {
         this.utxo = null;
         this.type = ManagedUtxoCacheRecord.FINALIZED;
         this.transactionId = null;        
+    }
+    
+    public compareTo(other: IComparable | null): number {
+        let o = <ManagedUtxoCacheRecord>other;
+        if(o == null|| o.utxo == null){
+            if(this.utxo == null){
+                return 0;
+            }
+            return 1;
+        }
+        if(this.utxo == null){
+            return -1;
+        }
+        return this.utxo.compareTo(o.utxo);
     }
 
 	public getUtxo() : AbstractUtxo {

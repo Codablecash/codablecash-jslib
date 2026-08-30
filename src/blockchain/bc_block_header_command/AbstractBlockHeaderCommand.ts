@@ -1,4 +1,5 @@
 import { Sha256 } from "../../base/crypto/Sha256";
+import { IComparable } from "../../db/base/IComparable";
 import { NullPointerException } from "../../db/base/NullPointerException";
 import { ByteBuffer } from "../../db/base_io/ByteBuffer";
 import { IBlockObject } from "../../db/filestore_block/IBlockObject";
@@ -7,7 +8,7 @@ import { NewShardZoneCommand } from "./NewShardZoneCommand";
 import { RecognizedNewShardCommand } from "./RecognizedNewShardCommand";
 
 
-export abstract class AbstractBlockHeaderCommand implements IBlockObject {
+export abstract class AbstractBlockHeaderCommand implements IBlockObject, IComparable {
 	public static NEW_SHARD_COMMAND = 1;
 	public static RECOGNIZED_SHARD_COMMAND = 2;
 
@@ -17,6 +18,20 @@ export abstract class AbstractBlockHeaderCommand implements IBlockObject {
     constructor(type : number){
         this.type = type;
         this.commandId = null;
+    }
+    
+    public compareTo(other: IComparable | null): number {
+        let o = <AbstractBlockHeaderCommand>other;
+        if(o == null || o.commandId == null){
+            if(this.commandId == null){
+                return 0;
+            }
+            return 1;
+        }
+        if(this.commandId == null){
+            return -1;
+        }
+        return this.commandId.compareTo(o.commandId);
     }
     
     public abstract binarySize(): number;

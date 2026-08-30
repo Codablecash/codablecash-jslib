@@ -1,3 +1,4 @@
+import { IComparable } from "../../db/base/IComparable";
 import { NullPointerException } from "../../db/base/NullPointerException";
 import { ByteBuffer } from "../../db/base_io/ByteBuffer";
 import { SystemTimestamp } from "../../db/base_timestamp/SystemTimestamp";
@@ -21,7 +22,7 @@ import { TransactionId } from "./TransactionId";
 import { TransactionVersion } from "./TransactionVersion";
 
 
-export abstract class AbstractBlockchainTransaction implements IBlockObject{
+export abstract class AbstractBlockchainTransaction implements IBlockObject, IComparable{
     public static readonly TRX_TYPE_GENESIS = 1;
     public static readonly TRX_TYPE_BANANCE_TRANSFER = 2;
 
@@ -99,6 +100,21 @@ export abstract class AbstractBlockchainTransaction implements IBlockObject{
         this.trxId = null;
         this.timestamp = new SystemTimestamp();
         this.version = new TransactionVersion(1, 0 , 0);        
+    }
+
+    public compareTo(other: IComparable | null): number {
+        let o = <AbstractBlockchainTransaction>other;
+        if(o == null || o.trxId == null){
+            if(this.trxId == null){
+                return 0;
+            }
+            return 1;
+        }
+        if(this.trxId == null){
+            return -1;
+        }
+
+        return this.trxId.compareTo(o.trxId);
     }
 
 	public getTransactionId() : TransactionId {

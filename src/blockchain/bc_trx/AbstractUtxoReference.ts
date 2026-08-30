@@ -1,4 +1,5 @@
 import { ArrayList } from "../../db/base/ArrayList";
+import { IComparable } from "../../db/base/IComparable";
 import { NullPointerException } from "../../db/base/NullPointerException";
 import { ByteBuffer } from "../../db/base_io/ByteBuffer";
 import { IBlockObject } from "../../db/filestore_block/IBlockObject";
@@ -12,7 +13,7 @@ import { BloomFilter1024 } from "../bc_wallet_filter/BloomFilter1024";
 import { BloomHash1024 } from "../bc_wallet_filter/BloomHash1024";
 import { UtxoId } from "./UtxoId";
 
-export abstract class AbstractUtxoReference implements IBlockObject {
+export abstract class AbstractUtxoReference implements IBlockObject, IComparable {
     public static UTXO_REF_TYPE_BALANCE = 1;
     public static UTXO_REF_TYPE_UTXO_TICKET = 2;
     public static UTXO_REF_TYPE_UTXO_VOTED_TICKET = 3;
@@ -26,6 +27,21 @@ export abstract class AbstractUtxoReference implements IBlockObject {
     constructor(){
         this.utxoId = null;
         this.bloomHash = null;
+    }
+
+    public compareTo(other: IComparable | null): number {
+        let o = <AbstractUtxoReference>other;
+        if(o == null || o.utxoId == null){
+            if(this.utxoId == null){
+                return 0;
+            }
+            return 1;
+        }
+        if(this.utxoId == null){
+            return -1;
+        }
+
+        return this.utxoId.compareTo(o.utxoId);
     }
 
     public static createFromBinary(input : ByteBuffer) : AbstractUtxoReference {

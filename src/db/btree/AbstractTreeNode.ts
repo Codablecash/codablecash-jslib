@@ -1,3 +1,4 @@
+import { IComparable } from "../base/IComparable";
 import { ByteBuffer } from "../base_io/ByteBuffer";
 import { BtreeKeyFactory } from "../btreekey/BtreeKeyFactory";
 import { IBlockObject } from "../filestore_block/IBlockObject";
@@ -6,7 +7,7 @@ import { DataNode } from "./DataNode";
 import { NodeStructureException } from "./NodeStructureException";
 import { TreeNode } from "./TreeNode";
 
-export abstract class AbstractTreeNode implements IBlockObject {
+export abstract class AbstractTreeNode implements IBlockObject, IComparable {
 	public static readonly NODE : number = 0x01;
 	public static readonly DATA : number = 0x02;
 
@@ -15,7 +16,15 @@ export abstract class AbstractTreeNode implements IBlockObject {
 
     constructor(key : AbstractBtreeKey | null) {
         this.key = key;
-        this.fpos = 0;      
+        this.fpos = 0;
+    }
+    
+    public compareTo(other: IComparable | null): number {
+        let o = <AbstractTreeNode>other;
+        if(o == null){
+            return 1;
+        }
+        return this.fpos - o.fpos;
     }
     
     public abstract copyData(): IBlockObject;

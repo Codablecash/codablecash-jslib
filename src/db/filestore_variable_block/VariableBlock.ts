@@ -1,10 +1,11 @@
+import { IComparable } from "../base/IComparable";
 import { ByteBuffer } from "../base_io/ByteBuffer";
 import { LongRange } from "../filestore/LongRange";
 import { FileIOException } from "../osenv/FileIOException";
 import { VariableBlockFileBody } from "./VariableBlockFileBody";
 import { VariableBlockHeader } from "./VariableBlockHeader";
 
-export class VariableBlock {
+export class VariableBlock implements IComparable {
     public static HEADER_SIZE = 2 + 8;
 
     private blockSize : number;
@@ -28,6 +29,12 @@ export class VariableBlock {
             let sd = data.slice(0, used);
             this.data.set(sd, 0);
         }
+    }
+    compareTo(other: IComparable | null): number {
+        if(other == null){
+            return 1;
+        }
+        return this.currentfPos - (<VariableBlock>other).currentfPos;
     }
 
     public writeBack(body : VariableBlockFileBody) : void {

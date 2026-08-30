@@ -1,5 +1,6 @@
 import { Sha256 } from "../../base/crypto/Sha256";
 import { ArrayList } from "../../db/base/ArrayList";
+import { IComparable } from "../../db/base/IComparable";
 import { ByteBuffer } from "../../db/base_io/ByteBuffer";
 import { SystemTimestamp } from "../../db/base_timestamp/SystemTimestamp";
 import { IBlockObject } from "../../db/filestore_block/IBlockObject";
@@ -12,7 +13,7 @@ import { BlockHeaderId } from "./BlockHeaderId";
 import { BlockMerkleRoot } from "./BlockMerkleRoot";
 import { BlockVersion } from "./BlockVersion";
 
-export class BlockHeader implements IBlockObject {
+export class BlockHeader implements IBlockObject, IComparable {
 	private version : BlockVersion;
 
 	private zone : number;
@@ -57,6 +58,20 @@ export class BlockHeader implements IBlockObject {
         this.commnads = new ArrayList<AbstractBlockHeaderCommand>();       
     }
 
+    public compareTo(other: IComparable | null): number {
+        let o = <BlockHeader>other;
+        if(o == null || o.id == null){
+            if(this.id == null){
+                return 0;
+            }
+            return 1;
+        }
+        if(this.id == null){
+            return -1;
+        }
+
+        return this.id.compareTo(o.id);
+    }
 
     public binarySize() : number {
         let total = this.version.binarySize() + 2 + 8;

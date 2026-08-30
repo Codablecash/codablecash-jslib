@@ -1,17 +1,35 @@
+import { IComparable } from "./IComparable";
 
-export class ArrayList<T> {
+type ArrayListCmp = (x : IComparable | null, y : IComparable | null) => number;
+
+function defaultCompare(x : IComparable | null, y : IComparable | null) : number {
+    if(x == null){
+        if(y == null){
+            return 0;
+        }
+        else {
+            return 1;
+        }
+    }
+
+    return x.compareTo(y);
+}
+
+export class ArrayList<T extends IComparable> {
     private numArray : number;
     private currentSize : number;
     private root : (T | null)[];
     private cursor : number;
     private sorted : boolean;
+    private compare : ArrayListCmp;
 
-    constructor(defaultSize = 32) {
+    constructor(defaultSize = 32, cmp : ArrayListCmp = defaultCompare) {
         this.numArray = 0;
         this.currentSize = defaultSize;
         this.root = Array.from({length: this.numArray});
         this.cursor = 0;
         this.sorted = true;
+        this.compare = cmp;
     }
 
     public addElement(ptr : T | null){
@@ -100,7 +118,7 @@ export class ArrayList<T> {
 		for(let i = 0; i != maxLoop; ++i){
 			let other = this.get(i);
 
-			if(ptr === other){
+            if(this.compare(ptr, other) == 0){
 				return i;
 			}
 		}
