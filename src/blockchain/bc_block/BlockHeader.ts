@@ -247,6 +247,9 @@ export class BlockHeader implements IBlockObject, IComparable {
     public getId() {
         return this.id;
     }
+    public getZone() : number {
+		return this.zone;
+	}
 	public getTimestamp() : SystemTimestamp {
 		return this.timestamp;
 	}

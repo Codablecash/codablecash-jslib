@@ -16,6 +16,10 @@ export class BlockHead implements IComparable{
 		return this.list.size();
 	}
 
+	public getHeaders() : ArrayList<BlockHeadElement> {
+		return this.list;
+	}
+
     public copyOriginalBlockHead() : BlockHead {
         let newHead = new BlockHead();
 

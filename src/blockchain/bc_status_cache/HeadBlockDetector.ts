@@ -1,10 +1,17 @@
 import { ArrayList } from "../../db/base/ArrayList";
 import { NullPointerException } from "../../db/base/NullPointerException";
+import { CodablecashSystemParam } from "../bc/CodablecashSystemParam";
 import { ISystemLogger } from "../bc/ISystemLogger";
+import { BlockHeader } from "../bc_block/BlockHeader";
 import { BlockHeaderId } from "../bc_block/BlockHeaderId";
+import { VotePart } from "../bc_block_vote/VotePart";
 import { BlockHeaderStoreManager } from "../bc_blockstore_header/BlockHeaderStoreManager";
 import { BlockHead } from "./BlockHead";
+import { BlockHeadElement } from "./BlockHeadElement";
+import { BlockStack } from "./BlockStack";
+import { BlockStackElement } from "./BlockStackElement";
 import { HeadBlockDetectorCache } from "./HeadBlockDetectorCache";
+import { HeadBlockDetectorCacheElement } from "./HeadBlockDetectorCacheElement";
 import { IBlockchainStoreProvider } from "./IBlockchainStoreProvider";
 
 
@@ -43,56 +50,65 @@ export class HeadBlockDetector {
         let startHeight = finalizedHeight > 0 ? finalizedHeight : 1;
         let finalizedTopHeaderId = this.getFinalizedHeaderId(headerStore, startHeight);
 
-        BlockStack stack;
+        let stack  = new BlockStack();
         // first root
         {
-            ArrayList<BlockHeader>* headerList = headerStore.getBlocksAtHeight(startHeight); __STP(headerList);
-            headerList.setDeleteOnExit();
+            let headerList = headerStore.getBlocksAtHeight(startHeight);
 
-            BlockStackElement* element = new BlockStackElement();
-            int maxLoop = headerList.size();
-            for(int i = 0; i != maxLoop; ++i){
-                const BlockHeader* header = headerList.get(i);
-                const BlockHeaderId* headerId = header.getId();
+            if(headerList != null && finalizedTopHeaderId != null){
+                let element = new BlockStackElement();
+                let maxLoop = headerList.size();
+                for(let i = 0; i != maxLoop; ++i){
+                    let header = headerList.get(i);
 
+                    if(header != null){
+                        let headerId = header.getId();
 
-                // filter finalized root
-                if(header.getHeight() == 1 || finalizedTopHeaderId.equals(headerId)){
-                    element.addHeader(header);
+                        // filter finalized root
+                        if(header.getHeight() == 1 || finalizedTopHeaderId.equals(headerId)){
+                            element.addHeader(header);
+                        }
+                    }
                 }
+                stack.push(element);
             }
-            stack.push(element);
+            else {
+                throw new NullPointerException("HeadBlockDetector.buildHeads() 1");
+            }
+
         }
 
         // children
         while(!stack.isEmpty()){
-            BlockStackElement* element = stack.top();
-            const BlockHeader* header = element.current();
-            const BlockHeaderId* headerId = header.getId();
-            uint64_t height = header.getHeight();
+            let element = stack.top();
+            let header = element.current();
+            let headerId = header.getId();
+            let height = header.getHeight();
 
             // getChildrenOf() does not return nullptr
-            ArrayList<BlockHeader>* children = headerStore.getChildrenOf(headerId, height); __STP(children);
-            children.setDeleteOnExit();
+            let children = headerStore.getChildrenOf(headerId, height);
 
-            // add generated block
-            if(this.scheduledBlock != nullptr){
-                addScheculedBlock(height, headerId, children);
-            }
+            // add generated block ** ignore
+            //if(this.scheduledBlock != nullptr){
+            //   addScheculedBlock(height, headerId, children);
+            //
 
             if(children.isEmpty()){ // head
-                BlockHead* head = stack.createBlockHead();
+                let head = stack.createBlockHead();
                 this.headsList.addElement(head);
 
                 stack.gotoBranch();
             }
             else{ // add children
-                BlockStackElement* element = new BlockStackElement();
+                let element = new BlockStackElement();
 
-                int maxLoop = children.size();
-                for(int i = 0; i != maxLoop; ++i){
-                    const BlockHeader* header = children.get(i);
-                    element.addHeader(header);
+                let maxLoop = children.size();
+                for(let i = 0; i != maxLoop; ++i){
+                    let header = children.get(i);
+
+                    if(header != null){
+                        element.addHeader(header);
+                    }
                 }
 
                 stack.push(element);
@@ -118,6 +134,134 @@ export class HeadBlockDetector {
         throw new NullPointerException("HeadBlockDetector.getFinalizedHeaderId()");
     }
 
+    public normalizeHeadLength() : void {
+        let length = 0;
+
+        {
+            let maxLoop = this.headsList.size();
+            for(let i = 0; i != maxLoop; ++i){
+                let head = this.headsList.get(i);
+
+                if(head != null){
+                    let size = head.size();
+
+                    if(size > length){
+                        length = size;
+                    }
+                }
+            }
+        }
+
+        {
+            let maxLoop = this.headsList.size();
+            for(let i = 0; i != maxLoop; ++i){
+                let head = this.headsList.get(i);
+
+                if(head != null){
+                    head.normalizeWithlength(length);
+                }
+            }
+        }
+    }
+
+    public evaluate(zone : number, chain : IBlockchainStoreProvider, config : CodablecashSystemParam) : void {
+
+        let maxLoop = this.headsList.size();
+        for(let i = 0; i != maxLoop; ++i){
+            let head = this.headsList.get(i);
+
+            if(head != null){
+                this.evaluateHead(zone, head, chain, config);
+            }
+        }
+    }
+
+    public evaluateHead(zone : number, head : BlockHead, chain : IBlockchainStoreProvider, config : CodablecashSystemParam) {
+        let list = head.getHeaders();
+        let maxLoop = list.size();
+        for(let i = 0; i != maxLoop; ++i){
+            let element = list.get(i);
+            if(element != null && element.isPaddong()){
+                break;
+            }
+
+            if(element != null){ // guard
+                let header = element.getBlockHeader();
+                let headerId = header.getId();
+                let height = header.getHeight();
+
+                // use cache
+                {
+                    let cacheElement = this.cache.getCache(headerId);
+                    if(cacheElement != null){
+                        cacheElement.export2BlockHeadElement(element);
+                        continue;
+                    }
+                }
+
+                let cacheElemet = new HeadBlockDetectorCacheElement();
+                // vote
+                this.handleVotes(config, chain, list, header, i);
+
+                // register cache
+                cacheElemet.importBlockHeadElement(element);
+                this.cache.registerCache(headerId, cacheElemet);
+            }
+        }
+    }
+
+    private handleVotes(config : CodablecashSystemParam, chain : IBlockchainStoreProvider, list : ArrayList<BlockHeadElement>, header : BlockHeader, i : number) : void{
+        let height = header.getHeight();
+
+        let voteBeforeNBlocks = config.getVoteBeforeNBlocks(height);
+        let voteBlockIncludeAfterNBlocks = config.getVoteBlockIncludeAfterNBlocks(height);
+        let diffBlocks = voteBeforeNBlocks + voteBlockIncludeAfterNBlocks;
+
+        let pos = i - diffBlocks;
+        if(pos >= 0){
+            // calc voted score of voted block
+            let vorts = header.getVotePart();
+            let element = list.get(pos); // voted block
+
+            if(element != null){ // guard
+                element.importVotes(vorts);
+
+                // voting
+                let votedHeader = element.getBlockHeader();
+                let votedId = votedHeader.getId();
+                let votingElement = list.get(i); // self block
+
+                if(votingElement != null){ // guard
+                    votingElement.calcVotingScore(votedId);
+                    return;
+                }
+            }
+
+        }
+
+
+        // can not voted score of voted block
+        // calc only voting of this block
+        if(height > diffBlocks){
+            let votedHeight = height - diffBlocks;
+
+            let zone = header.getZone();
+            let headerManager = chain.getHeaderManager(zone);
+
+            let votingHeaderId = header.getId();
+            let votedHeader = headerManager.getNBlocksBefore(votingHeaderId, height, diffBlocks);
+
+            if(votedHeader != null){ // guard
+                let votedId = votedHeader.getId();
+
+                let votingElement = list.get(i); // self block
+                if(votingElement != null){ // guard
+                    votingElement.calcVotingScore(votedId);
+                }
+            }
+
+        }
+    }
 
     // TODO implement
 }
