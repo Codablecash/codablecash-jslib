@@ -60,6 +60,7 @@ export class BlockHeader implements IBlockObject, IComparable {
     public getVotePart() {
         return this.votePart;
     }
+
     public compareTo(other: IComparable | null): number {
         let o = <BlockHeader>other;
         if(o == null || o.id == null){
@@ -239,10 +240,16 @@ export class BlockHeader implements IBlockObject, IComparable {
         this.id = id;
     }
 
+    public setTimestamp(tm : SystemTimestamp) : void {
+        this.timestamp = tm.copy();
+    }
+
     public getId() {
         return this.id;
     }
-
+	public getTimestamp() : SystemTimestamp {
+		return this.timestamp;
+	}
     public getHeight() : number {
         return this.height;
     }
