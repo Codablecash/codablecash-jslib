@@ -263,5 +263,25 @@ export class HeadBlockDetector {
         }
     }
 
-    // TODO implement
+    public selectChain() : void {
+        this.headsList.sort();
+
+        let maxLoop = this.headsList.size();
+
+        let first = this.headsList.get(maxLoop - 1);
+        if(first != null){
+            this.selectedHead = first.copyOriginalBlockHead();
+        }
+
+        // second
+        this.secondHead = null;
+        if(maxLoop > 1){
+            let second = this.headsList.get(maxLoop - 2);
+            if(second != null){
+                this.secondHead = second.copyOriginalBlockHead();
+            }
+        }
+
+        this.headsList.reset();
+    }
 }

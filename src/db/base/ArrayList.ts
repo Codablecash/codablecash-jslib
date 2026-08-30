@@ -39,6 +39,8 @@ export class ArrayList<T extends IComparable> {
 
         this.root[this.cursor++] = ptr;
         this.numArray++;
+
+        this.sorted = false;
     }
 
 	public addAll(list : ArrayList<T>){
@@ -47,10 +49,13 @@ export class ArrayList<T extends IComparable> {
 			let ptr = list.get(i);
 			this.addElement(ptr);
 		}
+
+        this.sorted = false;
 	}
 
     public setElement(ptr : T | null, index : number) : void {
         this.root[index] = ptr;
+        this.sorted = false;
     }
 
     public reset() {
@@ -111,7 +116,7 @@ export class ArrayList<T extends IComparable> {
 			for(let i = 0; i < copySize; i++){
 				this.root[index + i] = this.root[index + i + length];
 			}
-			//__move(this->root, index, this->root, index + length, copySize);
+			//__move(this.root, index, this.root, index + length, copySize);
 		}
 
 		this.numArray = this.numArray - length;
@@ -129,5 +134,62 @@ export class ArrayList<T extends IComparable> {
 		}
 
 		return -1;
+	}
+
+	public sort() : void
+	{
+		if(this.sorted){
+			return;
+		}
+		let length = this.numArray;
+
+		let middle = (length) / 2;
+
+		for (let i = middle; i >= 0; i--) {
+		    this.downheap(i, length - 1);
+		}
+
+		for (let i = length - 1; i > 0; i--) {
+		    this.swap(0, i);
+		    this.downheap(0, i - 1);
+		}
+		this.sorted = true;
+	}
+
+	private downheap(rootDefault : number, leaf : number) : void
+	{
+		let root = rootDefault;
+		let left = (root + 1) * 2 - 1;
+		let right = left + 1;
+		let leafMax  = null;
+		let rootValue = null;
+		let _root = this.root;
+
+		while (left <= leaf) {
+			if(right <= leaf){ // The tree has right
+				left = this.compare(_root[left], _root[right]) < 0 ? right : left;
+			}
+
+			leafMax = _root[left];
+			rootValue = _root[root];
+
+			if(this.compare(leafMax, rootValue) < 0){
+				return;
+			}
+
+			this.swap(root, left);
+			//debugPrint("swap() :");
+
+			// next status
+			root = left;
+			left = (root + 1) * 2 - 1;
+			right = left + 1;
+		}
+	}
+	private swap(i : number, j : number) : void
+	{
+		let tmp = this.root[i];
+		this.root[i] = this.root[j];
+		this.root[j] = tmp;
 	}
 }
