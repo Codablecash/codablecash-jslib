@@ -5,7 +5,7 @@ import { BlockHeader } from "../bc_block/BlockHeader";
 import { BlockHeadElement } from "./BlockHeadElement";
 import { BlockHeadElementPadding } from "./BlockHeadElementPadding";
 
-export class BlockHead {
+export class BlockHead implements IComparable{
     private list : ArrayList<BlockHeadElement>;
 
     constructor(){
