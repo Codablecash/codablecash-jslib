@@ -1,3 +1,4 @@
+import { NullPointerException } from "../../db/base/NullPointerException";
 import { BtreeScanner } from "../../db/btree/BtreeScanner";
 import { AbstractBlockchainTransaction } from "../bc_trx/AbstractBlockchainTransaction";
 import { TransactionId } from "../bc_trx/TransactionId";
@@ -43,6 +44,9 @@ export class WalletMemoryPoolScanner {
 			retTrx = this.pool.getBlockchainTransaction(this.trxId);
 		}
 
-		return retTrx;
+		if(retTrx != null){
+			return retTrx;
+		}
+		throw new NullPointerException("WalletMemoryPoolScanner.next()");
 	}
 }

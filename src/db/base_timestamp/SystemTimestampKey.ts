@@ -1,3 +1,4 @@
+import { NullPointerException } from "../base/NullPointerException";
 import { ByteBuffer } from "../base_io/ByteBuffer";
 import { AbstractBtreeKey } from "../btree/AbstractBtreeKey";
 import { IBlockObject } from "../filestore_block/IBlockObject";
@@ -58,6 +59,12 @@ export class SystemTimestampKey extends AbstractBtreeKey {
         return new SystemTimestampKey(this.tm);
     }
 
+    public getRemoveKey() : IBlockObject {
+        if(this.removeKey != null){
+            return this.removeKey;
+        }
+        throw new NullPointerException("SystemTimestampKey.getRemoveKey()");
+    }
     public setRemoveKey(rkey : IBlockObject) : void {
         this.removeKey = null;
         this.removeKey = rkey.copyData();
