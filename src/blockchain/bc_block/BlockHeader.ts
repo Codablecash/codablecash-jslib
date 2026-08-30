@@ -57,7 +57,9 @@ export class BlockHeader implements IBlockObject, IComparable {
 
         this.commnads = new ArrayList<AbstractBlockHeaderCommand>();       
     }
-
+    public getVotePart() {
+        return this.votePart;
+    }
     public compareTo(other: IComparable | null): number {
         let o = <BlockHeader>other;
         if(o == null || o.id == null){

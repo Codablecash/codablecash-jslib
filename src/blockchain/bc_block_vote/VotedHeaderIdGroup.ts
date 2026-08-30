@@ -13,6 +13,10 @@ export class VotedHeaderIdGroup {
         this.trxIdList = new ArrayList<TransactionId>();
     }
 
+    public size() : number {
+        return this.trxIdList.size();
+    }
+
     public getBlockHeaderId() : BlockHeaderId {
         return this.votedHeaderId;
     }
