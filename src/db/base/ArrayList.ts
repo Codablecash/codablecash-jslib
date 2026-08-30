@@ -91,6 +91,11 @@ export class ArrayList<T extends IComparable> {
 		return this.numArray == 0;
 	}
 
+	public pop() : T | null {
+		let topindex = this.numArray - 1;
+		return this.remove(topindex);
+	}
+
     public remove(index : number) : T | null
 	{
 		let ptr = this.get(index);
