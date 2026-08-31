@@ -63,6 +63,4 @@ export class BlockStack {
             element.next();
         }
     }
-
-    // TODO
 }

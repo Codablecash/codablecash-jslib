@@ -46,7 +46,7 @@ export class BlockHeaderStoreCache {
             cache.create();
         }
 
-        cache.init(); // open
+        cache.open(); // open
         this.list.__add(0, cache);
 
         return cache;
