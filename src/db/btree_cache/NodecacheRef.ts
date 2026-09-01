@@ -14,8 +14,11 @@ export class NodecacheRef implements IComparable{
         return this.node;
     }
 
-    compareTo(other: IComparable | null): number {
+    public compareTo(other: IComparable | null): number {
         let ref = <NodecacheRef>other;
+        if(ref == null){
+            return 1;
+        }
 
         return this.node.getFpos() - ref.node.getFpos();
     }

@@ -1,14 +1,28 @@
 import { MinusToken } from "typescript";
 import { ByteBuffer } from "../base_io/ByteBuffer";
+import { IComparable } from "../base/IComparable";
 
 
-export class LongRange {
+export class LongRange implements IComparable {
     private min : number;
     private max : number;
 
     constructor(min : number, max : number) {
         this.min = min;
         this.max = max;
+    }
+    
+    public compareTo(other: IComparable | null): number {
+        let o = <LongRange>other;
+        if(o == null){
+            return 1;
+        }
+
+        let diff = this.min - o.min;
+        if(diff != 0){
+            return diff;
+        }
+        return this.max - o.max;
     }
 
     public getMin() : number {

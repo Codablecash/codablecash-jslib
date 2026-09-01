@@ -40,6 +40,13 @@ export class HdWallet {
 		return wallet;
 	}
 
+	public static loadWallet(dir : CFile, encoder : IWalletDataEncoder) : HdWallet {
+		let wallet = new HdWallet(dir);
+		wallet.load(encoder);
+
+		return wallet;
+	}
+
 	public setSeed(seed : HdWalletSeed, encoder : IWalletDataEncoder) : void {
 		this.encodedSeed = seed.encodedSeed(encoder);
 	}
@@ -82,6 +89,12 @@ export class HdWallet {
 		}
 
 		this.defaultZone = this.store.getShortValue(HdWallet.KEY_DEFAULT_ZONE);
+	}
+
+	public close() : void {
+		if(this.encodedSeed != null){
+			this.encodedSeed = null;
+		}
 	}
 
 	public getRootSeed(encoder : IWalletDataEncoder) : HdWalletSeed {

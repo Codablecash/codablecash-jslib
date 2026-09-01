@@ -40,7 +40,7 @@ export class BlockHeaderStoreCacheElement implements IComparable {
 		return this.index;
 	}
 
-    public init() : void {
+    public open() : void {
         this.store = new BlockHeaderStore(this.index, this.baseDir, this.cacheManager);
         this.heightIndex = new BlockHeaderHeightIndex(this.index, this.baseDir, this.cacheManager);
 
@@ -166,7 +166,7 @@ export class BlockHeaderStoreCacheElement implements IComparable {
         }
     }
 
-    public finalize(height : number, headerId : BlockHeaderId, notifier : IHeaderRemovalNotifier) : void {
+    public finalize(height : number, headerId : BlockHeaderId, notifier : IHeaderRemovalNotifier | null) : void {
         if(this.store != null && this.heightIndex != null) {
             let list = this.heightIndex.getHeadersAtHeight(height);
 

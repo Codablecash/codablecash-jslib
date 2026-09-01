@@ -101,7 +101,7 @@ export class BlockHeaderStoreManager {
         return currentHeader;
     }
 
-    public finalize(height : number, headerId : BlockHeaderId, notifier : IHeaderRemovalNotifier) {
+    public finalize(height : number, headerId : BlockHeaderId, notifier : IHeaderRemovalNotifier | null) {
         let cache = this.cache.getHeaderStoreCacheElement(height, false);
         cache.finalize(height, headerId, notifier);
     }

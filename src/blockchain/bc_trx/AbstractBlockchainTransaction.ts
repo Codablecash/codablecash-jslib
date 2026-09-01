@@ -1,3 +1,4 @@
+import { IComparable } from "../../db/base/IComparable";
 import { NullPointerException } from "../../db/base/NullPointerException";
 import { ByteBuffer } from "../../db/base_io/ByteBuffer";
 import { SystemTimestamp } from "../../db/base_timestamp/SystemTimestamp";
@@ -17,11 +18,13 @@ import { GenesisTransaction } from "../bc_trx_genesis/GenesisTransaction";
 import { MerkleTree } from "../merkletree/MerkleTree";
 import { AbstractUtxo } from "./AbstractUtxo";
 import { AbstractUtxoReference } from "./AbstractUtxoReference";
+import { IAddressChecker } from "./IAddressChecker";
+import { IUtxoRefChecker } from "./IUtxoRefChecker";
 import { TransactionId } from "./TransactionId";
 import { TransactionVersion } from "./TransactionVersion";
 
 
-export abstract class AbstractBlockchainTransaction implements IBlockObject{
+export abstract class AbstractBlockchainTransaction implements IBlockObject, IComparable{
     public static readonly TRX_TYPE_GENESIS = 1;
     public static readonly TRX_TYPE_BANANCE_TRANSFER = 2;
 
@@ -101,6 +104,21 @@ export abstract class AbstractBlockchainTransaction implements IBlockObject{
         this.version = new TransactionVersion(1, 0 , 0);        
     }
 
+    public compareTo(other: IComparable | null): number {
+        let o = <AbstractBlockchainTransaction>other;
+        if(o == null || o.trxId == null){
+            if(this.trxId == null){
+                return 0;
+            }
+            return 1;
+        }
+        if(this.trxId == null){
+            return -1;
+        }
+
+        return this.trxId.compareTo(o.trxId);
+    }
+
 	public getTransactionId() : TransactionId {
         if(this.trxId != null){
             return this.trxId;
@@ -141,4 +159,36 @@ export abstract class AbstractBlockchainTransaction implements IBlockObject{
 
     }
 
+    public checkFilteredUxtoRef(utxoRefChecker : IUtxoRefChecker) : boolean {
+        let ret = false;
+
+        let maxLoop = this.getUtxoReferenceSize();
+        for(let i = 0; i != maxLoop; ++i){
+            let ref = this.getUtxoReference(i);
+
+            if(utxoRefChecker.checkUtxo(ref)){
+                ret = true;
+                break;
+            }
+        }
+
+        return ret;
+    }
+
+    public checkFilteredAddress(addressChecker : IAddressChecker) : boolean {
+        let ret = false;
+
+        let maxLoop = this.getUtxoSize();
+        for(let i = 0; i != maxLoop; ++i){
+            let utxo = this.getUtxo(i);
+            let desc = utxo.getAddress();
+
+            if(addressChecker.checkAddress(desc)){
+                ret = true;
+                break;
+            }
+        }
+
+        return ret;
+    }
 }

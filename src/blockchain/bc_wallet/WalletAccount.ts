@@ -1,3 +1,4 @@
+import { IMuSigSigner } from "../../base/musig/IMuSigSigner";
 import { ArrayList } from "../../db/base/ArrayList";
 import { NullPointerException } from "../../db/base/NullPointerException";
 import { CFile } from "../../db/base_io/CFile";
@@ -7,9 +8,20 @@ import { BalanceUnit } from "../bc_base/BalanceUnit";
 import { StatusStore } from "../bc_base_conf_store/StatusStore";
 import { TransactionData } from "../bc_base_trx_index/TransactionData";
 import { AbstractBlockchainTransaction } from "../bc_trx/AbstractBlockchainTransaction";
+import { IAddressChecker } from "../bc_trx/IAddressChecker";
 import { TransactionId } from "../bc_trx/TransactionId";
 import { IWalletDataEncoder } from "../bc_wallet_encoder/IWalletDataEncoder";
 import { BloomFilter1024 } from "../bc_wallet_filter/BloomFilter1024";
+import { AbstractWalletTransactionHandler } from "../bc_wallet_trx/AbstractWalletTransactionHandler";
+import { BalanceTransactionWalletHandler } from "../bc_wallet_trx/BalanceTransactionWalletHandler";
+import { CoinbaseTransactionWalletHandler } from "../bc_wallet_trx/CoinbaseTransactionWalletHandler";
+import { GenesisTransactionHandler } from "../bc_wallet_trx/GenesisTransactionHandler";
+import { RegisterTicketTransactionWalletHandler } from "../bc_wallet_trx/RegisterTicketTransactionWalletHandler";
+import { RegisterVotePoolTransactionWalletHandler } from "../bc_wallet_trx/RegisterVotePoolTransactionWalletHandler";
+import { RevokeMissedTicketWalletHandler } from "../bc_wallet_trx/RevokeMissedTicketWalletHandler";
+import { RevokeMissVotedTicketWalletHandler } from "../bc_wallet_trx/RevokeMissVotedTicketWalletHandler";
+import { StakeBaseTransactionWalletHandler } from "../bc_wallet_trx/StakeBaseTransactionWalletHandler";
+import { VoteBlockTransactionWalletHandler } from "../bc_wallet_trx/VoteBlockTransactionWalletHandler";
 import { WalletAccountTrxRepository } from "../bc_wallet_trx_repo/WalletAccountTrxRepository";
 import { AbstractAddressStore } from "./AbstractAddressStore";
 import { AbstractWalletAccount } from "./AbstractWalletAccount";
@@ -17,7 +29,7 @@ import { ChangeAddressStore } from "./ChangeAddressStore";
 import { HdWalletSeed } from "./HdWalletSeed";
 import { ReceivingAddressStore } from "./ReceivingAddressStore";
 
-export class WalletAccount extends AbstractWalletAccount {
+export class WalletAccount extends AbstractWalletAccount implements IAddressChecker {
 	public static STORE_NAME = "WalletAccount";
 	public static KEY_ENCRYPTED_SEED = "encryptedSeed";
 
@@ -62,6 +74,18 @@ export class WalletAccount extends AbstractWalletAccount {
 		throw new NullPointerException("WalletAccount.getWalletAccountTrxRepository()");
 	}
 
+	public getReceivingAddresses() : ReceivingAddressStore {
+        if(this.receivingAddresses != null){
+		    return this.receivingAddresses;
+        }
+        throw new NullPointerException("WalletAccount.getReceivingAddresses()");
+	}
+	public  getChangeAddresses() : ChangeAddressStore {
+        if(this.changeAddresses != null){
+            return this.changeAddresses;
+        }
+		throw new NullPointerException("WalletAccount.getChangeAddresses()");
+	}
 
     public static newAccount(baseDir : CFile, rootSeed : HdWalletSeed, accountIndex : number, zone : number
             , encoder : IWalletDataEncoder, maxAddress : number) : WalletAccount {
@@ -137,7 +161,42 @@ export class WalletAccount extends AbstractWalletAccount {
     public importTransaction(trx : AbstractBlockchainTransaction) : void{
         let type = trx.getType();
 
+        let handler : AbstractWalletTransactionHandler;
+
         switch(type){
+        case AbstractBlockchainTransaction.TRX_TYPE_GENESIS:
+            handler = new GenesisTransactionHandler(this);
+            break;
+        case AbstractBlockchainTransaction.TRX_TYPE_BANANCE_TRANSFER:
+            handler = new BalanceTransactionWalletHandler(this);
+            break;
+        case AbstractBlockchainTransaction.TRX_TYPE_REGISTER_VOTE_POOL:
+            handler = new RegisterVotePoolTransactionWalletHandler(this);
+            break;
+        case AbstractBlockchainTransaction.TRX_TYPE_REGISTER_TICKET:
+            handler = new RegisterTicketTransactionWalletHandler(this);
+            break;
+        case AbstractBlockchainTransaction.TRX_TYPE_VOTE_BLOCK:
+            handler = new VoteBlockTransactionWalletHandler(this);
+            break;
+        case AbstractBlockchainTransaction.TRX_TYPE_REVOKE_MISSED_TICKET:
+            handler = new RevokeMissedTicketWalletHandler(this);
+            break;
+        case AbstractBlockchainTransaction.TRX_TYPE_REVOKE_MISS_VOTED_TICKET:
+            handler = new RevokeMissVotedTicketWalletHandler(this);
+            break;
+        case AbstractBlockchainTransaction.TRX_TYPE_COIN_BASE:
+            handler = new CoinbaseTransactionWalletHandler(this);
+            break;
+        case AbstractBlockchainTransaction.TRX_TYPE_STAKE_BASE:
+            handler = new StakeBaseTransactionWalletHandler(this);
+            break;
+        //case AbstractBlockchainTransaction.TRX_TYPE_SMARTCONTRACT_NOP:
+        //   handler = new SmartcontractNopTransactionWalletHandler(this);
+        //    break;
+        //case AbstractBlockchainTransaction.TRX_TYPE_ICC_NOP:
+        //    handler = new IccNopTransactionWalletHandler(this);
+        //    break;
         default:
             throw new NullPointerException("WalletAccount.importTransaction()");
         }
@@ -269,5 +328,18 @@ export class WalletAccount extends AbstractWalletAccount {
             return this.receivingAddresses.hasAddress(desc) || this.changeAddresses.hasAddress(desc);
         }
         throw new NullPointerException("WalletAccount.checkAddress()");
+    }
+
+    public getSigner(desc : AddressDescriptor, encoder : IWalletDataEncoder) : IMuSigSigner | null {
+        if(this.receivingAddresses != null && this.changeAddresses != null){
+            let signer = this.receivingAddresses.getSigner(desc, encoder);
+            if(signer != null){
+                return signer;
+            }
+
+            signer = this.changeAddresses.getSigner(desc, encoder);
+            return signer;
+        }
+        throw new NullPointerException("WalletAccount.getSigner()");
     }
 }

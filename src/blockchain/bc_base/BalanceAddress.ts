@@ -2,13 +2,14 @@ import { RipeMd160 } from "../../base/crypto/RipeMd160";
 import { Sha256 } from "../../base/crypto/Sha256";
 import { ScPublicKey } from "../../base/ecda/ScPublicKey";
 import { Secp256k1CompressedPoint } from "../../base/ecda/Secp256k1CompressedPoint";
+import { IComparable } from "../../db/base/IComparable";
 import { NullPointerException } from "../../db/base/NullPointerException";
 import { ByteBuffer } from "../../db/base_io/ByteBuffer";
 import { IBlockObject } from "../../db/filestore_block/IBlockObject";
 import { AbstractAddress } from "./AbstractAddress";
 import { AddressDescriptor } from "./AddressDescriptor";
 
-export class BalanceAddress extends AbstractAddress {
+export class BalanceAddress extends AbstractAddress implements IComparable {
     public static readonly PREFIX = "cb";
 
     private pubkey : Secp256k1CompressedPoint | null;
@@ -22,6 +23,20 @@ export class BalanceAddress extends AbstractAddress {
             super(0);
             this.pubkey = null;
         }
+    }
+    compareTo(other: IComparable | null): number {
+        if(other == null || (<BalanceAddress>other).pubkey == null){
+            if(this.pubkey == null){
+                return 0;
+            }
+            return 1;
+        }
+
+        if(this.pubkey != null){
+            let o = <BalanceAddress>other;
+            return this.pubkey.compareTo(o.pubkey);
+        }
+        return -1;
     }
     
     public static createAddress(zone : number, publicKey : ScPublicKey) {

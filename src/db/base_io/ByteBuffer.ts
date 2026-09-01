@@ -2,13 +2,14 @@ import { toBigIntBE, toBufferBE } from "bigint-buffer";
 import { BufferOverflowException } from "./BufferOverflowException";
 import { BigInteger } from "../numeric/BigInteger";
 import bigInt from "big-integer";
+import { IComparable } from "../base/IComparable";
 
 const { Buffer } = require('node:buffer');
 
 /**
  * Bytebuffer with Big Endian
  */
-export class ByteBuffer {
+export class ByteBuffer implements IComparable {
     protected pos : number;
     protected lim : number;
     protected cap : number;
@@ -19,6 +20,14 @@ export class ByteBuffer {
         this.cap = length;
         this.lim = length;
         this.pos = 0;
+    }
+
+    compareTo(other: IComparable | null): number {
+        if(other == null){
+            return 1;
+        }
+
+        return this.binaryCmp(<ByteBuffer>other);
     }
 
     public static wrapWithEndian(data : Uint8Array, length : number, bigEngian : boolean) : ByteBuffer {

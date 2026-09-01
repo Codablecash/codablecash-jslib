@@ -1,9 +1,10 @@
+import { IComparable } from "../../db/base/IComparable";
 import { ByteBuffer } from "../../db/base_io/ByteBuffer";
 import { IBlockObject } from "../../db/filestore_block/IBlockObject";
 import { BigInteger } from "../../db/numeric/BigInteger";
 import { Secp256k1Point } from "./Secp256k1Point";
 
-export class Secp256k1CompressedPoint implements IBlockObject {
+export class Secp256k1CompressedPoint implements IBlockObject, IComparable {
     public static readonly COMPRESS_Y_EVEN : number = 2;
     public static readonly COMPRESS_Y_ODD : number = 3;
 
@@ -13,6 +14,20 @@ export class Secp256k1CompressedPoint implements IBlockObject {
     constructor(x : BigInteger, prefix : number) {
         this.x = x.copy();
         this.prefix = prefix;
+    }
+
+    public compareTo(other: IComparable | null): number {
+        if(other == null){
+            return 1;
+        }
+
+        let o = <Secp256k1CompressedPoint>other;
+        let p = this.prefix - o.prefix;
+        if(p != 0){
+            return p;
+        }
+
+        return this.x.compareTo(o.x);
     }
 
     public static compress(pt : Secp256k1Point) : Secp256k1CompressedPoint {

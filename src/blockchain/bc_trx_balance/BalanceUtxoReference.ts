@@ -24,6 +24,10 @@ export class BalanceUtxoReference extends AbstractUtxoReference {
         throw new NullPointerException("BalanceUtxoReference.getXi()");
     }
 
+    public setXi(Xi : Secp256k1CompressedPoint) {
+        this.Xi = <Secp256k1CompressedPoint>Xi.copyData();
+    }
+
     public binarySize(): number {
         if(this.Xi != null && this.utxoId != null && this.bloomHash != null){
             let total = 1; //sizeof(uint8_t);

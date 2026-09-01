@@ -1,3 +1,4 @@
+import { IComparable } from "../../db/base/IComparable";
 import { BigInteger } from "../../db/numeric/BigInteger";
 import { Secp256k1Point } from "../ecda/Secp256k1Point";
 import { IMuSigSigner } from "./IMuSigSigner";
@@ -11,6 +12,19 @@ export class SimpleMuSigSigner implements IMuSigSigner {
     constructor(x: BigInteger){
         this.x = x.copy();
         this.r = new BigInteger(0n);
+    }
+    public compareTo(other: IComparable | null): number {
+        if(other == null){
+            return 1;
+        }
+
+        let o = <SimpleMuSigSigner>other;
+        let diff = this.x.compareTo(o.x);
+
+        if(diff != 0){
+            return diff;
+        }
+        return this.r.compareTo(o.r);
     }
 
     public getxG() : Secp256k1Point {

@@ -18,6 +18,10 @@ export class SystemTimestamp {
         }        
     }
 
+    public copy() : SystemTimestamp{
+        return new SystemTimestamp(this.sec, this.usec);
+    }
+
     public binarySize() : number {
         let total = 8;
         total += 4;

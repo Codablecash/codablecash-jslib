@@ -113,4 +113,8 @@ export class BalanceUtxo extends AbstractUtxo {
 
         this.amount.subSelf(feeRemain);
     }
+
+    public setAmount(amount : BalanceUnit) : void {
+        this.amount = amount;
+    }
 }

@@ -1,5 +1,6 @@
 import { Sha256 } from "../../base/crypto/Sha256";
 import { ArrayList } from "../../db/base/ArrayList";
+import { IComparable } from "../../db/base/IComparable";
 import { ByteBuffer } from "../../db/base_io/ByteBuffer";
 import { SystemTimestamp } from "../../db/base_timestamp/SystemTimestamp";
 import { IBlockObject } from "../../db/filestore_block/IBlockObject";
@@ -12,7 +13,7 @@ import { BlockHeaderId } from "./BlockHeaderId";
 import { BlockMerkleRoot } from "./BlockMerkleRoot";
 import { BlockVersion } from "./BlockVersion";
 
-export class BlockHeader implements IBlockObject {
+export class BlockHeader implements IBlockObject, IComparable {
 	private version : BlockVersion;
 
 	private zone : number;
@@ -56,7 +57,24 @@ export class BlockHeader implements IBlockObject {
 
         this.commnads = new ArrayList<AbstractBlockHeaderCommand>();       
     }
+    public getVotePart() {
+        return this.votePart;
+    }
 
+    public compareTo(other: IComparable | null): number {
+        let o = <BlockHeader>other;
+        if(o == null || o.id == null){
+            if(this.id == null){
+                return 0;
+            }
+            return 1;
+        }
+        if(this.id == null){
+            return -1;
+        }
+
+        return this.id.compareTo(o.id);
+    }
 
     public binarySize() : number {
         let total = this.version.binarySize() + 2 + 8;
@@ -196,6 +214,12 @@ export class BlockHeader implements IBlockObject {
         this.setHeaderId(newId);
     }
 
+    public isFinalizing(votePerBlock : number) :boolean {
+        let group = this.votePart.getMaxVotedGroup();
+
+        return group != null && group.size() == votePerBlock;
+    }
+
     public copyData() : IBlockObject {
         let size = this.binarySize();
 
@@ -222,10 +246,19 @@ export class BlockHeader implements IBlockObject {
         this.id = id;
     }
 
+    public setTimestamp(tm : SystemTimestamp) : void {
+        this.timestamp = tm.copy();
+    }
+
     public getId() {
         return this.id;
     }
-
+    public getZone() : number {
+		return this.zone;
+	}
+	public getTimestamp() : SystemTimestamp {
+		return this.timestamp;
+	}
     public getHeight() : number {
         return this.height;
     }
