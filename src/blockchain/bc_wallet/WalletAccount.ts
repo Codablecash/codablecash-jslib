@@ -12,6 +12,8 @@ import { IAddressChecker } from "../bc_trx/IAddressChecker";
 import { TransactionId } from "../bc_trx/TransactionId";
 import { IWalletDataEncoder } from "../bc_wallet_encoder/IWalletDataEncoder";
 import { BloomFilter1024 } from "../bc_wallet_filter/BloomFilter1024";
+import { AbstractWalletTransactionHandler } from "../bc_wallet_trx/AbstractWalletTransactionHandler";
+import { GenesisTransactionHandler } from "../bc_wallet_trx/GenesisTransactionHandler";
 import { WalletAccountTrxRepository } from "../bc_wallet_trx_repo/WalletAccountTrxRepository";
 import { AbstractAddressStore } from "./AbstractAddressStore";
 import { AbstractWalletAccount } from "./AbstractWalletAccount";
@@ -151,7 +153,16 @@ export class WalletAccount extends AbstractWalletAccount implements IAddressChec
     public importTransaction(trx : AbstractBlockchainTransaction) : void{
         let type = trx.getType();
 
+        let handler : AbstractWalletTransactionHandler;
+
         switch(type){
+        case AbstractBlockchainTransaction.TRX_TYPE_GENESIS:
+            handler = new GenesisTransactionHandler(this);
+            break;
+        case AbstractBlockchainTransaction.TRX_TYPE_BANANCE_TRANSFER:
+            handler = new BalanceTransactionWalletHandler(this);
+            break;
+            // TODO importTransaction
         default:
             throw new NullPointerException("WalletAccount.importTransaction()");
         }

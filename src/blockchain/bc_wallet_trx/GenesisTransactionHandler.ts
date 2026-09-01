@@ -7,7 +7,7 @@ import { WalletAccount } from "../bc_wallet/WalletAccount";
 import { WalletAccountTrxRepository } from "../bc_wallet_trx_repo/WalletAccountTrxRepository";
 import { AbstractWalletTransactionHandler } from "./AbstractWalletTransactionHandler";
 
-class GenesisTransactionHandler extends AbstractWalletTransactionHandler {
+export class GenesisTransactionHandler extends AbstractWalletTransactionHandler {
 
     constructor(account : WalletAccount){
         super(account);

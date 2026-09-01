@@ -2,7 +2,7 @@ import { AbstractBlockchainTransaction } from "../bc_trx/AbstractBlockchainTrans
 import { WalletAccount } from "../bc_wallet/WalletAccount";
 import { AbstractWalletTransactionHandler } from "./AbstractWalletTransactionHandler";
 
-class CoinbaseTransactionWalletHandler extends AbstractWalletTransactionHandler {
+export class CoinbaseTransactionWalletHandler extends AbstractWalletTransactionHandler {
     constructor(account : WalletAccount){
         super(account);
     }
