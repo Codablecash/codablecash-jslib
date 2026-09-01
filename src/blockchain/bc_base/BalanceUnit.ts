@@ -65,4 +65,18 @@ export class BalanceUnit implements IBlockObject {
         this.amount += val.amount;
         return this; 
     }
+
+    public static multiply(a : BalanceUnit, b : BalanceUnit) : BalanceUnit {
+        let val = a.amount * b.amount;
+        return new BalanceUnit(val);
+    }
+
+    public static add(a : BalanceUnit, b : BalanceUnit) : BalanceUnit {
+        let val = a.amount + b.amount;
+        return new BalanceUnit(val);
+    }
+    public static minus(a : BalanceUnit, b : BalanceUnit) : BalanceUnit {
+        let val = a.amount - b.amount;
+        return new BalanceUnit(val);
+    }
 }
