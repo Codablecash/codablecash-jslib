@@ -512,6 +512,4 @@ export class NetworkWalletData {
 	public getFinalizedHeight() : number {
 		return this.finalizedHeight;
 	}
-
-    // TODO implement
 }
