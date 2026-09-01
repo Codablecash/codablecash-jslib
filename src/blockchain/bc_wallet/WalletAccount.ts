@@ -15,6 +15,7 @@ import { BloomFilter1024 } from "../bc_wallet_filter/BloomFilter1024";
 import { AbstractWalletTransactionHandler } from "../bc_wallet_trx/AbstractWalletTransactionHandler";
 import { BalanceTransactionWalletHandler } from "../bc_wallet_trx/BalanceTransactionWalletHandler";
 import { GenesisTransactionHandler } from "../bc_wallet_trx/GenesisTransactionHandler";
+import { RegisterVotePoolTransactionWalletHandler } from "../bc_wallet_trx/RegisterVotePoolTransactionWalletHandler";
 import { WalletAccountTrxRepository } from "../bc_wallet_trx_repo/WalletAccountTrxRepository";
 import { AbstractAddressStore } from "./AbstractAddressStore";
 import { AbstractWalletAccount } from "./AbstractWalletAccount";
