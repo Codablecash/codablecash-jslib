@@ -14,9 +14,14 @@ import { IWalletDataEncoder } from "../bc_wallet_encoder/IWalletDataEncoder";
 import { BloomFilter1024 } from "../bc_wallet_filter/BloomFilter1024";
 import { AbstractWalletTransactionHandler } from "../bc_wallet_trx/AbstractWalletTransactionHandler";
 import { BalanceTransactionWalletHandler } from "../bc_wallet_trx/BalanceTransactionWalletHandler";
+import { CoinbaseTransactionWalletHandler } from "../bc_wallet_trx/CoinbaseTransactionWalletHandler";
 import { GenesisTransactionHandler } from "../bc_wallet_trx/GenesisTransactionHandler";
 import { RegisterTicketTransactionWalletHandler } from "../bc_wallet_trx/RegisterTicketTransactionWalletHandler";
 import { RegisterVotePoolTransactionWalletHandler } from "../bc_wallet_trx/RegisterVotePoolTransactionWalletHandler";
+import { RevokeMissedTicketWalletHandler } from "../bc_wallet_trx/RevokeMissedTicketWalletHandler";
+import { RevokeMissVotedTicketWalletHandler } from "../bc_wallet_trx/RevokeMissVotedTicketWalletHandler";
+import { StakeBaseTransactionWalletHandler } from "../bc_wallet_trx/StakeBaseTransactionWalletHandler";
+import { VoteBlockTransactionWalletHandler } from "../bc_wallet_trx/VoteBlockTransactionWalletHandler";
 import { WalletAccountTrxRepository } from "../bc_wallet_trx_repo/WalletAccountTrxRepository";
 import { AbstractAddressStore } from "./AbstractAddressStore";
 import { AbstractWalletAccount } from "./AbstractWalletAccount";
@@ -171,7 +176,27 @@ export class WalletAccount extends AbstractWalletAccount implements IAddressChec
         case AbstractBlockchainTransaction.TRX_TYPE_REGISTER_TICKET:
             handler = new RegisterTicketTransactionWalletHandler(this);
             break;
-            // TODO importTransaction
+        case AbstractBlockchainTransaction.TRX_TYPE_VOTE_BLOCK:
+            handler = new VoteBlockTransactionWalletHandler(this);
+            break;
+        case AbstractBlockchainTransaction.TRX_TYPE_REVOKE_MISSED_TICKET:
+            handler = new RevokeMissedTicketWalletHandler(this);
+            break;
+        case AbstractBlockchainTransaction.TRX_TYPE_REVOKE_MISS_VOTED_TICKET:
+            handler = new RevokeMissVotedTicketWalletHandler(this);
+            break;
+        case AbstractBlockchainTransaction.TRX_TYPE_COIN_BASE:
+            handler = new CoinbaseTransactionWalletHandler(this);
+            break;
+        case AbstractBlockchainTransaction.TRX_TYPE_STAKE_BASE:
+            handler = new StakeBaseTransactionWalletHandler(this);
+            break;
+        //case AbstractBlockchainTransaction.TRX_TYPE_SMARTCONTRACT_NOP:
+        //   handler = new SmartcontractNopTransactionWalletHandler(this);
+        //    break;
+        //case AbstractBlockchainTransaction.TRX_TYPE_ICC_NOP:
+        //    handler = new IccNopTransactionWalletHandler(this);
+        //    break;
         default:
             throw new NullPointerException("WalletAccount.importTransaction()");
         }
