@@ -214,6 +214,12 @@ export class BlockHeader implements IBlockObject, IComparable {
         this.setHeaderId(newId);
     }
 
+    public isFinalizing(votePerBlock : number) :boolean {
+        let group = this.votePart.getMaxVotedGroup();
+
+        return group != null && group.size() == votePerBlock;
+    }
+
     public copyData() : IBlockObject {
         let size = this.binarySize();
 

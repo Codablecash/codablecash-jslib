@@ -274,7 +274,7 @@ export class NetworkWalletData {
 				//assert(header != null);
 
 				if(header != null){ // guard
-					list.addElement(<BlockHeader>(header.copyData()), 0);
+					list.setElement(<BlockHeader>(header.copyData()), 0);
 
 					// last header
 					currentHeaderId = <BlockHeaderId>(header.getLastHeaderId().copyData());
@@ -353,7 +353,7 @@ export class NetworkWalletData {
 		this.detector.buildHeads(this.zone, this, this.finalizedHeight);
 
 		// evaluate
-		this.detector.evaluate(this.zone, null, this, this.config, true);
+		this.detector.evaluate(this.zone, this, this.config);
 		this.detector.selectChain();
 	}
 
@@ -501,7 +501,7 @@ export class NetworkWalletData {
 					let trx = list.get(i);
 
 					// check trx contains address
-					if(trx.checkFilteredUxtoRef(ma) || trx.checkFilteredAddress(waccount)){
+					if(trx != null && (trx.checkFilteredUxtoRef(ma) || trx.checkFilteredAddress(waccount))){
 						ma.addTransaction(trx, waccount);
 					}
 				}

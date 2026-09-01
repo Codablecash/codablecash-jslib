@@ -88,4 +88,20 @@ export class VotePart {
 
         return part;
     }
+
+    public getMaxVotedGroup() : VotedHeaderIdGroup | null{
+        let retGroup : VotedHeaderIdGroup | null = null;
+        let lastsize = 0;
+
+        for(const headerId of this.map.keys()){
+            let group = this.map.get(headerId);
+
+            if(group != undefined && lastsize < group.size()){
+                retGroup = group;
+                lastsize = group.size();
+            }
+        }
+
+        return retGroup;
+    }
 }

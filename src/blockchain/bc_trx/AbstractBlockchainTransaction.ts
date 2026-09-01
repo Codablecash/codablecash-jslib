@@ -18,6 +18,8 @@ import { GenesisTransaction } from "../bc_trx_genesis/GenesisTransaction";
 import { MerkleTree } from "../merkletree/MerkleTree";
 import { AbstractUtxo } from "./AbstractUtxo";
 import { AbstractUtxoReference } from "./AbstractUtxoReference";
+import { IAddressChecker } from "./IAddressChecker";
+import { IUtxoRefChecker } from "./IUtxoRefChecker";
 import { TransactionId } from "./TransactionId";
 import { TransactionVersion } from "./TransactionVersion";
 
@@ -157,4 +159,36 @@ export abstract class AbstractBlockchainTransaction implements IBlockObject, ICo
 
     }
 
+    public checkFilteredUxtoRef(utxoRefChecker : IUtxoRefChecker) : boolean {
+        let ret = false;
+
+        let maxLoop = this.getUtxoReferenceSize();
+        for(let i = 0; i != maxLoop; ++i){
+            let ref = this.getUtxoReference(i);
+
+            if(utxoRefChecker.checkUtxo(ref)){
+                ret = true;
+                break;
+            }
+        }
+
+        return ret;
+    }
+
+    public checkFilteredAddress(addressChecker : IAddressChecker) : boolean {
+        let ret = false;
+
+        let maxLoop = this.getUtxoSize();
+        for(let i = 0; i != maxLoop; ++i){
+            let utxo = this.getUtxo(i);
+            let desc = utxo.getAddress();
+
+            if(addressChecker.checkAddress(desc)){
+                ret = true;
+                break;
+            }
+        }
+
+        return ret;
+    }
 }
