@@ -8,7 +8,7 @@ export abstract class AbstractTransferedData {
 
 	public static  DATA_LIVEDATA = 10;
 
-    private type : number;
+    protected type : number;
 
     constructor(type : number){
         this.type = type;
