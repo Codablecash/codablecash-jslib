@@ -273,5 +273,4 @@ export class BalanceTransactionWalletHandler extends AbstractWalletTransactionHa
             trxRepo.importTransaction(trx);
         }
     }
-    // TODO
 }

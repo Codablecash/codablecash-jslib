@@ -15,6 +15,7 @@ import { BloomFilter1024 } from "../bc_wallet_filter/BloomFilter1024";
 import { AbstractWalletTransactionHandler } from "../bc_wallet_trx/AbstractWalletTransactionHandler";
 import { BalanceTransactionWalletHandler } from "../bc_wallet_trx/BalanceTransactionWalletHandler";
 import { GenesisTransactionHandler } from "../bc_wallet_trx/GenesisTransactionHandler";
+import { RegisterTicketTransactionWalletHandler } from "../bc_wallet_trx/RegisterTicketTransactionWalletHandler";
 import { RegisterVotePoolTransactionWalletHandler } from "../bc_wallet_trx/RegisterVotePoolTransactionWalletHandler";
 import { WalletAccountTrxRepository } from "../bc_wallet_trx_repo/WalletAccountTrxRepository";
 import { AbstractAddressStore } from "./AbstractAddressStore";
@@ -166,6 +167,9 @@ export class WalletAccount extends AbstractWalletAccount implements IAddressChec
             break;
         case AbstractBlockchainTransaction.TRX_TYPE_REGISTER_VOTE_POOL:
             handler = new RegisterVotePoolTransactionWalletHandler(this);
+            break;
+        case AbstractBlockchainTransaction.TRX_TYPE_REGISTER_TICKET:
+            handler = new RegisterTicketTransactionWalletHandler(this);
             break;
             // TODO importTransaction
         default:
