@@ -10,7 +10,7 @@ export class ManagementAccountsCollection {
 	public static readonly POS_UNFINALIZED = 1;
 	public static readonly POS_MEMPOOL = 2;
 
-    static RECORD_SOTRE_TYPE_TO_INXED(storeType : number) : number {
+    public static RECORD_SOTRE_TYPE_TO_INXED(storeType : number) : number {
         return storeType - 1;
     }
 

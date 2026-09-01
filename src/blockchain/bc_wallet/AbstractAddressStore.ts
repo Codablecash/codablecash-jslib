@@ -106,31 +106,7 @@ export class AbstractAddressStore {
         throw new NullPointerException("AbstractAddressStore.createNewAddressAndPrivateKey()");
     }
 
-    public getSigner(desc : AddressDescriptor, encoder : IWalletDataEncoder) : IMuSigSigner {
-        let ret = null;
-
-        let maxLoop = this.list.size();
-        for(let i = 0; i != maxLoop; ++i){
-            let key = this.list.get(i);
-
-            if(key != null){
-                let address = key.getAddress();
-                let descriptor = address.toAddressDescriptor();
-                if(desc.compareTo(descriptor) == 0){
-                    let pkey = key.getPrivateKey();
-                    ret = new SimpleMuSigSigner(pkey.getKeyvalue());
-                    break;
-                }
-            }
-        }
-
-        if(ret != null){
-            return ret;
-        }
-        throw new NullPointerException("AbstractAddressStore.getSigner()");
-    }
-
-    protected __save() {
+     protected __save() {
         this.store.addShortValue(AbstractAddressStore.KEY_ZONE, this.zone);
 
          if(this.encryptedSeed != null){
@@ -150,5 +126,26 @@ export class AbstractAddressStore {
         }
 
         this.addressSerial = Number(this.store.getLongValue(AbstractAddressStore.KEY_ADDRESS_SERIAL));
+    }
+
+    public getSigner(desc : AddressDescriptor, encoder : IWalletDataEncoder) : IMuSigSigner | null {
+        let ret = null;
+
+        let maxLoop = this.list.size();
+        for(let i = 0; i != maxLoop; ++i){
+            let key = this.list.get(i);
+
+            if(key != null){ // guard
+                let address = key.getAddress();
+                let descriptor = address.toAddressDescriptor();
+                if(desc.compareTo(descriptor) == 0){
+                    let pkey = key.getPrivateKey();
+                    ret = new SimpleMuSigSigner(pkey.getKeyvalue());
+                    break;
+                }
+            }
+        }
+
+        return ret;
     }
 }

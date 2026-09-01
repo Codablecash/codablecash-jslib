@@ -1,3 +1,4 @@
+import { IMuSigSigner } from "../../base/musig/IMuSigSigner";
 import { ArrayList } from "../../db/base/ArrayList";
 import { NullPointerException } from "../../db/base/NullPointerException";
 import { CFile } from "../../db/base_io/CFile";
@@ -270,5 +271,18 @@ export class WalletAccount extends AbstractWalletAccount implements IAddressChec
             return this.receivingAddresses.hasAddress(desc) || this.changeAddresses.hasAddress(desc);
         }
         throw new NullPointerException("WalletAccount.checkAddress()");
+    }
+
+    public getSigner(desc : AddressDescriptor, encoder : IWalletDataEncoder) : IMuSigSigner | null {
+        if(this.receivingAddresses != null && this.changeAddresses != null){
+            let signer = this.receivingAddresses.getSigner(desc, encoder);
+            if(signer != null){
+                return signer;
+            }
+
+            signer = this.changeAddresses.getSigner(desc, encoder);
+            return signer;
+        }
+        throw new NullPointerException("WalletAccount.getSigner()");
     }
 }
