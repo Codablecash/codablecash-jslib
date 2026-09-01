@@ -15,6 +15,10 @@ export class HeaderTransactionGroup{
         this.list = new ArrayList<AbstractBlockchainTransaction>();
     }
 
+    public getTransactionsList() : ArrayList<AbstractBlockchainTransaction> {
+        return this.list;
+    }
+
     public binarySize() : number {
         if(this.headerId != null){
             let total = 0;

@@ -166,7 +166,7 @@ export class BlockHeaderStoreCacheElement implements IComparable {
         }
     }
 
-    public finalize(height : number, headerId : BlockHeaderId, notifier : IHeaderRemovalNotifier) : void {
+    public finalize(height : number, headerId : BlockHeaderId, notifier : IHeaderRemovalNotifier | null) : void {
         if(this.store != null && this.heightIndex != null) {
             let list = this.heightIndex.getHeadersAtHeight(height);
 

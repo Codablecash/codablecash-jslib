@@ -47,6 +47,12 @@ export class TransactionTransferData extends AbstractTransferedData {
     public setTransaction(trx : AbstractBlockchainTransaction) : void {
         this.trx = <AbstractBlockchainTransaction>(trx.copyData());
     }
+    public getTransaction() : AbstractBlockchainTransaction {
+        if(this.trx != null) {
+            return this.trx;
+        }
+        throw new NullPointerException("TransactionTransferData.getTransaction()");
+    }
 
     public getTransferedDataId() : TransferedDataId {
         if(this.trx != null){

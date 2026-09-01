@@ -35,6 +35,13 @@ export class HeadBlockDetector {
         this.secondHead = null;
     }
 
+    public getHead() : BlockHead {
+        if(this.selectedHead != null){
+            return this.selectedHead;
+        }
+        throw new NullPointerException("HeadBlockDetector.getHead()");
+    }
+
     public reset() : void {
         this.headsList.reset();
 

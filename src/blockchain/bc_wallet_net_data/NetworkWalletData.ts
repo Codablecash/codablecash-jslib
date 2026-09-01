@@ -1,3 +1,4 @@
+import { TransactionTransferData } from "../../blockchain_p2p/data_history_data/TransactionTransferData";
 import { ArrayList } from "../../db/base/ArrayList";
 import { NullPointerException } from "../../db/base/NullPointerException";
 import { CFile } from "../../db/base_io/CFile";
@@ -207,11 +208,13 @@ export class NetworkWalletData {
 			for(let i = 0; i != maxLoop; ++i){
 				let ele = elements.get(i);
 
-				let header = ele.getBlockHeader();
-				let height = header.getHeight();
+				if(ele != null){ // guard
+					let header = ele.getBlockHeader();
+					let height = header.getHeight();
 
-				if(height > this.finalizedHeight){
-					list.addElement(header);
+					if(height > this.finalizedHeight){
+						list.addElement(header);
+					}
 				}
 			}
 		}
@@ -222,7 +225,7 @@ export class NetworkWalletData {
 			for(let i = 0; i != maxLoop; ++i){
 				let header = list.get(i);
 
-				if(header.isFinalizing(votePerBlock)){
+				if(header != null && header.isFinalizing(votePerBlock)){
 					this.__doFinalize(header);
 					finalized = true;
 				}
@@ -245,12 +248,14 @@ export class NetworkWalletData {
 		if(this.finalizedHeight < finalizingHeight && this.headerManager != null){
 			let finalizedheader = this.headerManager.getNBlocksBefore(id, includingHeight, beforeHeight);
 
-			let fheaderId = finalizedheader.getId();
-			this.__updateFinalizedData(finalizingHeight, fheaderId);
+			if(finalizedheader != null){ // guard
+				let fheaderId = finalizedheader.getId();
+				this.__updateFinalizedData(finalizingHeight, fheaderId);
 
-			// update
-			this.finalizedHeight = finalizingHeight;
-			this.__saveStatus();
+				// update
+				this.finalizedHeight = finalizingHeight;
+				this.__saveStatus();
+			}
 		}
 	}
 
@@ -260,7 +265,7 @@ export class NetworkWalletData {
 		let list  =new ArrayList<BlockHeader>();
 
 		// make list
-		{
+		if(this.headerManager != null){
 			let height = finalizingHeight;
 			let currentHeaderId = <BlockHeaderId>(finalizingHeaderId.copyData());
 
@@ -268,11 +273,13 @@ export class NetworkWalletData {
 				let header = this.headerManager.getHeader(currentHeaderId, height);
 				//assert(header != null);
 
-				list.addElement(<BlockHeader>(header.copyData()), 0);
+				if(header != null){ // guard
+					list.addElement(<BlockHeader>(header.copyData()), 0);
 
-				// last header
-				currentHeaderId = <BlockHeaderId>(header.getLastHeaderId().copyData());
-				height--;
+					// last header
+					currentHeaderId = <BlockHeaderId>(header.getLastHeaderId().copyData());
+					height--;
+				}
 			}
 		}
 
@@ -286,25 +293,36 @@ export class NetworkWalletData {
 	}
 
 	private __importIntoHdWallet(list : ArrayList<BlockHeader>) : void {
-		let waccount = this.hdWallet.getZoneAccount(this.zone);
+		if(this.hdWallet != null){
+			let waccount = this.hdWallet.getZoneAccount(this.zone);
 
-		// import
-		let maxLoop = list.size();
-		for(let i = 0; i != maxLoop; ++i){
-			let header = list.get(i);
-			let headerId = header.getId();
+			if(waccount != null){ // guard
+				// import
+				let maxLoop = list.size();
+				for(let i = 0; i != maxLoop; ++i){
+					let header = list.get(i);
 
-			let trxGourp = this.transactionGroupData.getHeaderTransactionGroup(headerId);
-			this.__importImportHeaderTransactionGroup(trxGourp, waccount);
+					if(header != null){
+						let headerId = header.getId();
+
+						let trxGourp = this.transactionGroupData.getHeaderTransactionGroup(headerId);
+						this.__importImportHeaderTransactionGroup(trxGourp, waccount);
+					}
+				}
+
+				// clean
+				for(let i = 0; i != maxLoop; ++i){
+					let header = list.get(i);
+
+					if(header != null){
+						let headerId = header.getId();
+
+						this.transactionGroupData.removeHeaderTransactionGroup(headerId);
+					}
+				}
+			}
 		}
 
-		// clean
-		for(let i = 0; i != maxLoop; ++i){
-			let header = list.get(i);
-			let headerId = header.getId();
-
-			this.transactionGroupData.removeHeaderTransactionGroup(headerId);
-		}
 	}
 
 	private __importImportHeaderTransactionGroup(trxGourp : HeaderTransactionGroup, waccount : WalletAccount) : void {
@@ -314,12 +332,17 @@ export class NetworkWalletData {
 		for(let i = 0; i != maxLoop; ++i){
 			let trx = list.get(i);
 
-			waccount.importTransaction(trx);
+			if(trx != null){
+				waccount.importTransaction(trx);
+			}
 		}
 	}
 
 	private __finalizeHeaderStore(height : number, headerId : BlockHeaderId) {
-		this.headerManager.finalize(height, headerId, null);
+		if(this.headerManager != null){
+			this.headerManager.finalize(height, headerId, null);
+		}
+		throw new NullPointerException("transactionGroupData.__finalizeHeaderStore()");
 	}
 
 
@@ -335,22 +358,33 @@ export class NetworkWalletData {
 	}
 
 	private __saveStatus() {
-		this.statusStore.addShortValue(NetworkWalletData.KEY_ZONE, this.zone);
-		this.statusStore.addLongValue(NetworkWalletData.KEY_FINALIZED_HEIGHT, this.finalizedHeight);
+		if(this.statusStore != null){
+			this.statusStore.addShortValue(NetworkWalletData.KEY_ZONE, this.zone);
+			this.statusStore.addLongValue(NetworkWalletData.KEY_FINALIZED_HEIGHT, this.finalizedHeight);
+			return;
+		}
+		throw new NullPointerException("NetworkWalletData.__saveStatus()");
 	}
 
 	private __loadStatus() {
-		this.zone = this.statusStore.getShortValue(NetworkWalletData.KEY_ZONE);
-		this.finalizedHeight = Number(this.statusStore.getLongValue(NetworkWalletData.KEY_FINALIZED_HEIGHT));
+		if(this.statusStore != null){
+			this.zone = this.statusStore.getShortValue(NetworkWalletData.KEY_ZONE);
+			this.finalizedHeight = Number(this.statusStore.getLongValue(NetworkWalletData.KEY_FINALIZED_HEIGHT));
+			return;
+		}
+		throw new NullPointerException("NetworkWalletData.__loadStatus()");
 	}
 
 	public getHeaderManager(zone : number) : BlockHeaderStoreManager {
-		return this.headerManager;
+		if(this.headerManager != null){
+			return this.headerManager;
+		}
+		throw new NullPointerException("NetworkWalletData.getHeaderManager()");
 	}
 
 	public __initStatusStore() : void {
 		if(this.statusStore == null){
-			this.statusStore = new StatusStore(this.baseDir, STATUS_STORE_FILE_NAME);
+			this.statusStore = new StatusStore(this.baseDir, NetworkWalletData.STATUS_STORE_FILE_NAME);
 		}
 	}
 
@@ -371,25 +405,27 @@ export class NetworkWalletData {
 	}
 
 	private __buildMempoolAccount() : void {
-		let waccount = this.hdWallet.getZoneAccount(this.zone);
+		if(this.hdWallet != null){
+			let waccount = this.hdWallet.getZoneAccount(this.zone);
 
-		let uma = this.managementAccounts.getUnFinalizedManagementAccount();
-		let ma = this.managementAccounts.getMempoolManagementAccount();
+			let uma = this.managementAccounts.getUnFinalizedManagementAccount();
+			let ma = this.managementAccounts.getMempoolManagementAccount();
 
-		ma.reset();
-		ma.importOtherAccount(uma);
+			ma.reset();
+			ma.importOtherAccount(uma);
 
-		{
-			// mempool scan
-			let scanner =  this.mempool.getScanner();
-			scanner.begin();
+			if(waccount != null){
+				// mempool scan
+				let scanner =  this.mempool.getScanner();
+				scanner.begin();
 
-			while(scanner.hasNext()){
-				let trx = scanner.next();
-				let trxId = trx.getTransactionId();
+				while(scanner.hasNext()){
+					let trx = scanner.next();
+					let trxId = trx.getTransactionId();
 
-				if(!uma.hasTransaction(trxId)){
-					ma.addTransaction(trx, waccount);
+					if(!uma.hasTransaction(trxId)){
+						ma.addTransaction(trx, waccount);
+					}
 				}
 			}
 		}
@@ -413,9 +449,11 @@ export class NetworkWalletData {
 			let begin = this.finalizedHeight == 0 ? 0 : 1;
 			for(let i = begin; i != maxLoop; ++i){
 				let element = list.get(i);
-				let header = element.getBlockHeader();
 
-				this.__buildManagementAccount4Header(ma, header);
+				if(element != null){ // guard
+					let header = element.getBlockHeader();
+					this.__buildManagementAccount4Header(ma, header);
+				}
 			}
 		}
 	}
@@ -431,15 +469,17 @@ export class NetworkWalletData {
 		if(this.hdWallet != null){ // guard
 			let waccount = this.hdWallet.getZoneAccount(this.zone);
 
-			let list = waccount.getTransactions();
+			if(waccount != null){ // guard
+				let list = waccount.getTransactions();
 
-			// import Hd wallet into Management Account
-			let maxLoop = list.size();
-			for(let i = 0; i != maxLoop; ++i){
-				let trx = list.get(i);
+				// import Hd wallet into Management Account
+				let maxLoop = list.size();
+				for(let i = 0; i != maxLoop; ++i){
+					let trx = list.get(i);
 
-				if(trx != null && trx.checkFilteredUxtoRef(ma) || trx.checkFilteredAddress(waccount)){
-					ma.addTransaction(trx, waccount);
+					if(trx != null && (trx.checkFilteredUxtoRef(ma) || trx.checkFilteredAddress(waccount))){
+						ma.addTransaction(trx, waccount);
+					}
 				}
 			}
 		}
