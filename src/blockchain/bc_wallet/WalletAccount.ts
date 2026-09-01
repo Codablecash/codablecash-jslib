@@ -64,6 +64,18 @@ export class WalletAccount extends AbstractWalletAccount implements IAddressChec
 		throw new NullPointerException("WalletAccount.getWalletAccountTrxRepository()");
 	}
 
+	public getReceivingAddresses() : ReceivingAddressStore {
+        if(this.receivingAddresses != null){
+		    return this.receivingAddresses;
+        }
+        throw new NullPointerException("WalletAccount.getReceivingAddresses()");
+	}
+	public  getChangeAddresses() : ChangeAddressStore {
+        if(this.changeAddresses != null){
+            return this.changeAddresses;
+        }
+		throw new NullPointerException("WalletAccount.getChangeAddresses()");
+	}
 
     public static newAccount(baseDir : CFile, rootSeed : HdWalletSeed, accountIndex : number, zone : number
             , encoder : IWalletDataEncoder, maxAddress : number) : WalletAccount {
