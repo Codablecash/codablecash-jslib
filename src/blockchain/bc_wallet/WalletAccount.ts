@@ -163,6 +163,9 @@ export class WalletAccount extends AbstractWalletAccount implements IAddressChec
         case AbstractBlockchainTransaction.TRX_TYPE_BANANCE_TRANSFER:
             handler = new BalanceTransactionWalletHandler(this);
             break;
+        case AbstractBlockchainTransaction.TRX_TYPE_REGISTER_VOTE_POOL:
+            handler = new RegisterVotePoolTransactionWalletHandler(this);
+            break;
             // TODO importTransaction
         default:
             throw new NullPointerException("WalletAccount.importTransaction()");
